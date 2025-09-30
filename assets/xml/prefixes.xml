@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<racerNamePrefixes>
+<prefixes>
     <item index="0">The</item>
     <item index="1">Inert</item>
     <item index="2">Toe</item>
@@ -2080,4 +2080,4 @@
     <item index="2077">Minimalist</item>
     <item index="2078">Reluctant</item>
     <item index="2079">Reticent</item>
-</racerNamePrefixes>
+</prefixes>

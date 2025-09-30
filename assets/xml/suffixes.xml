@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<racerNameSuffixes>
+<suffixes>
 	<item index="0">Quote</item>
 	<item index="1">Hammer</item>
 	<item index="2">Violation</item>
@@ -2088,4 +2088,4 @@
     <item index="2085">Defiance</item>
     <item index="2086">Rot</item>
     <item index="2087">Diva</item>
-</racerNameSuffixes>
+</suffixes>
