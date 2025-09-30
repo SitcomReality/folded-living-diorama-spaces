@@ -1,3 +1,5 @@
+import { CONSTANTS } from '../config/constants.js';
+
 export function createDefaultSettings(cube) {
     const defaults = {
         portal: '#f5e6d3',
@@ -11,12 +13,15 @@ export function createDefaultSettings(cube) {
         surfaces: {},
         environment: { preset: 'warm', ambientIntensity: 0.6, backgroundColor: '#0a0a0a', groundColor: '#d8d2c7' }
     };
+    // Surfaces that can fold and are visually 'down' (horizontal) in the initial unfolded state
+    const foldingSurfaces = [CONSTANTS.SURFACES.PORTAL, CONSTANTS.SURFACES.BACKDROP, CONSTANTS.SURFACES.WING_LEFT, CONSTANTS.SURFACES.WING_RIGHT];
+
     Object.keys(cube.surfaces).forEach(surfaceName => {
         settings.surfaces[surfaceName] = {
             visible: true,
             color: defaults[surfaceName] || '#ffffff',
             texture: 'solid',
-            orientation: 'down'
+            orientation: foldingSurfaces.includes(surfaceName) ? 'down' : 'up'
         };
     });
     return settings;
