@@ -7,9 +7,10 @@ import { applyPreset, updateAmbientLight, updateBackgroundColor, updateGroundCol
 import { toggleVisibility, updateColor, updateTexture, updateOrientation } from './settings/surfaceControls.js';
 
 export class SettingsManager {
-    constructor(cube, scene) {
+    constructor(cube, scene, saveManager) {
         this.cube = cube;
         this.scene = scene;
+        this.saveManager = saveManager;
         this.panel = document.getElementById('settings-panel');
         this.content = this.panel.querySelector('.settings-content');
         this.openBtn = document.getElementById('settings-btn');
@@ -45,11 +46,20 @@ export class SettingsManager {
             updateColor,
             updateTexture,
             updateOrientation,
-            onSettingsChanged: () => this.renderSettings()
+            onSettingsChanged: () => {
+                this.renderSettings();
+                if (this.saveManager) {
+                    this.saveManager.autoSave();
+                }
+            }
         });
     }
 
     getSettings() { return this.settings; }
+    
+    createDefaultSettings() {
+        return createDefaultSettings(this.cube);
+    }
 
     applySettings(settings) {
         this.settings = settings;

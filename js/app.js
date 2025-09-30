@@ -10,12 +10,14 @@ import { SelectionSystem } from './building/selection.js';
 import { BudgetManager } from './building/budget.js';
 import { DatabaseManager } from './social/database.js';
 import { EconomyManager } from './social/economy.js';
+import { SaveManager } from './social/save.js';
 import { HUDManager } from './ui/hud.js';
 import { ToolbarManager } from './ui/toolbar.js';
 import { InspectorManager } from './ui/inspector.js';
 import { SettingsManager } from './ui/settings.js';
 import { GalleryManager } from './gallery/gallery.js';
 import { TransitionManager } from './gallery/transitions.js';
+import { NamingModal } from './ui/naming.js';
 import { AnimationLoop } from './utils/animation.js';
 
 export class FoldedLivingApp {
@@ -54,18 +56,22 @@ export class FoldedLivingApp {
     setupSocial() {
         this.databaseManager = new DatabaseManager();
         this.economyManager = new EconomyManager();
+        this.saveManager = new SaveManager(this.cube, this.databaseManager);
     }
 
     setupUI() {
-        this.hudManager = new HUDManager(this.economyManager, this.budgetManager);
+        this.namingModal = new NamingModal(this.saveManager);
+        this.hudManager = new HUDManager(this.economyManager, this.budgetManager, this.saveManager, this.namingModal);
         this.toolbarManager = new ToolbarManager(
             document.getElementById('toolbar'),
             (toolId, assetId) => this.onToolSelected(toolId, assetId)
         );
         this.inspectorManager = new InspectorManager();
-        this.settingsManager = new SettingsManager(this.cube, this.scene);
+        this.settingsManager = new SettingsManager(this.cube, this.scene, this.saveManager);
         this.galleryManager = new GalleryManager(this.databaseManager, this.economyManager);
         this.transitionManager = new TransitionManager(this.camera);
+        
+        window.addEventListener('newCube', () => this.resetCube());
     }
 
     setupInput() {
@@ -82,9 +88,13 @@ export class FoldedLivingApp {
             } else if (activeTool === 'place') {
                 if (this.input.didMouseMoveSinceMouseDown()) return;
                 const placed = this.placementSystem.placeObject();
-                if (placed) console.log('Object placed');
+                if (placed) {
+                    console.log('Object placed');
+                    this.saveManager.autoSave();
+                }
             } else if (activeTool === 'delete') {
                 this.selectionSystem.deleteSelected();
+                this.saveManager.autoSave();
             }
         });
         window.addEventListener('keydown', (e) => {
@@ -93,6 +103,7 @@ export class FoldedLivingApp {
                 this.selectionSystem.deselect();
             } else if (e.key === 'Delete' || e.key === 'Backspace') {
                 this.selectionSystem.deleteSelected();
+                this.saveManager.autoSave();
             } else if (e.key === 'g') {
                 this.scene.toggleGrid();
             }
@@ -107,6 +118,12 @@ export class FoldedLivingApp {
             if (reward > 0) {
                 this.hudManager.showNotification(`Daily reward claimed: ${reward} ✨`);
             }
+            
+            const savedData = this.saveManager.loadFromLocalStorage();
+            if (savedData) {
+                this.loadCubeData(savedData);
+            }
+            
             await new Promise(resolve => setTimeout(resolve, 500));
             await this.foldingAnimator.unfold();
             this.animationLoop.add((dt) => this.update(dt));
@@ -117,6 +134,21 @@ export class FoldedLivingApp {
             console.error('Failed to initialize:', error);
             loadingOverlay.innerHTML = '<p>Error loading application</p>';
         }
+    }
+    
+    loadCubeData(data) {
+        // Load cube objects and settings from saved data
+        if (data.objects) {
+            // TODO: Restore placed objects
+        }
+    }
+    
+    resetCube() {
+        // Clear all objects and reset to default state
+        this.cube.placedObjects.forEach(item => {
+            this.cube.removeObject(item.object);
+        });
+        this.settingsManager.applySettings(this.settingsManager.createDefaultSettings());
     }
 
     update() {

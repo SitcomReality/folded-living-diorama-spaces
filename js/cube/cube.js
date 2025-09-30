@@ -120,6 +120,16 @@ export class DioramaCube {
                     x: item.localPosition.x,
                     y: item.localPosition.y,
                     z: item.localPosition.z
+                },
+                rotation: {
+                    x: item.object.rotation.x,
+                    y: item.object.rotation.y,
+                    z: item.object.rotation.z
+                },
+                scale: {
+                    x: item.object.scale.x,
+                    y: item.object.scale.y,
+                    z: item.object.scale.z
                 }
             }))
         };

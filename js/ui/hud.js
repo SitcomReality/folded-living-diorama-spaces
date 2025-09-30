@@ -1,7 +1,9 @@
 export class HUDManager {
-    constructor(economyManager, budgetManager) {
+    constructor(economyManager, budgetManager, saveManager, namingModal) {
         this.economyManager = economyManager;
         this.budgetManager = budgetManager;
+        this.saveManager = saveManager;
+        this.namingModal = namingModal;
         this.sparkleDisplay = document.getElementById('sparkle-count');
         this.budgetDisplay = this.createBudgetDisplay();
         
@@ -42,6 +44,29 @@ export class HUDManager {
         this.budgetManager.subscribe((status) => {
             this.updateBudgetDisplay();
         });
+        
+        const saveBtn = document.getElementById('save-btn');
+        const newCubeBtn = document.getElementById('new-cube-btn');
+        
+        saveBtn.addEventListener('click', () => {
+            const hasName = !!this.saveManager.getCubeName();
+            this.namingModal.show(hasName);
+        });
+        
+        newCubeBtn.addEventListener('click', () => {
+            this.showNewCubeConfirmation();
+        });
+        
+        window.addEventListener('cubeSaved', (e) => {
+            this.showNotification(`Cube saved: ${e.detail.name}`, 'success');
+        });
+    }
+    
+    showNewCubeConfirmation() {
+        if (confirm('Are you sure you want to start a new cube? Any unsaved changes will be lost.')) {
+            this.saveManager.newCube();
+            this.showNotification('Starting new cube', 'info');
+        }
     }
     
     updateSparkleDisplay() {

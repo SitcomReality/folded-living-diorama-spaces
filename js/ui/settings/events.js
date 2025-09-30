@@ -10,6 +10,7 @@ export function attachSettingsEvents(content, ctx) {
         visibleToggle.addEventListener('click', () => {
             ctx.toggleVisibility(ctx.cube, ctx.settings, surfaceName);
             visibleToggle.classList.toggle('active');
+            ctx.onSettingsChanged();
         });
         const colorInput = control.querySelector('[data-control="color"]');
         const colorPreview = control.querySelector('[data-control="color-preview"]');
@@ -17,16 +18,19 @@ export function attachSettingsEvents(content, ctx) {
         colorInput.addEventListener('input', (e) => {
             colorPreview.style.backgroundColor = e.target.value;
             ctx.updateColor(ctx.cube, ctx.settings, surfaceName, e.target.value);
+            ctx.onSettingsChanged();
         });
         const orientationSelect = control.querySelector('[data-control="orientation"]');
         if (orientationSelect) {
             orientationSelect.addEventListener('change', (e) => {
                 ctx.updateOrientation(ctx.cube, ctx.settings, surfaceName, e.target.value);
+                ctx.onSettingsChanged();
             });
         }
         const textureSelect = control.querySelector('[data-control="texture"]');
         textureSelect.addEventListener('change', (e) => {
             ctx.updateTexture(ctx.cube, ctx.settings, surfaceName, e.target.value);
+            ctx.onSettingsChanged();
         });
     });
     // Environment presets
@@ -36,6 +40,7 @@ export function attachSettingsEvents(content, ctx) {
             preset.classList.add('active');
             ctx.settings.environment.preset = preset.dataset.preset;
             ctx.applyPreset(ctx.scene, ctx.settings.environment.preset);
+            ctx.onSettingsChanged();
         });
     });
     // Ambient slider
@@ -46,6 +51,7 @@ export function attachSettingsEvents(content, ctx) {
         ambientValue.textContent = `${Math.round(v*100)}%`;
         ctx.settings.environment.ambientIntensity = v;
         ctx.updateAmbientLight(ctx.scene, v);
+        ctx.onSettingsChanged();
     });
     // Background color
     const bgColorInput = content.querySelector('[data-control="bg-color"]');
@@ -56,6 +62,7 @@ export function attachSettingsEvents(content, ctx) {
         bgColorPreview.style.backgroundColor = color;
         ctx.settings.environment.backgroundColor = color;
         ctx.updateBackgroundColor(ctx.scene, color);
+        ctx.onSettingsChanged();
     });
     const groundColorInput = content.querySelector('[data-control="ground-color"]');
     const groundColorPreview = content.querySelector('[data-control="ground-color-preview"]');
@@ -65,5 +72,6 @@ export function attachSettingsEvents(content, ctx) {
         groundColorPreview.style.backgroundColor = color;
         ctx.settings.environment.groundColor = color;
         ctx.updateGroundColor(ctx.scene, color);
+        ctx.onSettingsChanged();
     });
 }
