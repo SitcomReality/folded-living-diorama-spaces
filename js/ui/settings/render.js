@@ -5,7 +5,7 @@ export function renderSettingsHTML(settings) {
     const surfaceControls = surfaces.map(surfaceName => {
         const s = settings.surfaces[surfaceName];
         const displayName = surfaceName.replace('_', ' ');
-        const hasPivot = ['backdrop','wing_left','wing_right','portal'].includes(surfaceName);
+        const hasPivot = ['backdrop','wing_left','wing_right'].includes(surfaceName);
         return `
         <div class="surface-control" data-surface="${surfaceName}">
           <div class="surface-control-header"><div class="surface-name">${displayName}</div></div>
