@@ -143,12 +143,19 @@ export class PlacementSystem {
         }
         
         object.position.copy(this.previewObject.position);
+        object.rotation.copy(this.previewObject.rotation);
         object.userData.assetId = this.currentAssetId;
         
         // Find which surface this is on
         const surfaceName = this.findSurfaceForPosition(object.position);
         if (surfaceName) {
             const localPos = this.worldToLocal(object.position, surfaceName);
+            const localRot = this.worldToLocalRotation(object.rotation, surfaceName);
+            
+            // Set position and rotation in local space
+            object.position.copy(localPos);
+            object.rotation.copy(localRot);
+            
             this.cube.addObject(object, surfaceName, localPos);
         }
         
@@ -178,6 +185,18 @@ export class PlacementSystem {
         const surface = this.cube.surfaces[surfaceName];
         const localPos = surface.worldToLocal(worldPos.clone());
         return localPos;
+    }
+    
+    worldToLocalRotation(worldRot, surfaceName) {
+        const surface = this.cube.surfaces[surfaceName];
+        // Create a dummy object to help with rotation conversion
+        const dummy = new THREE.Object3D();
+        dummy.rotation.copy(worldRot);
+        surface.worldToLocal(dummy.position.set(0, 0, 0));
+        
+        // For now, keep the world rotation as-is
+        // This will be refined based on surface orientation
+        return worldRot.clone();
     }
     
     cancelPlacement() {

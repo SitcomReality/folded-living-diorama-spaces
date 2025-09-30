@@ -37,6 +37,21 @@ export class ToolbarManager {
         this.assetPicker = document.createElement('div');
         this.assetPicker.className = 'asset-picker hidden';
         
+        // Add header with close button
+        const header = document.createElement('div');
+        header.className = 'asset-picker-header';
+        header.innerHTML = `
+            <h3>Place Asset</h3>
+            <button class="close-picker-btn">✕</button>
+        `;
+        this.assetPicker.appendChild(header);
+        
+        // Add close button handler
+        header.querySelector('.close-picker-btn').addEventListener('click', () => {
+            this.hideAssetPicker();
+            this.selectTool('select');
+        });
+        
         const categories = Object.keys(ASSET_LIBRARY);
         
         categories.forEach(category => {
@@ -92,12 +107,18 @@ export class ToolbarManager {
         // Show/hide asset picker
         if (toolId === 'place') {
             this.showAssetPicker();
+            // If there's a selected asset, notify about it
+            const selectedAsset = this.assetPicker.querySelector('.asset-btn.selected');
+            if (selectedAsset && this.onToolSelected) {
+                this.onToolSelected(toolId, selectedAsset.dataset.assetId);
+            } else if (this.onToolSelected) {
+                this.onToolSelected(toolId);
+            }
         } else {
             this.hideAssetPicker();
-        }
-        
-        if (this.onToolSelected) {
-            this.onToolSelected(toolId);
+            if (this.onToolSelected) {
+                this.onToolSelected(toolId);
+            }
         }
     }
     

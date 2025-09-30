@@ -177,9 +177,13 @@ class FoldedLivingApp {
         console.log('Tool selected:', toolId, assetId);
         
         if (toolId === 'place') {
-            // Start placement mode with selected asset (or default)
-            const selectedAsset = assetId || 'bed_single_a';
-            this.placementSystem.startPlacement(selectedAsset);
+            // Start placement mode with selected asset
+            if (assetId) {
+                this.placementSystem.startPlacement(assetId);
+            } else {
+                // Default to first available asset
+                this.placementSystem.startPlacement('bed_single_a');
+            }
         } else {
             this.placementSystem.cancelPlacement();
         }
