@@ -36,28 +36,85 @@ export const ASSET_LIBRARY = {
     
     furniture: [
         {
-            id: 'chair_simple',
-            name: 'Simple Chair',
+            id: 'bed_single_a',
+            name: 'Single Bed A',
             type: 'prop',
-            polys: 120,
-            cost: 15,
-            category: 'furniture'
+            polys: 500,
+            cost: 30,
+            category: 'furniture',
+            modelPath: '/assets/gltf/furniturebits/bed_single_A.gltf'
         },
         {
-            id: 'table_low',
-            name: 'Low Table',
+            id: 'bed_single_b',
+            name: 'Single Bed B',
             type: 'prop',
-            polys: 180,
-            cost: 20,
-            category: 'furniture'
+            polys: 500,
+            cost: 30,
+            category: 'furniture',
+            modelPath: '/assets/gltf/furniturebits/bed_single_B.gltf'
         },
         {
-            id: 'lamp_floor',
-            name: 'Floor Lamp',
+            id: 'bed_double_a',
+            name: 'Double Bed A',
             type: 'prop',
-            polys: 150,
+            polys: 800,
+            cost: 50,
+            category: 'furniture',
+            modelPath: '/assets/gltf/furniturebits/bed_double_A.gltf'
+        },
+        {
+            id: 'bed_double_b',
+            name: 'Double Bed B',
+            type: 'prop',
+            polys: 800,
+            cost: 50,
+            category: 'furniture',
+            modelPath: '/assets/gltf/furniturebits/bed_double_B.gltf'
+        },
+        {
+            id: 'armchair',
+            name: 'Armchair',
+            type: 'prop',
+            polys: 600,
+            cost: 35,
+            category: 'furniture',
+            modelPath: '/assets/gltf/furniturebits/armchair.gltf'
+        },
+        {
+            id: 'armchair_pillows',
+            name: 'Armchair with Pillows',
+            type: 'prop',
+            polys: 700,
+            cost: 40,
+            category: 'furniture',
+            modelPath: '/assets/gltf/furniturebits/armchair_pillows.gltf'
+        },
+        {
+            id: 'cabinet_medium',
+            name: 'Medium Cabinet',
+            type: 'prop',
+            polys: 400,
             cost: 25,
-            category: 'furniture'
+            category: 'furniture',
+            modelPath: '/assets/gltf/furniturebits/cabinet_medium.gltf'
+        },
+        {
+            id: 'book_single',
+            name: 'Single Book',
+            type: 'prop',
+            polys: 50,
+            cost: 5,
+            category: 'furniture',
+            modelPath: '/assets/gltf/furniturebits/book_single.gltf'
+        },
+        {
+            id: 'book_set',
+            name: 'Book Set',
+            type: 'prop',
+            polys: 200,
+            cost: 15,
+            category: 'furniture',
+            modelPath: '/assets/gltf/furniturebits/book_set.gltf'
         }
     ],
     

@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { getAssetById } from '../config/assets.js';
 
 export class PlacementSystem {
     constructor(scene, cube) {
@@ -7,16 +9,59 @@ export class PlacementSystem {
         this.previewObject = null;
         this.isPlacing = false;
         this.raycaster = new THREE.Raycaster();
+        this.gltfLoader = new GLTFLoader();
+        this.modelCache = new Map();
     }
     
-    startPlacement(assetId) {
+    async startPlacement(assetId) {
         this.isPlacing = true;
         this.currentAssetId = assetId;
-        this.createPreview(assetId);
+        await this.createPreview(assetId);
     }
     
-    createPreview(assetId) {
-        // Create a simple preview based on asset type
+    async createPreview(assetId) {
+        const asset = getAssetById(assetId);
+        
+        if (!asset) {
+            console.error(`Asset ${assetId} not found`);
+            return;
+        }
+        
+        // Remove existing preview
+        if (this.previewObject) {
+            this.scene.remove(this.previewObject);
+            this.previewObject = null;
+        }
+        
+        // Create preview based on asset type
+        if (asset.modelPath) {
+            // Load GLTF model
+            try {
+                const model = await this.loadModel(asset.modelPath);
+                this.previewObject = model;
+                
+                // Make it semi-transparent for preview
+                this.previewObject.traverse((child) => {
+                    if (child.isMesh) {
+                        child.material = child.material.clone();
+                        child.material.transparent = true;
+                        child.material.opacity = 0.6;
+                        child.material.emissive = new THREE.Color(0x4a9eff);
+                        child.material.emissiveIntensity = 0.3;
+                    }
+                });
+                
+                this.scene.add(this.previewObject);
+            } catch (error) {
+                console.error('Failed to load model:', error);
+                this.createFallbackPreview();
+            }
+        } else {
+            this.createFallbackPreview();
+        }
+    }
+    
+    createFallbackPreview() {
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshStandardMaterial({ 
             color: 0x4a9eff,
@@ -26,6 +71,27 @@ export class PlacementSystem {
         
         this.previewObject = new THREE.Mesh(geometry, material);
         this.scene.add(this.previewObject);
+    }
+    
+    async loadModel(path) {
+        // Check cache first
+        if (this.modelCache.has(path)) {
+            return this.modelCache.get(path).clone();
+        }
+        
+        // Load model
+        return new Promise((resolve, reject) => {
+            this.gltfLoader.load(
+                path,
+                (gltf) => {
+                    const model = gltf.scene;
+                    this.modelCache.set(path, model);
+                    resolve(model.clone());
+                },
+                undefined,
+                reject
+            );
+        });
     }
     
     updatePreview(camera, mousePos) {
@@ -45,18 +111,38 @@ export class PlacementSystem {
         }
     }
     
-    placeObject() {
+    async placeObject() {
         if (!this.isPlacing || !this.previewObject || !this.previewObject.visible) {
             return null;
         }
         
+        const asset = getAssetById(this.currentAssetId);
+        let object;
+        
         // Create actual object
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshStandardMaterial({ color: 0x4a9eff });
-        const object = new THREE.Mesh(geometry, material);
+        if (asset.modelPath) {
+            try {
+                object = await this.loadModel(asset.modelPath);
+                
+                // Enable shadows on all meshes
+                object.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to load model for placement:', error);
+                return null;
+            }
+        } else {
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = new THREE.MeshStandardMaterial({ color: 0x4a9eff });
+            object = new THREE.Mesh(geometry, material);
+            object.castShadow = true;
+        }
         
         object.position.copy(this.previewObject.position);
-        object.castShadow = true;
         object.userData.assetId = this.currentAssetId;
         
         // Find which surface this is on
@@ -102,4 +188,3 @@ export class PlacementSystem {
         }
     }
 }
-

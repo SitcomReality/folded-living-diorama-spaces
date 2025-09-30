@@ -173,12 +173,13 @@ class FoldedLivingApp {
         );
     }
     
-    onToolSelected(toolId) {
-        console.log('Tool selected:', toolId);
+    onToolSelected(toolId, assetId) {
+        console.log('Tool selected:', toolId, assetId);
         
         if (toolId === 'place') {
-            // Start placement mode with default asset
-            this.placementSystem.startPlacement('cube_small');
+            // Start placement mode with selected asset (or default)
+            const selectedAsset = assetId || 'bed_single_a';
+            this.placementSystem.startPlacement(selectedAsset);
         } else {
             this.placementSystem.cancelPlacement();
         }
