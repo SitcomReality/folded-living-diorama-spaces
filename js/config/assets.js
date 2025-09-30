@@ -25,13 +25,39 @@ export const ASSET_LIBRARY = {
             category: 'basic'
         },
         {
-            id: 'point_light',
-            name: 'Point Light',
-            type: 'light',
-            polys: 0,
-            lightCost: 1,
+            id: 'cone',
+            name: 'Cone',
+            type: 'prop',
+            polys: 32,
             cost: 0,
-            category: 'lighting'
+            category: 'basic'
+        }
+    ],
+    
+    furniture: [
+        {
+            id: 'chair_simple',
+            name: 'Simple Chair',
+            type: 'prop',
+            polys: 120,
+            cost: 15,
+            category: 'furniture'
+        },
+        {
+            id: 'table_low',
+            name: 'Low Table',
+            type: 'prop',
+            polys: 180,
+            cost: 20,
+            category: 'furniture'
+        },
+        {
+            id: 'lamp_floor',
+            name: 'Floor Lamp',
+            type: 'prop',
+            polys: 150,
+            cost: 25,
+            category: 'furniture'
         }
     ],
     
@@ -51,6 +77,43 @@ export const ASSET_LIBRARY = {
             polys: 50,
             cost: 5,
             category: 'nature'
+        },
+        {
+            id: 'rock_small',
+            name: 'Small Rock',
+            type: 'prop',
+            polys: 40,
+            cost: 5,
+            category: 'nature'
+        },
+        {
+            id: 'flower_patch',
+            name: 'Flower Patch',
+            type: 'prop',
+            polys: 120,
+            cost: 15,
+            category: 'nature'
+        }
+    ],
+    
+    lighting: [
+        {
+            id: 'point_light',
+            name: 'Point Light',
+            type: 'light',
+            polys: 0,
+            lightCost: 1,
+            cost: 0,
+            category: 'lighting'
+        },
+        {
+            id: 'spot_light',
+            name: 'Spot Light',
+            type: 'light',
+            polys: 0,
+            lightCost: 1,
+            cost: 10,
+            category: 'lighting'
         }
     ]
 };
@@ -67,3 +130,10 @@ export function getAllAssets() {
     return Object.values(ASSET_LIBRARY).flat();
 }
 
+export function getAssetsByCategory(category) {
+    return ASSET_LIBRARY[category] || [];
+}
+
+export function getCategories() {
+    return Object.keys(ASSET_LIBRARY);
+}

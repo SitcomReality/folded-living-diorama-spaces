@@ -56,6 +56,7 @@ export class GalleryManager {
         card.innerHTML = `
             <div class="cube-preview">
                 <!-- 3D preview will be rendered here -->
+                <div class="preview-placeholder">📦</div>
             </div>
             <div class="cube-info">
                 <div class="cube-creator">
@@ -66,21 +67,45 @@ export class GalleryManager {
                     <span class="cube-stat">📊 ${cube.poly_count || 0} polys</span>
                     <span class="cube-stat">💡 ${cube.light_count || 0} lights</span>
                 </div>
+                <div class="cube-reactions">
+                    <button class="reaction-btn" data-reaction="heart">❤️</button>
+                    <button class="reaction-btn" data-reaction="star">⭐</button>
+                    <button class="reaction-btn" data-reaction="fire">🔥</button>
+                    <button class="reaction-btn" data-reaction="sparkle">✨</button>
+                </div>
             </div>
         `;
         
-        card.addEventListener('click', () => {
+        // Handle cube selection
+        const preview = card.querySelector('.cube-preview');
+        preview.addEventListener('click', () => {
             this.onCubeSelected(cube);
+        });
+        
+        // Handle reactions
+        const reactionBtns = card.querySelectorAll('.reaction-btn');
+        reactionBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.onReaction(cube, btn.dataset.reaction);
+                btn.classList.add('reacted');
+                setTimeout(() => btn.classList.remove('reacted'), 300);
+            });
         });
         
         return card;
     }
     
     onCubeSelected(cube) {
-        // TODO: Load and transition to selected cube
         console.log('Selected cube:', cube);
         this.economyManager.visitCube(cube.id);
         this.hide();
+        // TODO: Load and transition to selected cube
+    }
+    
+    onReaction(cube, reactionType) {
+        const reward = this.economyManager.leaveReaction(cube.id);
+        console.log(`Reacted with ${reactionType}, earned ${reward} ✨`);
     }
 }
 

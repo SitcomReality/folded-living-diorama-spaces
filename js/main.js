@@ -67,7 +67,7 @@ class FoldedLivingApp {
     }
     
     setupUI() {
-        this.hudManager = new HUDManager(this.economyManager);
+        this.hudManager = new HUDManager(this.economyManager, this.budgetManager);
         
         this.toolbarManager = new ToolbarManager(
             document.getElementById('toolbar'),

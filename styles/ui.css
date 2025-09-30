@@ -159,3 +159,50 @@
     border-color: var(--accent-color);
 }
 
+.budget-display {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 200px;
+}
+
+.budget-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.budget-label {
+    font-weight: 700;
+    min-width: 60px;
+}
+
+.budget-progress {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.budget-fill {
+    height: 100%;
+    background: var(--accent-color);
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.budget-fill.warning {
+    background: var(--warning-color);
+}
+
+.budget-value {
+    opacity: 0.7;
+    font-size: 11px;
+    min-width: 70px;
+    text-align: right;
+}
