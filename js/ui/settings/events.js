@@ -57,4 +57,13 @@ export function attachSettingsEvents(content, ctx) {
         ctx.settings.environment.backgroundColor = color;
         ctx.updateBackgroundColor(ctx.scene, color);
     });
+    const groundColorInput = content.querySelector('[data-control="ground-color"]');
+    const groundColorPreview = content.querySelector('[data-control="ground-color-preview"]');
+    groundColorPreview.addEventListener('click', () => groundColorInput.click());
+    groundColorInput.addEventListener('input', (e) => {
+        const color = e.target.value;
+        groundColorPreview.style.backgroundColor = color;
+        ctx.settings.environment.groundColor = color;
+        ctx.updateGroundColor(ctx.scene, color);
+    });
 }

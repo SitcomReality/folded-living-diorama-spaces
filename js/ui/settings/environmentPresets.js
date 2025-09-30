@@ -32,3 +32,7 @@ export function updateBackgroundColor(sceneManager, color) {
     const scene = sceneManager.getScene();
     scene.background = new THREE.Color(color);
 }
+export function updateGroundColor(sceneManager, color) {
+    if (typeof sceneManager.setGroundColor === 'function') sceneManager.setGroundColor(color);
+}
+export { updateGroundColor }; // ensure exported

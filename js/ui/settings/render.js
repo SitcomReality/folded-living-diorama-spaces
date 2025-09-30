@@ -76,6 +76,13 @@ export function renderSettingsHTML(settings) {
               <input type="color" class="color-input" data-control="bg-color" value="${settings.environment.backgroundColor}">
             </div>
           </div>
+          <div class="control-row">
+            <div class="control-label">Ground</div>
+            <div class="color-picker-wrapper">
+              <div class="color-preview" style="background-color:${settings.environment.groundColor};" data-control="ground-color-preview"></div>
+              <input type="color" class="color-input" data-control="ground-color" value="${settings.environment.groundColor}">
+            </div>
+          </div>
         </div>
       </div>`;
 }

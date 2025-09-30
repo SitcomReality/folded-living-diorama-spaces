@@ -9,7 +9,7 @@ export function createDefaultSettings(cube) {
     };
     const settings = {
         surfaces: {},
-        environment: { preset: 'warm', ambientIntensity: 0.6, backgroundColor: '#0a0a0a' }
+        environment: { preset: 'warm', ambientIntensity: 0.6, backgroundColor: '#0a0a0a', groundColor: '#d8d2c7' }
     };
     Object.keys(cube.surfaces).forEach(surfaceName => {
         settings.surfaces[surfaceName] = {
@@ -21,4 +21,3 @@ export function createDefaultSettings(cube) {
     });
     return settings;
 }
-

@@ -76,6 +76,8 @@ export class CameraController {
         offset.setFromSpherical(spherical);
         this.camera.position.copy(this.target).add(offset);
         this.camera.lookAt(this.target);
+        const minY = -CONSTANTS.CUBE_SIZE / 2 + 0.05;
+        if (this.camera.position.y < minY) this.camera.position.y = minY;
     }
     
     zoom(delta) {
@@ -87,6 +89,8 @@ export class CameraController {
         
         offset.normalize().multiplyScalar(newDistance);
         this.camera.position.copy(this.target).add(offset);
+        const minY = -CONSTANTS.CUBE_SIZE / 2 + 0.05;
+        if (this.camera.position.y < minY) this.camera.position.y = minY;
     }
     
     onWindowResize() {
@@ -103,4 +107,3 @@ export class CameraController {
         this.camera.lookAt(this.target);
     }
 }
-

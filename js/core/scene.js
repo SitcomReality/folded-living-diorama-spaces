@@ -8,6 +8,7 @@ export class SceneManager {
         
         this.setupLighting();
         this.setupHelpers();
+        this.setupGroundPlane();
     }
     
     setupLighting() {
@@ -40,6 +41,19 @@ export class SceneManager {
         this.gridHelper.visible = false;
         this.scene.add(this.gridHelper);
     }
+    
+    setupGroundPlane() {
+        const half = CONSTANTS.CUBE_SIZE / 2;
+        const geo = new THREE.PlaneGeometry(200, 200);
+        const mat = new THREE.MeshStandardMaterial({ color: 0xd8d2c7, roughness: 1, metalness: 0 });
+        this.groundPlane = new THREE.Mesh(geo, mat);
+        this.groundPlane.rotation.x = -Math.PI / 2;
+        this.groundPlane.position.y = -half - 0.001;
+        this.groundPlane.receiveShadow = true;
+        this.scene.add(this.groundPlane);
+    }
+    
+    setGroundColor(color) { if (this.groundPlane) this.groundPlane.material.color.set(color); }
     
     add(object) {
         this.scene.add(object);

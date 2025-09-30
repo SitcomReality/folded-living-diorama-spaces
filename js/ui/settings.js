@@ -40,6 +40,7 @@ export class SettingsManager {
             applyPreset,
             updateAmbientLight,
             updateBackgroundColor,
+            updateGroundColor,
             toggleVisibility,
             updateColor,
             updateTexture,
@@ -66,6 +67,7 @@ export class SettingsManager {
         applyPreset(this.scene, settings.environment.preset);
         updateAmbientLight(this.scene, settings.environment.ambientIntensity);
         updateBackgroundColor(this.scene, settings.environment.backgroundColor);
+        this.scene.setGroundColor(settings.environment.groundColor);
         this.renderSettings();
     }
 }
