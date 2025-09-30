@@ -100,11 +100,17 @@ export class PlacementSystem {
         this.raycaster.setFromCamera(mousePos, camera);
         
         const surfaces = Object.values(this.cube.surfaces);
-        const intersects = this.raycaster.intersectObjects(surfaces);
+        const intersects = this.raycaster.intersectObjects(surfaces, true); // Intersect children too
         
         if (intersects.length > 0) {
             const hit = intersects[0];
             this.previewObject.position.copy(hit.point);
+            
+            // Align to surface normal
+            const normalMatrix = new THREE.Matrix4();
+            normalMatrix.lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0, 1, 0));
+            this.previewObject.quaternion.setFromRotationMatrix(normalMatrix);
+
             this.previewObject.visible = true;
         } else {
             this.previewObject.visible = false;
@@ -117,6 +123,10 @@ export class PlacementSystem {
         }
         
         const asset = getAssetById(this.currentAssetId);
+        if (!asset) {
+            console.error('Asset not found for placement:', this.currentAssetId);
+            return null;
+        }
         let object;
         
         // Create actual object

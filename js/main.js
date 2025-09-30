@@ -181,8 +181,10 @@ class FoldedLivingApp {
             if (assetId) {
                 this.placementSystem.startPlacement(assetId);
             } else {
-                // Default to first available asset
-                this.placementSystem.startPlacement('bed_single_a');
+                // When place tool is clicked without an asset, don't default to a bed.
+                // Instead, just wait for an asset to be selected.
+                // The toolbar will show the picker.
+                this.placementSystem.cancelPlacement(); // Clear any existing preview
             }
         } else {
             this.placementSystem.cancelPlacement();
