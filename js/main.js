@@ -102,6 +102,7 @@ class FoldedLivingApp {
                     this.inspectorManager.inspect(selected);
                 }
             } else if (activeTool === 'place') {
+                if (this.input.didMouseMoveSinceMouseDown()) return; // prevent accidental placement after orbit
                 const placed = this.placementSystem.placeObject();
                 if (placed) {
                     console.log('Object placed');

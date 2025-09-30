@@ -3,6 +3,8 @@ export class InputManager {
         this.keys = {};
         this.mousePos = { x: 0, y: 0 };
         this.mouseDown = false;
+        this.mouseDownStart = { x: 0, y: 0 };
+        this.mouseMovedSinceDown = false;
         
         this.setupListeners();
     }
@@ -19,10 +21,17 @@ export class InputManager {
         window.addEventListener('mousemove', (e) => {
             this.mousePos.x = (e.clientX / window.innerWidth) * 2 - 1;
             this.mousePos.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            if (this.mouseDown) {
+                const dx = this.mousePos.x - this.mouseDownStart.x;
+                const dy = this.mousePos.y - this.mouseDownStart.y;
+                if (Math.hypot(dx, dy) > 0.01) this.mouseMovedSinceDown = true;
+            }
         });
         
         window.addEventListener('mousedown', () => {
             this.mouseDown = true;
+            this.mouseDownStart = { ...this.mousePos };
+            this.mouseMovedSinceDown = false;
         });
         
         window.addEventListener('mouseup', () => {
@@ -41,5 +50,8 @@ export class InputManager {
     isMouseDown() {
         return this.mouseDown;
     }
+    
+    didMouseMoveSinceMouseDown() {
+        return this.mouseMovedSinceDown;
+    }
 }
-
