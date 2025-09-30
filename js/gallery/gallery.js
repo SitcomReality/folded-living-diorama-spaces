@@ -56,12 +56,14 @@ export class GalleryManager {
         const card = document.createElement('div');
         card.className = 'cube-card';
         
+        const displayName = (cube.data && cube.data.name) || cube.name || 'Untitled Cube';
         card.innerHTML = `
             <div class="cube-preview">
                 <!-- 3D preview will be rendered here -->
                 <div class="preview-placeholder">📦</div>
             </div>
             <div class="cube-info">
+                <div class="cube-title">${displayName}</div>
                 <div class="cube-creator">
                     <img class="creator-avatar" src="https://images.websim.com/avatar/${cube.username}" alt="${cube.username}">
                     <span class="creator-name">${cube.username}</span>
