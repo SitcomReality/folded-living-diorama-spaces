@@ -107,8 +107,10 @@ export class SaveManager {
 
     serializeCube() {
         const cubeData = this.cube.serialize();
+        const settings = window.app?.settingsManager?.getSettings?.();
         return {
             ...cubeData,
+            settings,
             name: this.currentCubeName
         };
     }

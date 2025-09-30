@@ -19,6 +19,7 @@ import { GalleryManager } from './gallery/gallery.js';
 import { TransitionManager } from './gallery/transitions.js';
 import { NamingModal } from './ui/naming.js';
 import { AnimationLoop } from './utils/animation.js';
+import * as THREE from 'three';
 
 export class FoldedLivingApp {
     constructor() {
@@ -76,7 +77,7 @@ export class FoldedLivingApp {
 
     setupInput() {
         const canvas = this.renderer.getRenderer().domElement;
-        canvas.addEventListener('click', (e) => {
+        canvas.addEventListener('click', async (e) => {
             if (e.button !== 0) return;
             const activeTool = this.toolbarManager.getActiveTool();
             if (activeTool === 'select') {
@@ -87,7 +88,7 @@ export class FoldedLivingApp {
                 if (selected) this.inspectorManager.inspect(selected);
             } else if (activeTool === 'place') {
                 if (this.input.didMouseMoveSinceMouseDown()) return;
-                const placed = this.placementSystem.placeObject();
+                const placed = await this.placementSystem.placeObject();
                 if (placed) {
                     console.log('Object placed');
                     this.saveManager.autoSave();
@@ -121,7 +122,7 @@ export class FoldedLivingApp {
             
             const savedData = this.saveManager.loadFromLocalStorage();
             if (savedData) {
-                this.loadCubeData(savedData);
+                await this.loadCubeData(savedData);
             }
             
             await new Promise(resolve => setTimeout(resolve, 500));
@@ -136,10 +137,26 @@ export class FoldedLivingApp {
         }
     }
     
-    loadCubeData(data) {
-        // Load cube objects and settings from saved data
-        if (data.objects) {
-            // TODO: Restore placed objects
+    async loadCubeData(data) {
+        if (data.settings) this.settingsManager.applySettings(data.settings);
+        if (Array.isArray(data.objects)) {
+            const { getAssetById } = await import('./config/assets.js');
+            for (const item of data.objects) {
+                let object;
+                const asset = getAssetById(item.assetId);
+                if (asset && asset.modelPath) {
+                    object = await this.placementSystem.loadModel(asset.modelPath);
+                    object.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } });
+                } else {
+                    object = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshStandardMaterial({ color: 0x4a9eff }));
+                    object.castShadow = true;
+                }
+                object.userData.assetId = item.assetId;
+                this.cube.addObject(object, item.surface, new THREE.Vector3(item.position.x, item.position.y, item.position.z));
+                if (item.rotation) object.rotation.set(item.rotation.x, item.rotation.y, item.rotation.z);
+                if (item.scale) object.scale.set(item.scale.x, item.scale.y, item.scale.z);
+                if (item.assetId) this.budgetManager.addAsset(item.assetId);
+            }
         }
     }
     
