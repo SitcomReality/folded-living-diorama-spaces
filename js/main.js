@@ -13,6 +13,7 @@ import { EconomyManager } from './social/economy.js';
 import { HUDManager } from './ui/hud.js';
 import { ToolbarManager } from './ui/toolbar.js';
 import { InspectorManager } from './ui/inspector.js';
+import { SettingsManager } from './ui/settings.js';
 import { GalleryManager } from './gallery/gallery.js';
 import { TransitionManager } from './gallery/transitions.js';
 import { AnimationLoop } from './utils/animation.js';
@@ -75,6 +76,8 @@ class FoldedLivingApp {
         );
         
         this.inspectorManager = new InspectorManager();
+        
+        this.settingsManager = new SettingsManager(this.cube, this.scene);
         
         this.galleryManager = new GalleryManager(
             this.databaseManager,
