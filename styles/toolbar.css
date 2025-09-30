@@ -1,0 +1,5 @@
+.toolbar { background:var(--panel-bg); border:1px solid var(--border-color); border-radius:12px; padding:10px; display:flex; gap:8px; box-shadow:0 4px 16px rgba(0,0,0,.08); }
+.tool-btn { background:transparent; border:1px solid var(--border-color); border-radius:8px; padding:12px 20px; color:var(--text-color); font-family:'Space Mono', monospace; font-size:14px; cursor:pointer; transition:all .2s ease; }
+.tool-btn:hover { background:rgba(232,155,111,.1); transform:translateY(-1px); }
+.tool-btn.active { background:var(--accent-color); border-color:var(--accent-color); color:#fff; }
+
