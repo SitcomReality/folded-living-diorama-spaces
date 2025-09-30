@@ -16,7 +16,7 @@ export function createDefaultSettings(cube) {
             visible: true,
             color: defaults[surfaceName] || '#ffffff',
             texture: 'solid',
-            orientation: (surfaceName === 'portal') ? 'down' : 'up'
+            orientation: 'down'
         };
     });
     return settings;
