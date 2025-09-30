@@ -164,8 +164,7 @@ export class FoldingAnimator {
         positions[CONSTANTS.SURFACES.PORTAL] = {
             position: new THREE.Vector3(0, -halfSize, -halfSize),
             rotation: new THREE.Euler(Math.PI/2, 0, 0),
-            pivotRotation: new THREE.Euler(-Math.PI/2, 0, 0), // Fold flat away from center
-            scale: 0.3
+            pivotRotation: new THREE.Euler(-Math.PI/2, 0, 0) // Fold flat away from center
         };
         
         return positions;
