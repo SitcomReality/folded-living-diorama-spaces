@@ -87,7 +87,6 @@ export class FoldedLivingApp {
                 );
                 if (selected) this.inspectorManager.inspect(selected);
             } else if (activeTool === 'place') {
-                if (this.input.didMouseMoveSinceMouseDown()) return;
                 const placed = await this.placementSystem.placeObject();
                 if (placed) {
                     console.log('Object placed');
