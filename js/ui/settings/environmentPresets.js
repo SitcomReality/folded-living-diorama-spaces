@@ -35,4 +35,3 @@ export function updateBackgroundColor(sceneManager, color) {
 export function updateGroundColor(sceneManager, color) {
     if (typeof sceneManager.setGroundColor === 'function') sceneManager.setGroundColor(color);
 }
-export { updateGroundColor }; // ensure exported
