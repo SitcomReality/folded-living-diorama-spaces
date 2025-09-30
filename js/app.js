@@ -93,20 +93,41 @@ export class FoldedLivingApp {
                     this.saveManager.autoSave();
                 }
             } else if (activeTool === 'delete') {
-                this.selectionSystem.deleteSelected();
-                this.saveManager.autoSave();
+                // Select and delete in one action
+                const selected = this.selectionSystem.selectAt(
+                    this.camera.getCamera(),
+                    this.input.getMousePosition()
+                );
+                if (selected) {
+                    const assetId = this.selectionSystem.deleteSelected();
+                    if (assetId) {
+                        this.budgetManager.removeAsset(assetId);
+                        this.inspectorManager.hide();
+                        this.saveManager.autoSave();
+                    }
+                }
             }
         });
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.placementSystem.cancelPlacement();
                 this.selectionSystem.deselect();
+                this.inspectorManager.hide();
             } else if (e.key === 'Delete' || e.key === 'Backspace') {
-                this.selectionSystem.deleteSelected();
-                this.saveManager.autoSave();
+                const assetId = this.selectionSystem.deleteSelected();
+                if (assetId) {
+                    this.budgetManager.removeAsset(assetId);
+                    this.inspectorManager.hide();
+                    this.saveManager.autoSave();
+                }
             } else if (e.key === 'g') {
                 this.scene.toggleGrid();
             }
+        });
+        
+        // Listen for object modifications from inspector
+        window.addEventListener('objectModified', () => {
+            this.saveManager.autoSave();
         });
     }
 

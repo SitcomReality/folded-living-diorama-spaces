@@ -8,3 +8,31 @@
 .property-input { width:100%; background:rgba(255,255,255,.05); border:1px solid var(--border-color); border-radius:6px; padding:8px; color:var(--text-color); font-family:'Space Mono', monospace; font-size:13px; }
 .property-input:focus { outline:none; border-color:var(--accent-color); }
 
+.inspector-rotation-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.rotation-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text-color);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rotation-btn:hover {
+    background: rgba(232, 155, 111, 0.15);
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.rotation-btn:active {
+    transform: translateY(0);
+}

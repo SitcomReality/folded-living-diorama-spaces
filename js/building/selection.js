@@ -24,15 +24,22 @@ export class SelectionSystem {
         this.raycaster.setFromCamera(mousePos, camera);
         
         const objects = this.cube.placedObjects.map(item => item.object);
-        const intersects = this.raycaster.intersectObjects(objects);
+        const intersects = this.raycaster.intersectObjects(objects, true);
         
         if (intersects.length > 0) {
-            this.select(intersects[0].object);
-            return intersects[0].object;
-        } else {
-            this.deselect();
-            return null;
+            let hitObject = intersects[0].object;
+            // Find the root placed object by traversing up
+            while (hitObject && !this.cube.placedObjects.find(item => item.object === hitObject)) {
+                hitObject = hitObject.parent;
+            }
+            if (hitObject) {
+                this.select(hitObject);
+                return hitObject;
+            }
         }
+        
+        this.deselect();
+        return null;
     }
     
     select(object) {
@@ -61,9 +68,14 @@ export class SelectionSystem {
     
     deleteSelected() {
         if (this.selectedObject) {
-            this.cube.removeObject(this.selectedObject);
-            this.deselect();
+            const objectData = this.cube.placedObjects.find(item => item.object === this.selectedObject);
+            if (objectData) {
+                const assetId = this.selectedObject.userData.assetId;
+                this.cube.removeObject(this.selectedObject);
+                this.deselect();
+                return assetId;
+            }
         }
+        return null;
     }
 }
-

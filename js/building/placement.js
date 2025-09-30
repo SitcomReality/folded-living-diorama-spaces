@@ -111,7 +111,7 @@ export class PlacementSystem {
         this.raycaster.setFromCamera(mousePos, camera);
         
         const surfaces = Object.values(this.cube.surfaces);
-        const intersects = this.raycaster.intersectObjects(surfaces, true); // Intersect children too
+        const intersects = this.raycaster.intersectObjects(surfaces, true);
         
         if (intersects.length > 0) {
             const hit = intersects[0];
@@ -119,6 +119,11 @@ export class PlacementSystem {
             const normalMatrix = new THREE.Matrix4();
             normalMatrix.lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0, 1, 0));
             this.previewObject.quaternion.setFromRotationMatrix(normalMatrix);
+            
+            // apply yaw rotation around world up (absolute, not incremental)
+            const targetYaw = snapActive ? Math.round(this.previewYaw / (Math.PI/4)) * (Math.PI/4) : this.previewYaw;
+            this.previewObject.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), targetYaw);
+            
             this.lastHitSurfaceName = (hit.object.userData && hit.object.userData.surfaceName) 
                 || (hit.object.parent && hit.object.parent.userData && hit.object.parent.userData.surfaceName) 
                 || null;
@@ -136,13 +141,7 @@ export class PlacementSystem {
             } else {
                 this.previewObject.position.copy(hit.point);
             }
-            // re-apply yaw around world up
-            const targetYaw = snapActive ? Math.round(this.previewYaw / (Math.PI/4)) * (Math.PI/4) : this.previewYaw;
-            const deltaYaw = targetYaw - this.appliedYaw;
-            if (Math.abs(deltaYaw) > 1e-6) {
-                this.previewObject.rotateOnWorldAxis(new THREE.Vector3(0,1,0), deltaYaw);
-                this.appliedYaw = targetYaw;
-            }
+            
             this.previewObject.visible = true;
         } else {
             this.previewObject.visible = false;
@@ -238,18 +237,12 @@ export class PlacementSystem {
             this.scene.remove(this.previewObject);
             this.previewObject = null;
         }
-        this.previewYaw = 0; this.appliedYaw = 0;
+        this.previewYaw = 0;
     }
     
     rotateByDelta(deltaX, snapActive = false) {
         if (!this.isPlacing || !this.previewObject || !this.previewObject.visible) return;
         // sensitivity: normalized deltaX -> radians
         this.previewYaw += deltaX * Math.PI; // 180° per full screen width movement
-        const targetYaw = snapActive ? Math.round(this.previewYaw / (Math.PI/4)) * (Math.PI/4) : this.previewYaw;
-        const deltaYaw = targetYaw - this.appliedYaw;
-        if (Math.abs(deltaYaw) > 1e-6) {
-            this.previewObject.rotateOnWorldAxis(new THREE.Vector3(0,1,0), deltaYaw);
-            this.appliedYaw = targetYaw;
-        }
     }
 }

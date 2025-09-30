@@ -37,6 +37,7 @@ export class InspectorManager {
         const assetId = this.currentObject.userData.assetId || 'unknown';
         const asset = getAssetById(assetId);
         const pos = this.currentObject.position;
+        const rot = this.currentObject.rotation;
         
         this.content.innerHTML = `
             <div class="property-row">
@@ -67,7 +68,36 @@ export class InspectorManager {
                     Z: ${pos.z.toFixed(2)}
                 </div>
             </div>
+            <div class="property-row">
+                <div class="property-label">Rotation</div>
+                <div class="inspector-rotation-controls">
+                    <button class="rotation-btn" data-axis="y" data-angle="-45">↶ 45°</button>
+                    <button class="rotation-btn" data-axis="y" data-angle="45">↷ 45°</button>
+                </div>
+            </div>
         `;
+        
+        // Add rotation button handlers
+        this.content.querySelectorAll('.rotation-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const axis = btn.dataset.axis;
+                const angle = parseFloat(btn.dataset.angle) * (Math.PI / 180);
+                this.rotateObject(axis, angle);
+            });
+        });
+    }
+    
+    rotateObject(axis, angle) {
+        if (!this.currentObject) return;
+        
+        const axisVector = axis === 'x' ? new THREE.Vector3(1, 0, 0) :
+                           axis === 'y' ? new THREE.Vector3(0, 1, 0) :
+                           new THREE.Vector3(0, 0, 1);
+        
+        this.currentObject.rotateOnWorldAxis(axisVector, angle);
+        this.updateContent();
+        
+        // Trigger auto-save
+        window.dispatchEvent(new CustomEvent('objectModified'));
     }
 }
-
