@@ -98,15 +98,11 @@ export class InspectorManager {
     
     rotateObject(axis, angle) {
         if (!this.currentObject) return;
-        
-        const axisVector = axis === 'x' ? new THREE.Vector3(1, 0, 0) :
-                           axis === 'y' ? new THREE.Vector3(0, 1, 0) :
-                           new THREE.Vector3(0, 0, 1);
-        
-        this.currentObject.rotateOnWorldAxis(axisVector, angle);
+        const surface = this.currentObject.parent;
+        const surfaceQuat = surface.getWorldQuaternion(new THREE.Quaternion());
+        const floorUp = new THREE.Vector3(0, 1, 0).applyQuaternion(surfaceQuat);
+        this.currentObject.rotateOnWorldAxis(floorUp.normalize(), angle);
         this.updateContent();
-        
-        // Trigger auto-save
         window.dispatchEvent(new CustomEvent('objectModified'));
     }
 }

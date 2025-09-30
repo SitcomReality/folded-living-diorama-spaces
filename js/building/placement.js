@@ -15,6 +15,9 @@ export class PlacementSystem {
         this.lastHitSurfaceName = null;
         this.previewYaw = 0;
         this.appliedYaw = 0;
+        this.isRotating = false;
+        this.baseQuat = null;
+        this.anchorWorldPos = null;
     }
     
     async startPlacement(assetId) {
@@ -120,6 +123,7 @@ export class PlacementSystem {
             const normalMatrix = new THREE.Matrix4();
             normalMatrix.lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0, 1, 0));
             const qBase = new THREE.Quaternion().setFromRotationMatrix(normalMatrix);
+            this.baseQuat = qBase.clone();
 
             // 2. Calculate Yaw Rotation (World Y axis rotation based on user input)
             const targetYaw = snapActive ? Math.round(this.previewYaw / (Math.PI/4)) * (Math.PI/4) : this.previewYaw;
@@ -145,6 +149,7 @@ export class PlacementSystem {
                 }
                 const snappedWorld = surface.localToWorld(local);
                 this.previewObject.position.copy(snappedWorld);
+                this.anchorWorldPos = snappedWorld.clone();
             } else {
                 this.previewObject.position.copy(hit.point);
             }
@@ -245,11 +250,21 @@ export class PlacementSystem {
             this.previewObject = null;
         }
         this.previewYaw = 0;
+        this.isRotating = false;
+        this.baseQuat = null;
+        this.anchorWorldPos = null;
     }
     
     rotateByDelta(deltaX, snapActive = false) {
         if (!this.isPlacing || !this.previewObject || !this.previewObject.visible) return;
-        // sensitivity: normalized deltaX -> radians
-        this.previewYaw += deltaX * Math.PI; // 180° per full screen width movement
+        this.isRotating = true;
+        this.previewYaw += deltaX * Math.PI;
+        const targetYaw = snapActive ? Math.round(this.previewYaw / (Math.PI/4)) * (Math.PI/4) : this.previewYaw;
+        if (this.baseQuat) {
+            const qYaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetYaw);
+            this.previewObject.quaternion.copy(qYaw).multiply(this.baseQuat);
+        }
     }
+    
+    endRotation() { this.isRotating = false; }
 }
