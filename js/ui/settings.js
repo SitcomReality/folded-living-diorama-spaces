@@ -25,7 +25,8 @@ export class SettingsManager {
             this.settings.surfaces[surfaceName] = {
                 visible: true,
                 color: this.getDefaultSurfaceColor(surfaceName),
-                texture: 'solid'
+                texture: 'solid',
+                orientation: (surfaceName === 'portal') ? 'down' : 'up'
             };
         });
 
@@ -86,6 +87,7 @@ export class SettingsManager {
     renderSurfaceControl(surfaceName) {
         const settings = this.settings.surfaces[surfaceName];
         const displayName = surfaceName.replace('_', ' ');
+        const hasPivot = !!(this.cube.surfaces[surfaceName] && this.cube.surfaces[surfaceName].userData.pivot);
 
         return `
             <div class="surface-control" data-surface="${surfaceName}">
@@ -104,6 +106,14 @@ export class SettingsManager {
                             <input type="color" class="color-input" data-control="color" value="${settings.color}">
                         </div>
                     </div>
+                    ${hasPivot ? `
+                    <div class="control-row">
+                        <div class="control-label">Orientation</div>
+                        <select class="select-input" data-control="orientation">
+                            <option value="up" ${settings.orientation === 'up' ? 'selected' : ''}>Up (vertical)</option>
+                            <option value="down" ${settings.orientation === 'down' ? 'selected' : ''}>Down (horizontal)</option>
+                        </select>
+                    </div>` : ''}
                     <div class="control-row">
                         <div class="control-label">Texture</div>
                         <select class="select-input" data-control="texture">
@@ -188,14 +198,20 @@ export class SettingsManager {
             // Color picker
             const colorInput = control.querySelector('[data-control="color"]');
             const colorPreview = control.querySelector('[data-control="color-preview"]');
-
             colorPreview.addEventListener('click', () => colorInput.click());
-
             colorInput.addEventListener('input', (e) => {
                 const color = e.target.value;
                 colorPreview.style.backgroundColor = color;
                 this.updateSurfaceColor(surfaceName, color);
             });
+
+            // Orientation (if present)
+            const orientationSelect = control.querySelector('[data-control="orientation"]');
+            if (orientationSelect) {
+                orientationSelect.addEventListener('change', (e) => {
+                    this.updateSurfaceOrientation(surfaceName, e.target.value);
+                });
+            }
 
             // Texture selector
             const textureSelect = control.querySelector('[data-control="texture"]');
@@ -278,6 +294,44 @@ export class SettingsManager {
         }
 
         surface.material.needsUpdate = true;
+    }
+
+    updateSurfaceOrientation(surfaceName, orientation) {
+        const surface = this.cube.surfaces[surfaceName];
+        if (!surface || !surface.userData.pivot) return;
+
+        this.settings.surfaces[surfaceName].orientation = orientation;
+
+        const euler = this.getPivotTargetRotation(surfaceName, orientation);
+        if (!euler) return;
+
+        const pivot = surface.userData.pivot;
+        pivot.rotation.set(euler.x, euler.y, euler.z);
+    }
+
+    getPivotTargetRotation(surfaceName, orientation) {
+        // Up = folded/vertical, Down = unfolded/horizontal
+        // Matches folding.js pivotRotation targets
+        switch (surfaceName) {
+            case CONSTANTS.SURFACES.BACKDROP:
+                return orientation === 'down'
+                    ? new THREE.Euler(Math.PI / 2, 0, 0)
+                    : new THREE.Euler(0, 0, 0);
+            case CONSTANTS.SURFACES.WING_LEFT:
+                return orientation === 'down'
+                    ? new THREE.Euler(0, 0, Math.PI / 2)
+                    : new THREE.Euler(0, 0, 0);
+            case CONSTANTS.SURFACES.WING_RIGHT:
+                return orientation === 'down'
+                    ? new THREE.Euler(0, 0, -Math.PI / 2)
+                    : new THREE.Euler(0, 0, 0);
+            case CONSTANTS.SURFACES.PORTAL:
+                return orientation === 'down'
+                    ? new THREE.Euler(-Math.PI / 2, 0, 0)
+                    : new THREE.Euler(0, 0, 0);
+            default:
+                return null; // earth/sky not pivot-controlled here
+        }
     }
 
     applyEnvironmentPreset(presetId) {
@@ -385,6 +439,9 @@ export class SettingsManager {
                 surface.visible = surfaceSettings.visible;
                 surface.material.color.set(surfaceSettings.color);
                 this.updateSurfaceTexture(surfaceName, surfaceSettings.texture);
+                if (surface.userData.pivot && surfaceSettings.orientation) {
+                    this.updateSurfaceOrientation(surfaceName, surfaceSettings.orientation);
+                }
             }
         });
 
