@@ -26,39 +26,60 @@ export class FoldingAnimator {
                 case CONSTANTS.SURFACES.BACKDROP:
                     // Pivot at bottom edge (where it touches earth)
                     pivot.position.set(0, -halfSize, halfSize);
+                    this.cube.group.remove(surface);
+                    surface.position.set(0, halfSize, 0);
+                    pivot.add(surface);
+                    this.cube.group.add(pivot);
+                    surface.userData.pivot = pivot;
                     break;
                 case CONSTANTS.SURFACES.SKY:
-                    // Pivot at back edge (where it touches backdrop when folded)
-                    pivot.position.set(0, halfSize, halfSize);
+                    // Sky is parented to backdrop, not to main group
+                    // We'll handle this separately after backdrop is set up
                     break;
                 case CONSTANTS.SURFACES.WING_LEFT:
                     // Pivot at bottom edge
                     pivot.position.set(-halfSize, -halfSize, 0);
+                    this.cube.group.remove(surface);
+                    surface.position.set(0, halfSize, 0);
+                    pivot.add(surface);
+                    this.cube.group.add(pivot);
+                    surface.userData.pivot = pivot;
                     break;
                 case CONSTANTS.SURFACES.WING_RIGHT:
                     // Pivot at bottom edge
                     pivot.position.set(halfSize, -halfSize, 0);
+                    this.cube.group.remove(surface);
+                    surface.position.set(0, halfSize, 0);
+                    pivot.add(surface);
+                    this.cube.group.add(pivot);
+                    surface.userData.pivot = pivot;
                     break;
                 case CONSTANTS.SURFACES.PORTAL:
                     // Pivot at bottom edge
                     pivot.position.set(0, -halfSize, -halfSize);
+                    this.cube.group.remove(surface);
+                    surface.position.set(0, halfSize, 0);
+                    pivot.add(surface);
+                    this.cube.group.add(pivot);
+                    surface.userData.pivot = pivot;
                     break;
             }
-            
-            if (name !== CONSTANTS.SURFACES.EARTH) {
-                // Remove surface from group, add to pivot, add pivot to group
-                this.cube.group.remove(surface);
-                
-                // Adjust surface position relative to pivot
-                const worldPos = new THREE.Vector3();
-                surface.getWorldPosition(worldPos);
-                pivot.add(surface);
-                surface.position.copy(worldPos).sub(pivot.position);
-                
-                this.cube.group.add(pivot);
-                surface.userData.pivot = pivot;
-            }
         });
+        
+        // Now attach sky to backdrop's top edge
+        const skySurface = this.cube.surfaces[CONSTANTS.SURFACES.SKY];
+        const backdropSurface = this.cube.surfaces[CONSTANTS.SURFACES.BACKDROP];
+        
+        if (skySurface && backdropSurface) {
+            // Remove sky from main group
+            this.cube.group.remove(skySurface);
+            // Position sky at top edge of backdrop (in backdrop's local space)
+            skySurface.position.set(0, halfSize, 0);
+            skySurface.rotation.set(-Math.PI/2, 0, 0);
+            // Add sky as child of backdrop
+            backdropSurface.add(skySurface);
+            skySurface.userData.parentedToBackdrop = true;
+        }
     }
     
     calculateFoldedPositions() {
@@ -116,34 +137,34 @@ export class FoldingAnimator {
         positions[CONSTANTS.SURFACES.BACKDROP] = {
             position: new THREE.Vector3(0, 0, halfSize),
             rotation: new THREE.Euler(0, Math.PI, 0),
-            pivotRotation: new THREE.Euler(Math.PI/2, 0, 0) // Rotate 90° around X to stand up
+            pivotRotation: new THREE.Euler(-Math.PI/2, 0, 0) // Rotate backward (away from center)
         };
         
-        // Sky rotates forward from back edge to horizontal
+        // Sky doesn't need position data since it's parented to backdrop
         positions[CONSTANTS.SURFACES.SKY] = {
             position: new THREE.Vector3(0, halfSize, 0),
             rotation: new THREE.Euler(-Math.PI/2, 0, 0),
-            pivotRotation: new THREE.Euler(-Math.PI/2, 0, 0) // Rotate to lay flat
+            pivotRotation: new THREE.Euler(0, 0, 0) // No pivot rotation needed
         };
         
         // Wings rotate outward from bottom edge
         positions[CONSTANTS.SURFACES.WING_LEFT] = {
             position: new THREE.Vector3(-halfSize, 0, 0),
             rotation: new THREE.Euler(0, -Math.PI/2, 0),
-            pivotRotation: new THREE.Euler(0, 0, -Math.PI/2) // Rotate around Z to stand up
+            pivotRotation: new THREE.Euler(0, 0, Math.PI/2) // Rotate away from center
         };
         
         positions[CONSTANTS.SURFACES.WING_RIGHT] = {
             position: new THREE.Vector3(halfSize, 0, 0),
             rotation: new THREE.Euler(0, Math.PI/2, 0),
-            pivotRotation: new THREE.Euler(0, 0, Math.PI/2) // Rotate around Z to stand up
+            pivotRotation: new THREE.Euler(0, 0, -Math.PI/2) // Rotate away from center
         };
         
         // Portal folds down or minimizes
         positions[CONSTANTS.SURFACES.PORTAL] = {
             position: new THREE.Vector3(0, -halfSize, -halfSize),
             rotation: new THREE.Euler(Math.PI/2, 0, 0),
-            pivotRotation: new THREE.Euler(Math.PI/2, 0, 0), // Fold flat
+            pivotRotation: new THREE.Euler(-Math.PI/2, 0, 0), // Fold flat away from center
             scale: 0.3
         };
         
