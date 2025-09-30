@@ -1,0 +1,75 @@
+<!DOCTYPE DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folded Living - Diorama Spaces</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/ui.css">
+    <link rel="stylesheet" href="styles/gallery.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Three.js Canvas Container -->
+        <div id="canvas-container"></div>
+        
+        <!-- HUD Overlay -->
+        <div id="hud" class="hud">
+            <div class="hud-top">
+                <div class="currency-display">
+                    <span class="sparkle-icon">✨</span>
+                    <span id="sparkle-count">0</span>
+                </div>
+                <button id="gallery-btn" class="icon-btn">📂</button>
+            </div>
+            
+            <div class="hud-bottom">
+                <div id="toolbar" class="toolbar"></div>
+            </div>
+        </div>
+        
+        <!-- Gallery View (hidden by default) -->
+        <div id="gallery-view" class="gallery-view hidden">
+            <div class="gallery-header">
+                <h2>Cube Gallery</h2>
+                <button id="close-gallery" class="icon-btn">✕</button>
+            </div>
+            <div id="gallery-grid" class="gallery-grid"></div>
+        </div>
+        
+        <!-- Inspector Panel -->
+        <div id="inspector" class="inspector hidden">
+            <div class="inspector-header">
+                <h3>Object Inspector</h3>
+                <button id="close-inspector" class="icon-btn">✕</button>
+            </div>
+            <div class="inspector-content">
+                <div id="inspector-details"></div>
+            </div>
+        </div>
+        
+        <!-- Loading Overlay -->
+        <div id="loading" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <!-- Three.js from CDN -->
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <!-- Main Application -->
+    <script type="module" src="js/main.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+
