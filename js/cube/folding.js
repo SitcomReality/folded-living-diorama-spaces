@@ -7,6 +7,58 @@ export class FoldingAnimator {
         this.animating = false;
         this.foldedPositions = this.calculateFoldedPositions();
         this.unfoldedPositions = this.calculateUnfoldedPositions();
+        this.setupPivots();
+    }
+    
+    setupPivots() {
+        // Create pivot groups for each surface so they rotate around edges
+        const halfSize = this.cube.size / 2;
+        
+        Object.keys(this.cube.surfaces).forEach(name => {
+            const surface = this.cube.surfaces[name];
+            const pivot = new THREE.Group();
+            
+            // Set pivot position based on surface
+            switch(name) {
+                case CONSTANTS.SURFACES.EARTH:
+                    // Earth doesn't need a pivot, it stays fixed
+                    break;
+                case CONSTANTS.SURFACES.BACKDROP:
+                    // Pivot at bottom edge (where it touches earth)
+                    pivot.position.set(0, -halfSize, halfSize);
+                    break;
+                case CONSTANTS.SURFACES.SKY:
+                    // Pivot at back edge (where it touches backdrop when folded)
+                    pivot.position.set(0, halfSize, halfSize);
+                    break;
+                case CONSTANTS.SURFACES.WING_LEFT:
+                    // Pivot at bottom edge
+                    pivot.position.set(-halfSize, -halfSize, 0);
+                    break;
+                case CONSTANTS.SURFACES.WING_RIGHT:
+                    // Pivot at bottom edge
+                    pivot.position.set(halfSize, -halfSize, 0);
+                    break;
+                case CONSTANTS.SURFACES.PORTAL:
+                    // Pivot at bottom edge
+                    pivot.position.set(0, -halfSize, -halfSize);
+                    break;
+            }
+            
+            if (name !== CONSTANTS.SURFACES.EARTH) {
+                // Remove surface from group, add to pivot, add pivot to group
+                this.cube.group.remove(surface);
+                
+                // Adjust surface position relative to pivot
+                const worldPos = new THREE.Vector3();
+                surface.getWorldPosition(worldPos);
+                pivot.add(surface);
+                surface.position.copy(worldPos).sub(pivot.position);
+                
+                this.cube.group.add(pivot);
+                surface.userData.pivot = pivot;
+            }
+        });
     }
     
     calculateFoldedPositions() {
@@ -16,76 +68,83 @@ export class FoldingAnimator {
         
         positions[CONSTANTS.SURFACES.PORTAL] = {
             position: new THREE.Vector3(0, 0, -halfSize),
-            rotation: new THREE.Euler(0, 0, 0)
+            rotation: new THREE.Euler(0, 0, 0),
+            pivotRotation: new THREE.Euler(0, 0, 0)
         };
         positions[CONSTANTS.SURFACES.BACKDROP] = {
             position: new THREE.Vector3(0, 0, halfSize),
-            rotation: new THREE.Euler(0, Math.PI, 0)
+            rotation: new THREE.Euler(0, Math.PI, 0),
+            pivotRotation: new THREE.Euler(0, 0, 0)
         };
         positions[CONSTANTS.SURFACES.SKY] = {
             position: new THREE.Vector3(0, halfSize, 0),
-            rotation: new THREE.Euler(-Math.PI/2, 0, 0)
+            rotation: new THREE.Euler(-Math.PI/2, 0, 0),
+            pivotRotation: new THREE.Euler(0, 0, 0)
         };
         positions[CONSTANTS.SURFACES.EARTH] = {
             position: new THREE.Vector3(0, -halfSize, 0),
-            rotation: new THREE.Euler(Math.PI/2, 0, 0)
+            rotation: new THREE.Euler(Math.PI/2, 0, 0),
+            pivotRotation: new THREE.Euler(0, 0, 0)
         };
         positions[CONSTANTS.SURFACES.WING_LEFT] = {
             position: new THREE.Vector3(-halfSize, 0, 0),
-            rotation: new THREE.Euler(0, -Math.PI/2, 0)
+            rotation: new THREE.Euler(0, -Math.PI/2, 0),
+            pivotRotation: new THREE.Euler(0, 0, 0)
         };
         positions[CONSTANTS.SURFACES.WING_RIGHT] = {
             position: new THREE.Vector3(halfSize, 0, 0),
-            rotation: new THREE.Euler(0, Math.PI/2, 0)
+            rotation: new THREE.Euler(0, Math.PI/2, 0),
+            pivotRotation: new THREE.Euler(0, 0, 0)
         };
         
         return positions;
     }
     
     calculateUnfoldedPositions() {
-        // Diorama configuration: open front, floor extends forward, walls spread out
         const positions = {};
         const size = this.cube.size;
         const halfSize = size / 2;
         
-        // Portal (front) - hidden or moved far forward as the "viewing plane"
-        positions[CONSTANTS.SURFACES.PORTAL] = {
-            position: new THREE.Vector3(0, 0, -size * 1.5),
-            rotation: new THREE.Euler(0, 0, 0),
-            scale: 0.3 // Make it small to indicate it's the viewing portal
-        };
-        
-        // Earth becomes the floor, extended forward
+        // Earth stays fixed as floor
         positions[CONSTANTS.SURFACES.EARTH] = {
             position: new THREE.Vector3(0, -halfSize, 0),
-            rotation: new THREE.Euler(0, 0, 0), // Flat horizontal
-            scale: 1.0
+            rotation: new THREE.Euler(Math.PI/2, 0, 0),
+            pivotRotation: new THREE.Euler(0, 0, 0)
         };
         
-        // Backdrop stays as back wall
+        // Backdrop rotates back to vertical from its bottom edge
         positions[CONSTANTS.SURFACES.BACKDROP] = {
             position: new THREE.Vector3(0, 0, halfSize),
-            rotation: new THREE.Euler(0, 0, 0), // Facing forward
-            scale: 1.0
+            rotation: new THREE.Euler(0, Math.PI, 0),
+            pivotRotation: new THREE.Euler(Math.PI/2, 0, 0) // Rotate 90° around X to stand up
         };
         
-        // Sky stays as ceiling
+        // Sky rotates forward from back edge to horizontal
         positions[CONSTANTS.SURFACES.SKY] = {
             position: new THREE.Vector3(0, halfSize, 0),
-            rotation: new THREE.Euler(0, 0, 0), // Flat horizontal above
-            scale: 1.0
+            rotation: new THREE.Euler(-Math.PI/2, 0, 0),
+            pivotRotation: new THREE.Euler(-Math.PI/2, 0, 0) // Rotate to lay flat
         };
         
-        // Wings fold out to sides
+        // Wings rotate outward from bottom edge
         positions[CONSTANTS.SURFACES.WING_LEFT] = {
             position: new THREE.Vector3(-halfSize, 0, 0),
-            rotation: new THREE.Euler(0, Math.PI/2, 0),
-            scale: 1.0
+            rotation: new THREE.Euler(0, -Math.PI/2, 0),
+            pivotRotation: new THREE.Euler(0, 0, -Math.PI/2) // Rotate around Z to stand up
         };
+        
         positions[CONSTANTS.SURFACES.WING_RIGHT] = {
             position: new THREE.Vector3(halfSize, 0, 0),
-            rotation: new THREE.Euler(0, -Math.PI/2, 0),
-            scale: 1.0
+            rotation: new THREE.Euler(0, Math.PI/2, 0),
+            pivotRotation: new THREE.Euler(0, 0, Math.PI/2) // Rotate around Z to stand up
+        };
+        
+        // Portal folds down or minimizes
+        positions[CONSTANTS.SURFACES.PORTAL] = {
+            position: new THREE.Vector3(0, -halfSize, -halfSize),
+            rotation: new THREE.Euler(Math.PI/2, 0, 0),
+            pivotRotation: new THREE.Euler(Math.PI/2, 0, 0), // Fold flat
+            scale: 0.3
         };
         
         return positions;
@@ -97,13 +156,15 @@ export class FoldingAnimator {
         this.animating = true;
         const startTime = Date.now();
         
-        // Store starting positions
         const startPositions = {};
         Object.keys(this.cube.surfaces).forEach(name => {
             const surface = this.cube.surfaces[name];
+            const pivot = surface.userData.pivot;
+            
             startPositions[name] = {
                 position: surface.position.clone(),
                 rotation: surface.rotation.clone(),
+                pivotRotation: pivot ? pivot.rotation.clone() : new THREE.Euler(0, 0, 0),
                 scale: surface.scale.x
             };
         });
@@ -114,23 +175,18 @@ export class FoldingAnimator {
                 const progress = Math.min(elapsed / duration, 1);
                 const eased = this.easeOutCubic(progress);
                 
-                // Animate each surface to unfolded position
                 Object.keys(this.cube.surfaces).forEach(name => {
                     const surface = this.cube.surfaces[name];
+                    const pivot = surface.userData.pivot;
                     const start = startPositions[name];
                     const end = this.unfoldedPositions[name];
                     
-                    // Interpolate position
-                    surface.position.lerpVectors(
-                        start.position,
-                        end.position,
-                        eased
-                    );
-                    
-                    // Interpolate rotation
-                    surface.rotation.x = this.lerpAngle(start.rotation.x, end.rotation.x, eased);
-                    surface.rotation.y = this.lerpAngle(start.rotation.y, end.rotation.y, eased);
-                    surface.rotation.z = this.lerpAngle(start.rotation.z, end.rotation.z, eased);
+                    if (pivot) {
+                        // Animate pivot rotation
+                        pivot.rotation.x = this.lerpAngle(start.pivotRotation.x, end.pivotRotation.x, eased);
+                        pivot.rotation.y = this.lerpAngle(start.pivotRotation.y, end.pivotRotation.y, eased);
+                        pivot.rotation.z = this.lerpAngle(start.pivotRotation.z, end.pivotRotation.z, eased);
+                    }
                     
                     // Interpolate scale if needed
                     const targetScale = end.scale || 1.0;
@@ -157,13 +213,15 @@ export class FoldingAnimator {
         this.animating = true;
         const startTime = Date.now();
         
-        // Store starting positions
         const startPositions = {};
         Object.keys(this.cube.surfaces).forEach(name => {
             const surface = this.cube.surfaces[name];
+            const pivot = surface.userData.pivot;
+            
             startPositions[name] = {
                 position: surface.position.clone(),
                 rotation: surface.rotation.clone(),
+                pivotRotation: pivot ? pivot.rotation.clone() : new THREE.Euler(0, 0, 0),
                 scale: surface.scale.x
             };
         });
@@ -174,23 +232,18 @@ export class FoldingAnimator {
                 const progress = Math.min(elapsed / duration, 1);
                 const eased = this.easeInCubic(progress);
                 
-                // Animate surfaces folding back
                 Object.keys(this.cube.surfaces).forEach(name => {
                     const surface = this.cube.surfaces[name];
+                    const pivot = surface.userData.pivot;
                     const start = startPositions[name];
                     const end = this.foldedPositions[name];
                     
-                    // Interpolate position
-                    surface.position.lerpVectors(
-                        start.position,
-                        end.position,
-                        eased
-                    );
-                    
-                    // Interpolate rotation
-                    surface.rotation.x = this.lerpAngle(start.rotation.x, end.rotation.x, eased);
-                    surface.rotation.y = this.lerpAngle(start.rotation.y, end.rotation.y, eased);
-                    surface.rotation.z = this.lerpAngle(start.rotation.z, end.rotation.z, eased);
+                    if (pivot) {
+                        // Animate pivot rotation back to folded
+                        pivot.rotation.x = this.lerpAngle(start.pivotRotation.x, end.pivotRotation.x, eased);
+                        pivot.rotation.y = this.lerpAngle(start.pivotRotation.y, end.pivotRotation.y, eased);
+                        pivot.rotation.z = this.lerpAngle(start.pivotRotation.z, end.pivotRotation.z, eased);
+                    }
                     
                     // Reset scale
                     const currentScale = start.scale + (1.0 - start.scale) * eased;
