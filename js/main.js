@@ -137,6 +137,9 @@ class FoldedLivingApp {
                 this.hudManager.showNotification(`Daily reward claimed: ${reward} ✨`);
             }
             
+            // Start with cube folded, then unfold it
+            await new Promise(resolve => setTimeout(resolve, 500)); // Brief pause to see folded state
+            
             // Unfold the cube
             await this.foldingAnimator.unfold();
             
@@ -198,4 +201,3 @@ class FoldedLivingApp {
 window.addEventListener('DOMContentLoaded', () => {
     window.app = new FoldedLivingApp();
 });
-
