@@ -3,7 +3,7 @@ import { CameraController } from './core/camera.js';
 import { RendererManager } from './core/renderer.js';
 import { InputManager } from './core/input.js';
 import { DioramaCube } from './cube/cube.js';
-import { FoldingAnimator } from './cube/folding.js';
+import { FoldingAnimator } from './cube/folding/index.js';
 import { SurfaceManager } from './cube/surfaces.js';
 import { PlacementSystem } from './building/placement.js';
 import { SelectionSystem } from './building/selection.js';
@@ -165,4 +165,3 @@ export class FoldedLivingApp {
         }
     }
 }
-
