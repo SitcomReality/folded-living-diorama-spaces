@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { getAssetById } from '../config/assets.js';
 
 export class InspectorManager {
@@ -39,6 +40,11 @@ export class InspectorManager {
         const pos = this.currentObject.position;
         const rot = this.currentObject.rotation;
         
+        // Convert radians to degrees for display
+        const rotX = (rot.x * 180 / Math.PI).toFixed(1);
+        const rotY = (rot.y * 180 / Math.PI).toFixed(1);
+        const rotZ = (rot.z * 180 / Math.PI).toFixed(1);
+        
         this.content.innerHTML = `
             <div class="property-row">
                 <div class="property-label">Asset</div>
@@ -61,7 +67,7 @@ export class InspectorManager {
                 </div>
             ` : ''}
             <div class="property-row">
-                <div class="property-label">Position</div>
+                <div class="property-label">Local Position (relative to surface)</div>
                 <div class="property-value">
                     X: ${pos.x.toFixed(2)}<br>
                     Y: ${pos.y.toFixed(2)}<br>
@@ -69,7 +75,10 @@ export class InspectorManager {
                 </div>
             </div>
             <div class="property-row">
-                <div class="property-label">Rotation</div>
+                <div class="property-label">Local Rotation (Degrees)</div>
+                <div class="property-value">
+                    X: ${rotX}° | Y: ${rotY}° | Z: ${rotZ}°
+                </div>
                 <div class="inspector-rotation-controls">
                     <button class="rotation-btn" data-axis="y" data-angle="-45">↶ 45°</button>
                     <button class="rotation-btn" data-axis="y" data-angle="45">↷ 45°</button>

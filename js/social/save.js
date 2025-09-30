@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 export class SaveManager {
     constructor(cube, databaseManager) {
         this.cube = cube;

@@ -115,14 +115,21 @@ export class PlacementSystem {
         
         if (intersects.length > 0) {
             const hit = intersects[0];
-            // base orientation from surface normal
+            
+            // 1. Calculate Base Orientation (aligned with surface normal, but Y axis up)
             const normalMatrix = new THREE.Matrix4();
             normalMatrix.lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0, 1, 0));
-            this.previewObject.quaternion.setFromRotationMatrix(normalMatrix);
-            
-            // apply yaw rotation around world up (absolute, not incremental)
+            const qBase = new THREE.Quaternion().setFromRotationMatrix(normalMatrix);
+
+            // 2. Calculate Yaw Rotation (World Y axis rotation based on user input)
             const targetYaw = snapActive ? Math.round(this.previewYaw / (Math.PI/4)) * (Math.PI/4) : this.previewYaw;
-            this.previewObject.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), targetYaw);
+            this.appliedYaw = targetYaw;
+
+            const qYaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetYaw);
+
+            // 3. Combine rotations: Apply yaw rotation *to* the base orientation.
+            // Q_final = Q_yaw * Q_base
+            this.previewObject.quaternion.copy(qYaw).multiply(qBase);
             
             this.lastHitSurfaceName = (hit.object.userData && hit.object.userData.surfaceName) 
                 || (hit.object.parent && hit.object.parent.userData && hit.object.parent.userData.surfaceName) 
