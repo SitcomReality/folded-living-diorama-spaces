@@ -11,6 +11,7 @@ export class PlacementSystem {
         this.raycaster = new THREE.Raycaster();
         this.gltfLoader = new GLTFLoader();
         this.modelCache = new Map();
+        this.lastHitSurfaceName = null;
     }
     
     async startPlacement(assetId) {
@@ -110,10 +111,13 @@ export class PlacementSystem {
             const normalMatrix = new THREE.Matrix4();
             normalMatrix.lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0, 1, 0));
             this.previewObject.quaternion.setFromRotationMatrix(normalMatrix);
-
+            this.lastHitSurfaceName = (hit.object.userData && hit.object.userData.surfaceName) 
+                || (hit.object.parent && hit.object.parent.userData && hit.object.parent.userData.surfaceName) 
+                || null;
             this.previewObject.visible = true;
         } else {
             this.previewObject.visible = false;
+            this.lastHitSurfaceName = null;
         }
     }
     
@@ -121,6 +125,9 @@ export class PlacementSystem {
         if (!this.isPlacing || !this.previewObject || !this.previewObject.visible) {
             return null;
         }
+        
+        const surfaceName = this.lastHitSurfaceName;
+        if (!surfaceName) return null;
         
         const asset = getAssetById(this.currentAssetId);
         if (!asset) {
@@ -133,41 +140,27 @@ export class PlacementSystem {
         if (asset.modelPath) {
             try {
                 object = await this.loadModel(asset.modelPath);
-                
-                // Enable shadows on all meshes
-                object.traverse((child) => {
-                    if (child.isMesh) {
-                        child.castShadow = true;
-                        child.receiveShadow = true;
-                    }
-                });
-            } catch (error) {
-                console.error('Failed to load model for placement:', error);
-                return null;
-            }
+                object.traverse((child) => { if (child.isMesh) { child.castShadow = true; child.receiveShadow = true; } });
+            } catch (error) { console.error('Failed to load model for placement:', error); return null; }
         } else {
             const geometry = new THREE.BoxGeometry(1, 1, 1);
             const material = new THREE.MeshStandardMaterial({ color: 0x4a9eff });
-            object = new THREE.Mesh(geometry, material);
-            object.castShadow = true;
+            object = new THREE.Mesh(geometry, material); object.castShadow = true;
         }
         
+        // Copy exact ghost transform (world-aligned since preview is in scene root)
         object.position.copy(this.previewObject.position);
-        object.rotation.copy(this.previewObject.rotation);
+        object.quaternion.copy(this.previewObject.quaternion);
+        object.scale.copy(this.previewObject.scale);
         object.userData.assetId = this.currentAssetId;
         
-        // Find which surface this is on
-        const surfaceName = this.findSurfaceForPosition(object.position);
-        if (surfaceName) {
-            const localPos = this.worldToLocal(object.position, surfaceName);
-            const localRot = this.worldToLocalRotation(object.rotation, surfaceName);
-            
-            // Set position and rotation in local space
-            object.position.copy(localPos);
-            object.rotation.copy(localRot);
-            
-            this.cube.addObject(object, surfaceName, localPos);
-        }
+        // Add, then reparent to surface while preserving world transform
+        this.scene.add(object);
+        const surface = this.cube.surfaces[surfaceName];
+        surface.attach(object);
+        
+        // Track via cube with current local position
+        this.cube.addObject(object, surfaceName, object.position.clone());
         
         return object;
     }
