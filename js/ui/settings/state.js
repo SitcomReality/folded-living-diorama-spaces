@@ -1,4 +1,4 @@
-import { CONSTANTS } from '../config/constants.js';
+import { CONSTANTS } from '../../config/constants.js';
 
 export function createDefaultSettings(cube) {
     const defaults = {
