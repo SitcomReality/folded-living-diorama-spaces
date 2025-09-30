@@ -181,10 +181,22 @@ export class FoldedLivingApp {
             document.body.className = '';
         }
         if (this.toolbarManager.getActiveTool() === 'place') {
+            const snapActive = this.toolbarManager.isSnapEnabled() || this.input.isKeyPressed('shift');
             this.placementSystem.updatePreview(
                 this.camera.getCamera(),
-                this.input.getMousePosition()
+                this.input.getMousePosition(),
+                snapActive
             );
+            // left-click hold rotate
+            if (this.input.isMouseDown()) {
+                this._prevMouse = this._prevMouse || { x: this.input.getMousePosition().x, y: this.input.getMousePosition().y };
+                const cur = this.input.getMousePosition();
+                const dx = cur.x - this._prevMouse.x;
+                this.placementSystem.rotateByDelta(dx, snapActive);
+                this._prevMouse = { x: cur.x, y: cur.y };
+            } else {
+                this._prevMouse = null;
+            }
         }
         this.renderer.render(this.scene.getScene(), this.camera.getCamera());
     }

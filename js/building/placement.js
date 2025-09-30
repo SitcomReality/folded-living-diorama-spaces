@@ -13,6 +13,8 @@ export class PlacementSystem {
         this.gltfLoader = new GLTFLoader();
         this.modelCache = new Map();
         this.lastHitSurfaceName = null;
+        this.previewYaw = 0;
+        this.appliedYaw = 0;
     }
     
     async startPlacement(assetId) {
@@ -103,7 +105,7 @@ export class PlacementSystem {
         });
     }
     
-    updatePreview(camera, mousePos) {
+    updatePreview(camera, mousePos, snapActive = false) {
         if (!this.isPlacing || !this.previewObject) return;
         
         this.raycaster.setFromCamera(mousePos, camera);
@@ -113,15 +115,34 @@ export class PlacementSystem {
         
         if (intersects.length > 0) {
             const hit = intersects[0];
-            this.previewObject.position.copy(hit.point);
-            
-            // Align to surface normal
+            // base orientation from surface normal
             const normalMatrix = new THREE.Matrix4();
             normalMatrix.lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0, 1, 0));
             this.previewObject.quaternion.setFromRotationMatrix(normalMatrix);
             this.lastHitSurfaceName = (hit.object.userData && hit.object.userData.surfaceName) 
                 || (hit.object.parent && hit.object.parent.userData && hit.object.parent.userData.surfaceName) 
                 || null;
+            // position snapping
+            const surface = this.cube.surfaces[this.lastHitSurfaceName];
+            if (surface) {
+                const cell = this.cube.size / 8;
+                const local = surface.worldToLocal(hit.point.clone());
+                if (snapActive) {
+                    local.x = Math.round(local.x / cell) * cell;
+                    local.y = Math.round(local.y / cell) * cell;
+                }
+                const snappedWorld = surface.localToWorld(local);
+                this.previewObject.position.copy(snappedWorld);
+            } else {
+                this.previewObject.position.copy(hit.point);
+            }
+            // re-apply yaw around world up
+            const targetYaw = snapActive ? Math.round(this.previewYaw / (Math.PI/4)) * (Math.PI/4) : this.previewYaw;
+            const deltaYaw = targetYaw - this.appliedYaw;
+            if (Math.abs(deltaYaw) > 1e-6) {
+                this.previewObject.rotateOnWorldAxis(new THREE.Vector3(0,1,0), deltaYaw);
+                this.appliedYaw = targetYaw;
+            }
             this.previewObject.visible = true;
         } else {
             this.previewObject.visible = false;
@@ -216,6 +237,19 @@ export class PlacementSystem {
         if (this.previewObject) {
             this.scene.remove(this.previewObject);
             this.previewObject = null;
+        }
+        this.previewYaw = 0; this.appliedYaw = 0;
+    }
+    
+    rotateByDelta(deltaX, snapActive = false) {
+        if (!this.isPlacing || !this.previewObject || !this.previewObject.visible) return;
+        // sensitivity: normalized deltaX -> radians
+        this.previewYaw += deltaX * Math.PI; // 180° per full screen width movement
+        const targetYaw = snapActive ? Math.round(this.previewYaw / (Math.PI/4)) * (Math.PI/4) : this.previewYaw;
+        const deltaYaw = targetYaw - this.appliedYaw;
+        if (Math.abs(deltaYaw) > 1e-6) {
+            this.previewObject.rotateOnWorldAxis(new THREE.Vector3(0,1,0), deltaYaw);
+            this.appliedYaw = targetYaw;
         }
     }
 }

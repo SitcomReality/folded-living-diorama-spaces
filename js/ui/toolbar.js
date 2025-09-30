@@ -31,6 +31,18 @@ export class ToolbarManager {
             
             this.container.appendChild(btn);
         });
+        
+        // Snap-to-grid toggle
+        this.snapEnabled = false;
+        const snapBtn = document.createElement('button');
+        snapBtn.className = 'tool-btn';
+        snapBtn.dataset.tool = 'snap';
+        snapBtn.textContent = '🧲 Snap';
+        snapBtn.addEventListener('click', () => {
+            this.snapEnabled = !this.snapEnabled;
+            snapBtn.classList.toggle('active', this.snapEnabled);
+        });
+        this.container.appendChild(snapBtn);
     }
     
     createAssetPicker() {
@@ -153,4 +165,6 @@ export class ToolbarManager {
     getActiveTool() {
         return this.activeTool;
     }
+    
+    isSnapEnabled() { return !!this.snapEnabled; }
 }
