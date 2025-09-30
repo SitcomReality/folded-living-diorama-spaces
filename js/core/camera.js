@@ -19,6 +19,7 @@ export class CameraController {
         
         this.target = new THREE.Vector3(0, 0, 0);
         this.isOrbiting = false;
+        this.isPanning = false;
         this.orbitSpeed = 0.005;
         
         this.setupControls(renderer);
@@ -30,11 +31,21 @@ export class CameraController {
         let lastX = 0;
         let lastY = 0;
         
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
         canvas.addEventListener('mousedown', (e) => {
-            if (e.button === 0) { // Left click
+            lastX = e.clientX;
+            lastY = e.clientY;
+
+            if (e.button === 2) { // Right click for Orbit (Rotate)
                 this.isOrbiting = true;
-                lastX = e.clientX;
-                lastY = e.clientY;
+                this.isPanning = false;
+            } else if (e.button === 1) { // Middle click for Pan
+                this.isPanning = true;
+                this.isOrbiting = false;
+            } else {
+                this.isOrbiting = false; 
+                this.isPanning = false;
             }
         });
         
@@ -47,11 +58,23 @@ export class CameraController {
                 
                 lastX = e.clientX;
                 lastY = e.clientY;
+            } else if (this.isPanning) {
+                const deltaX = e.clientX - lastX;
+                const deltaY = e.clientY - lastY;
+
+                this.pan(deltaX, deltaY);
+                
+                lastX = e.clientX;
+                lastY = e.clientY;
             }
         });
         
-        canvas.addEventListener('mouseup', () => {
-            this.isOrbiting = false;
+        canvas.addEventListener('mouseup', (e) => {
+            if (e.button === 2) {
+                this.isOrbiting = false;
+            } else if (e.button === 1) {
+                this.isPanning = false;
+            }
         });
         
         canvas.addEventListener('wheel', (e) => {
@@ -78,6 +101,34 @@ export class CameraController {
         this.camera.lookAt(this.target);
         const minY = -CONSTANTS.CUBE_SIZE / 2 + 0.05;
         if (this.camera.position.y < minY) this.camera.position.y = minY;
+    }
+    
+    pan(deltaX, deltaY) {
+        // Pan sensitivity scaled by distance to target
+        const panSpeed = 0.002 * this.camera.position.distanceTo(this.target);
+
+        // 1. Calculate direction vectors
+        const right = new THREE.Vector3();
+        const offset = new THREE.Vector3().subVectors(this.camera.position, this.target);
+        
+        // Calculate screen right vector using cross product with camera.up (usually world up (0,1,0))
+        right.crossVectors(offset, this.camera.up).normalize();
+        
+        // World up vector for vertical panning
+        const up = new THREE.Vector3(0, 1, 0); 
+        
+        // 2. Calculate translation vectors
+        // Horizontal movement (deltaX): along 'right' vector. Negative deltaX means moving scene right (camera left/negative right).
+        const panRight = right.multiplyScalar(-deltaX * panSpeed);
+        
+        // Vertical movement (deltaY): along 'up' vector. Positive deltaY means moving scene down (camera up/positive up).
+        const panUp = up.multiplyScalar(deltaY * panSpeed);
+
+        const panVector = new THREE.Vector3().addVectors(panRight, panUp);
+
+        // 3. Apply translation
+        this.camera.position.add(panVector);
+        this.target.add(panVector);
     }
     
     zoom(delta) {
