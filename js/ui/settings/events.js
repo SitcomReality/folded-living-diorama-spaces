@@ -18,8 +18,9 @@ export function attachSettingsEvents(content, ctx) {
         colorInput.addEventListener('input', (e) => {
             colorPreview.style.backgroundColor = e.target.value;
             ctx.updateColor(ctx.cube, ctx.settings, surfaceName, e.target.value);
-            ctx.onSettingsChanged();
+            // removed onSettingsChanged during live input to prevent re-render closing the picker
         });
+        colorInput.addEventListener('change', () => ctx.onSettingsChanged());
         const orientationSelect = control.querySelector('[data-control="orientation"]');
         if (orientationSelect) {
             orientationSelect.addEventListener('change', (e) => {
@@ -62,8 +63,9 @@ export function attachSettingsEvents(content, ctx) {
         bgColorPreview.style.backgroundColor = color;
         ctx.settings.environment.backgroundColor = color;
         ctx.updateBackgroundColor(ctx.scene, color);
-        ctx.onSettingsChanged();
+        // no onSettingsChanged on input
     });
+    bgColorInput.addEventListener('change', () => ctx.onSettingsChanged());
     const groundColorInput = content.querySelector('[data-control="ground-color"]');
     const groundColorPreview = content.querySelector('[data-control="ground-color-preview"]');
     groundColorPreview.addEventListener('click', () => groundColorInput.click());
@@ -72,6 +74,7 @@ export function attachSettingsEvents(content, ctx) {
         groundColorPreview.style.backgroundColor = color;
         ctx.settings.environment.groundColor = color;
         ctx.updateGroundColor(ctx.scene, color);
-        ctx.onSettingsChanged();
+        // no onSettingsChanged on input
     });
+    groundColorInput.addEventListener('change', () => ctx.onSettingsChanged());
 }
