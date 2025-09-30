@@ -8,6 +8,7 @@ export class PlacementSystem {
         this.cube = cube;
         this.previewObject = null;
         this.isPlacing = false;
+        this.isLoadingAsset = false;
         this.raycaster = new THREE.Raycaster();
         this.gltfLoader = new GLTFLoader();
         this.modelCache = new Map();
@@ -15,9 +16,16 @@ export class PlacementSystem {
     }
     
     async startPlacement(assetId) {
+        this.isLoadingAsset = true;
         this.isPlacing = true;
         this.currentAssetId = assetId;
+
+        // Allow UI to update before potential blocking from loading
+        await new Promise(resolve => setTimeout(resolve, 10));
+        
         await this.createPreview(assetId);
+        
+        this.isLoadingAsset = false;
     }
     
     async createPreview(assetId) {
@@ -204,6 +212,7 @@ export class PlacementSystem {
     
     cancelPlacement() {
         this.isPlacing = false;
+        this.isLoadingAsset = false;
         if (this.previewObject) {
             this.scene.remove(this.previewObject);
             this.previewObject = null;

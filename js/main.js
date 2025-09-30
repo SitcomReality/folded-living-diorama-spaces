@@ -159,6 +159,21 @@ class FoldedLivingApp {
     }
     
     update(deltaTime) {
+        const canvas = this.renderer.getRenderer().domElement;
+
+        // Handle cursor style based on state
+        if (this.placementSystem.isLoadingAsset) {
+            document.body.className = 'cursor-wait';
+        } else if (this.toolbarManager.getActiveTool() === 'place') {
+            if (this.placementSystem.previewObject && this.placementSystem.previewObject.visible) {
+                document.body.className = 'cursor-none';
+            } else {
+                document.body.className = 'cursor-crosshair';
+            }
+        } else {
+            document.body.className = '';
+        }
+
         // Update preview placement
         if (this.toolbarManager.getActiveTool() === 'place') {
             this.placementSystem.updatePreview(
@@ -176,6 +191,9 @@ class FoldedLivingApp {
     
     onToolSelected(toolId, assetId) {
         console.log('Tool selected:', toolId, assetId);
+        
+        // Reset cursor when tool changes
+        this.input.resetCursor();
         
         if (toolId === 'place') {
             // Start placement mode with selected asset

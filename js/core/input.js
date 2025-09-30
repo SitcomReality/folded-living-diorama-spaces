@@ -54,4 +54,8 @@ export class InputManager {
     didMouseMoveSinceMouseDown() {
         return this.mouseMovedSinceDown;
     }
+
+    resetCursor() {
+        document.body.className = '';
+    }
 }
