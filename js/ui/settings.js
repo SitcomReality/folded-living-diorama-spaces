@@ -3,7 +3,7 @@ import { CONSTANTS } from '../config/constants.js';
 import { createDefaultSettings } from './settings/state.js';
 import { renderSettingsHTML } from './settings/render.js';
 import { attachSettingsEvents } from './settings/events.js';
-import { applyPreset, updateAmbientLight, updateBackgroundColor } from './settings/environmentPresets.js';
+import { applyPreset, updateAmbientLight, updateBackgroundColor, updateGroundColor } from './settings/environmentPresets.js';
 import { toggleVisibility, updateColor, updateTexture, updateOrientation } from './settings/surfaceControls.js';
 
 export class SettingsManager {
