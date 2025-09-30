@@ -11,22 +11,27 @@ export class SceneManager {
     }
     
     setupLighting() {
-        // Ambient light
-        const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+        // Warm ambient light
+        const ambient = new THREE.AmbientLight(0xfff5e6, 0.6);
         this.scene.add(ambient);
         
-        // Key light
-        const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        // Warm key light
+        const keyLight = new THREE.DirectionalLight(0xfff0d4, 0.7);
         keyLight.position.set(5, 10, 5);
         keyLight.castShadow = true;
         keyLight.shadow.mapSize.width = 2048;
         keyLight.shadow.mapSize.height = 2048;
         this.scene.add(keyLight);
         
-        // Fill light
-        const fillLight = new THREE.DirectionalLight(0x88ccff, 0.3);
+        // Soft fill light
+        const fillLight = new THREE.DirectionalLight(0xd4e6ff, 0.25);
         fillLight.position.set(-5, 5, -5);
         this.scene.add(fillLight);
+        
+        // Subtle rim light for depth
+        const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.3);
+        rimLight.position.set(0, 3, -10);
+        this.scene.add(rimLight);
     }
     
     setupHelpers() {
@@ -52,4 +57,3 @@ export class SceneManager {
         this.gridHelper.visible = !this.gridHelper.visible;
     }
 }
-

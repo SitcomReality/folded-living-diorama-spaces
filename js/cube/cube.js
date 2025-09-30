@@ -15,14 +15,14 @@ export class DioramaCube {
     createCube() {
         const halfSize = this.size / 2;
         
-        // Create individual surfaces with different colors for distinction
+        // Warm, cozy colors for surfaces
         const surfaceConfigs = [
-            { name: CONSTANTS.SURFACES.PORTAL, color: 0x4a9eff, position: [0, 0, -halfSize], rotation: [0, 0, 0] },
-            { name: CONSTANTS.SURFACES.BACKDROP, color: 0x9eff4a, position: [0, 0, halfSize], rotation: [0, Math.PI, 0] },
-            { name: CONSTANTS.SURFACES.SKY, color: 0xff9e4a, position: [0, halfSize, 0], rotation: [-Math.PI/2, 0, 0] },
-            { name: CONSTANTS.SURFACES.EARTH, color: 0x4aff9e, position: [0, -halfSize, 0], rotation: [Math.PI/2, 0, 0] },
-            { name: CONSTANTS.SURFACES.WING_LEFT, color: 0xff4a9e, position: [-halfSize, 0, 0], rotation: [0, -Math.PI/2, 0] },
-            { name: CONSTANTS.SURFACES.WING_RIGHT, color: 0x9e4aff, position: [halfSize, 0, 0], rotation: [0, Math.PI/2, 0] }
+            { name: CONSTANTS.SURFACES.PORTAL, color: 0xf5e6d3, position: [0, 0, -halfSize], rotation: [0, 0, 0] },
+            { name: CONSTANTS.SURFACES.BACKDROP, color: 0xe8d4c0, position: [0, 0, halfSize], rotation: [0, Math.PI, 0] },
+            { name: CONSTANTS.SURFACES.SKY, color: 0xd4e8f5, position: [0, halfSize, 0], rotation: [-Math.PI/2, 0, 0] },
+            { name: CONSTANTS.SURFACES.EARTH, color: 0xa8c9a3, position: [0, -halfSize, 0], rotation: [Math.PI/2, 0, 0] },
+            { name: CONSTANTS.SURFACES.WING_LEFT, color: 0xf0d8c4, position: [-halfSize, 0, 0], rotation: [0, -Math.PI/2, 0] },
+            { name: CONSTANTS.SURFACES.WING_RIGHT, color: 0xf0d8c4, position: [halfSize, 0, 0], rotation: [0, Math.PI/2, 0] }
         ];
         
         surfaceConfigs.forEach(config => {
@@ -30,8 +30,8 @@ export class DioramaCube {
             const material = new THREE.MeshStandardMaterial({ 
                 color: config.color,
                 side: THREE.DoubleSide,
-                roughness: 0.8,
-                metalness: 0.2
+                roughness: 0.9,
+                metalness: 0.05
             });
             
             const mesh = new THREE.Mesh(geometry, material);
@@ -53,8 +53,8 @@ export class DioramaCube {
             new THREE.BoxGeometry(this.size, this.size, this.size)
         );
         const edgeMaterial = new THREE.LineBasicMaterial({ 
-            color: 0xffffff, 
-            opacity: 0.2, 
+            color: 0x8a7a66, 
+            opacity: 0.3, 
             transparent: true 
         });
         const edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
@@ -125,4 +125,3 @@ export class DioramaCube {
         };
     }
 }
-
