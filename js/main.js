@@ -71,7 +71,7 @@ class FoldedLivingApp {
         
         this.toolbarManager = new ToolbarManager(
             document.getElementById('toolbar'),
-            (toolId) => this.onToolSelected(toolId)
+            (toolId, assetId) => this.onToolSelected(toolId, assetId)
         );
         
         this.inspectorManager = new InspectorManager();
