@@ -9,6 +9,7 @@ export class GalleryManager {
         this.closeBtn = document.getElementById('close-gallery');
         
         this.setupListeners();
+        this.unsubscribe = null;
     }
     
     setupListeners() {
@@ -23,11 +24,13 @@ export class GalleryManager {
     
     async show() {
         this.view.classList.remove('hidden');
-        await this.loadCubes();
+        if (this.unsubscribe) this.unsubscribe();
+        this.unsubscribe = this.databaseManager.subscribeToCubes((cubes) => this.renderCubes(cubes));
     }
     
     hide() {
         this.view.classList.add('hidden');
+        if (this.unsubscribe) { this.unsubscribe(); this.unsubscribe = null; }
     }
     
     async loadCubes() {
@@ -108,4 +111,3 @@ export class GalleryManager {
         console.log(`Reacted with ${reactionType}, earned ${reward} ✨`);
     }
 }
-
