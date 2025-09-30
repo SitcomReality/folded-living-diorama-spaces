@@ -74,7 +74,7 @@ export class FoldingAnimator {
             // Remove sky from main group
             this.cube.group.remove(skySurface);
             // Position sky at top edge of backdrop (in backdrop's local space)
-            skySurface.position.set(0, halfSize, 0);
+            skySurface.position.set(0, halfSize, halfSize);
             skySurface.rotation.set(-Math.PI/2, 0, 0);
             // Add sky as child of backdrop
             backdropSurface.add(skySurface);
@@ -137,7 +137,7 @@ export class FoldingAnimator {
         positions[CONSTANTS.SURFACES.BACKDROP] = {
             position: new THREE.Vector3(0, 0, halfSize),
             rotation: new THREE.Euler(0, Math.PI, 0),
-            pivotRotation: new THREE.Euler(-Math.PI/2, 0, 0) // Rotate backward (away from center)
+            pivotRotation: new THREE.Euler(Math.PI/2, 0, 0) // Rotate backward (away from center)
         };
         
         // Sky doesn't need position data since it's parented to backdrop
