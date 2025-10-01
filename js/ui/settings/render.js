@@ -1,12 +1,28 @@
 import { CONSTANTS } from '../../config/constants.js';
 
 export function renderSettingsHTML(settings) {
-    const surfaces = Object.keys(CONSTANTS.SURFACES).map(k => CONSTANTS.SURFACES[k]);
+    // Preferred display order so Left / Floor / Right sit together for clarity
+    const surfaces = [
+      CONSTANTS.SURFACES.WING_LEFT,
+      CONSTANTS.SURFACES.EARTH,
+      CONSTANTS.SURFACES.WING_RIGHT,
+      CONSTANTS.SURFACES.PORTAL,
+      CONSTANTS.SURFACES.BACKDROP,
+      CONSTANTS.SURFACES.SKY
+    ];
     
-    // Compact surface grid
+    // Friendly display name overrides for end users
     const surfaceCards = surfaces.map(surfaceName => {
         const s = settings.surfaces[surfaceName];
-        const displayName = surfaceName.replace('_', ' ');
+        const NAME_MAP = {
+          portal: 'Front',
+          backdrop: 'Back',
+          sky: 'Ceiling',
+          earth: 'Floor',
+          wing_left: 'Left',
+          wing_right: 'Right'
+        };
+        const displayName = NAME_MAP[surfaceName] || surfaceName.replace('_', ' ');
         const hasPivot = ['backdrop','wing_left','wing_right'].includes(surfaceName);
         
         return `
