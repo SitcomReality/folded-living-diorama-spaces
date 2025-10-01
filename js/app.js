@@ -123,13 +123,11 @@ export class FoldedLivingApp {
         canvas.addEventListener('mouseup', async (e) => {
             if (e.button === 0 && this.toolbarManager.getActiveTool() === 'place') {
                 document.exitPointerLock();
-                // If the mouse moved, we were rotating. The object is placed on mouse up.
-                if (this.input.didMouseMoveSinceMouseDown()) {
-                    const placed = await this.placementSystem.placeObject();
-                     if (placed) {
-                        console.log('Object placed after rotation');
-                        this.saveManager.autoSave();
-                    }
+                // Always place the object on mouse up when in placement mode
+                const placed = await this.placementSystem.placeObject();
+                if (placed) {
+                    console.log('Object placed');
+                    this.saveManager.autoSave();
                 }
             }
         });
