@@ -50,16 +50,22 @@ function updatePlacementPreview(app) {
 function handleKeyboardPanning(app, dt) {
     const im = app.input;
     const speed = 600;
-    let dx = 0;
-    let dy = 0;
     
-    if (im.isKeyPressed('a') || im.isKeyPressed('arrowleft')) dx += 1;
-    if (im.isKeyPressed('d') || im.isKeyPressed('arrowright')) dx -= 1;
-    if (im.isKeyPressed('w') || im.isKeyPressed('arrowup')) dy += 1;
-    if (im.isKeyPressed('s') || im.isKeyPressed('arrowdown')) dy -= 1;
-    
-    if (dx || dy) {
-        app.camera.pan(dx * speed * (dt || 0.016), dy * speed * (dt || 0.016));
+    // Horizontal pan: A/Left -> left, D/Right -> right (swapped from previous behavior)
+    let h = 0;
+    if (im.isKeyPressed('a') || im.isKeyPressed('arrowleft')) h -= 1;
+    if (im.isKeyPressed('d') || im.isKeyPressed('arrowright')) h += 1;
+
+    // Forward/back: W/Up -> forward (closer), S/Down -> backward (away)
+    let vz = 0;
+    if (im.isKeyPressed('w') || im.isKeyPressed('arrowup')) vz -= 1;
+    if (im.isKeyPressed('s') || im.isKeyPressed('arrowdown')) vz += 1;
+
+    if (h) {
+        app.camera.pan(h * speed * (dt || 0.016), 0);
+    }
+    if (vz) {
+        // scale to match wheel behavior (wheel used ~0.01 per delta)
+        app.camera.zoom(vz * speed * (dt || 0.016) * 0.01);
     }
 }
-
