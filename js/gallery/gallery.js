@@ -10,6 +10,17 @@ export class GalleryManager {
         
         this.setupListeners();
         this.unsubscribe = null;
+        this.currentUser = null;
+        this._initUser();
+    }
+    
+    async _initUser() {
+        try {
+            const user = await window.websim.getCurrentUser();
+            this.currentUser = user?.username || null;
+        } catch (e) {
+            console.warn('Failed to get current user:', e);
+        }
     }
     
     setupListeners() {
@@ -65,6 +76,11 @@ export class GalleryManager {
             ? `<img src="${thumbnailUrl}" class="cube-thumbnail" alt="Preview of ${displayName}">`
             : '<div class="preview-placeholder">📦</div>';
         
+        const isOwner = this.currentUser && cube.username === this.currentUser;
+        const isModerator = this.currentUser === 'SitcomReality';
+        const canModerate = isOwner || isModerator;
+        const actionLabel = isOwner ? 'Delete' : 'Delete';
+        
         card.innerHTML = `
             <div class="cube-preview">
                 ${previewHTML}
@@ -84,6 +100,7 @@ export class GalleryManager {
                     <button class="reaction-btn" data-reaction="star">⭐</button>
                     <button class="reaction-btn" data-reaction="fire">🔥</button>
                     <button class="reaction-btn" data-reaction="sparkle">✨</button>
+                    ${canModerate ? `<button class="reaction-btn delete-btn">🗑️ ${actionLabel}</button>` : ``}
                 </div>
             </div>
         `;
@@ -104,6 +121,27 @@ export class GalleryManager {
                 setTimeout(() => btn.classList.remove('reacted'), 300);
             });
         });
+        
+        if (canModerate) {
+            const delBtn = card.querySelector('.delete-btn');
+            delBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const confirmMsg = isOwner
+                    ? 'Delete this cube? This cannot be undone.'
+                    : 'Moderator action: Remove this cube from the gallery?';
+                if (!confirm(confirmMsg)) return;
+                try {
+                    if (isOwner) {
+                        await this.databaseManager.deleteCube(cube.id);
+                    } else {
+                        await this.databaseManager.hideCube(cube.id);
+                    }
+                } catch (err) {
+                    console.error('Delete/Hide failed:', err);
+                    alert('Failed to delete/hide cube.');
+                }
+            });
+        }
         
         return card;
     }

@@ -3,11 +3,15 @@ const room = new WebsimSocket();
 export class DatabaseManager {
     constructor() {
         this.initialized = false;
+        this.hiddenIds = new Set();
+        this._hiddenUnsub = null;
     }
     
     async initialize() {
         if (this.initialized) return;
         await room.initialize();
+        // subscribe to moderation flags (hidden cubes)
+        this._subscribeHidden();
         this.initialized = true;
     }
     
@@ -52,22 +56,25 @@ export class DatabaseManager {
         await this.initialize();
         
         const cubes = room.collection('cube_v1').getList();
-        return cubes.map(cube => {
-            try {
-                return {
-                    ...cube,
-                    data: JSON.parse(cube.data)
-                };
-            } catch (e) {
-                console.warn("Failed to parse cube data for cube:", cube.id, e);
-                return { ...cube, data: {} };
-            }
-        });
+        return cubes
+            .filter(c => !this.hiddenIds.has(c.id))
+            .map(cube => {
+                try {
+                    return {
+                        ...cube,
+                        data: JSON.parse(cube.data)
+                    };
+                } catch (e) {
+                    console.warn("Failed to parse cube data for cube:", cube.id, e);
+                    return { ...cube, data: {} };
+                }
+            });
     }
     
     subscribeToCubes(callback) {
         return room.collection('cube_v1').subscribe((cubes) => {
-            const parsed = cubes.map(cube => {
+            const filtered = cubes.filter(c => !this.hiddenIds.has(c.id));
+            const parsed = filtered.map(cube => {
                 try {
                     return {
                         ...cube,
@@ -106,6 +113,30 @@ export class DatabaseManager {
         } catch (error) {
             console.error('Error deleting cube:', error);
             throw error;
+        }
+    }
+    
+    // Soft-hide for moderator: create a flag record
+    async hideCube(cubeId) {
+        await this.initialize();
+        try {
+            await room.collection('cube_hide_v1').create({ cube_id: cubeId });
+        } catch (error) {
+            console.error('Error flagging cube hidden:', error);
+            throw error;
+        }
+    }
+    
+    _subscribeHidden() {
+        try {
+            // keep set in sync
+            this._hiddenUnsub = room.collection('cube_hide_v1').subscribe((flags) => {
+                const ids = new Set();
+                flags.forEach(f => { if (f.cube_id) ids.add(f.cube_id); });
+                this.hiddenIds = ids;
+            });
+        } catch (e) {
+            console.warn('Moderation hide subscription failed:', e);
         }
     }
 }
