@@ -51,6 +51,7 @@ export class SettingsManager {
                 if (this.saveManager) {
                     this.saveManager.autoSave();
                 }
+                window.dispatchEvent(new CustomEvent('settingsChanged'));
             }
         });
     }

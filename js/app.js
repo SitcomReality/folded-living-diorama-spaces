@@ -20,6 +20,7 @@ import { TransitionManager } from './gallery/transitions.js';
 import { NamingModal } from './ui/naming.js';
 import { AnimationLoop } from './utils/animation.js';
 import * as THREE from 'three';
+import { HistoryManager } from './ui/history.js';
 
 export class FoldedLivingApp {
     constructor() {
@@ -71,6 +72,7 @@ export class FoldedLivingApp {
         this.settingsManager = new SettingsManager(this.cube, this.scene, this.saveManager);
         this.galleryManager = new GalleryManager(this.databaseManager, this.economyManager);
         this.transitionManager = new TransitionManager(this.camera);
+        this.historyManager = new HistoryManager(50);
         
         window.addEventListener('newCube', () => this.resetCube());
     }
@@ -128,6 +130,7 @@ export class FoldedLivingApp {
                 if (placed) {
                     console.log('Object placed');
                     this.saveManager.autoSave();
+                    this.historyManager.push(this.getSnapshot());
                 }
             }
         });
@@ -160,15 +163,31 @@ export class FoldedLivingApp {
                     this.budgetManager.removeAsset(assetId);
                     this.inspectorManager.hide();
                     this.saveManager.autoSave();
+                    this.historyManager.push(this.getSnapshot());
                 }
             } else if (e.key === 'g') {
                 this.scene.toggleGrid();
+            }
+            // Undo / Redo
+            if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                const snap = e.shiftKey ? this.historyManager.redo() : this.historyManager.undo();
+                if (snap) this.applySnapshot(snap);
+            } else if (e.ctrlKey && e.key.toLowerCase() === 'y') {
+                e.preventDefault();
+                const snap = this.historyManager.redo();
+                if (snap) this.applySnapshot(snap);
             }
         });
         
         // Listen for object modifications from inspector
         window.addEventListener('objectModified', () => {
             this.saveManager.autoSave();
+            this.historyManager.push(this.getSnapshot());
+        });
+        window.addEventListener('settingsChanged', () => {
+            this.saveManager.autoSave();
+            this.historyManager.push(this.getSnapshot());
         });
     }
 
@@ -191,6 +210,7 @@ export class FoldedLivingApp {
             this.animationLoop.add((dt) => this.update(dt));
             this.animationLoop.start();
             loadingOverlay.classList.add('hidden');
+            this.historyManager.push(this.getSnapshot());
             console.log('🎮 Folded Living initialized');
         } catch (error) {
             console.error('Failed to initialize:', error);
@@ -227,6 +247,22 @@ export class FoldedLivingApp {
             this.cube.removeObject(item.object);
         });
         this.settingsManager.applySettings(this.settingsManager.createDefaultSettings());
+        this.historyManager.push(this.getSnapshot());
+    }
+
+    getSnapshot() {
+        return this.saveManager.serializeCube();
+    }
+    
+    applySnapshot(data) {
+        // Clear objects and budgets
+        this.cube.placedObjects.slice().forEach(item => this.cube.removeObject(item.object));
+        this.budgetManager.currentPolyCount = 0;
+        this.budgetManager.currentLightCount = 0;
+        this.budgetManager.notifyListeners();
+        // Apply settings then objects
+        if (data.settings) this.settingsManager.applySettings(data.settings);
+        if (Array.isArray(data.objects)) this.loadCubeData(data);
     }
 
     update() {
