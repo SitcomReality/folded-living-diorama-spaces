@@ -18,7 +18,7 @@ export class HUDManager {
         this.infoBanner = new InfoBannerManager(
             document.getElementById('info-banner'),
             [
-                'Check out <a href="https://websim.com/@SitcomReality/webgem" target="_blank">WebGem</a> for Websim\\'s highest quality overlooked projects!',
+                'Check out <a href="https://websim.com/@SitcomReality/webgem" target="_blank">WebGem</a> for Websim\'s highest quality overlooked projects!',
                 'Models from <a href="https://kaylousberg.itch.io/" target="_blank">KayLousberg.itch.io</a>',
                 'Vibecoded by <a href="https://websim.com/@SitcomReality" target="_blank">SitcomReality</a>'
             ]
