@@ -188,6 +188,9 @@ export class FoldedLivingApp {
                 this.selectionSystem.deselect();
                 this.inspectorManager.hide();
                 this.outlinerManager.highlight(null);
+            } else if (e.code === 'Space') {
+                e.preventDefault();
+                this.toggleFold();
             } else if (e.key === 'Delete' || e.key === 'Backspace') {
                 const selected = this.selectionSystem.getSelected();
                 const assetId = this.selectionSystem.deleteSelected();
