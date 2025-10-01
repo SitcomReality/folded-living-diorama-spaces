@@ -130,6 +130,50 @@ export class FoldingAnimator {
         });
     }
 
+    async animateObjectJiggle() {
+        return new Promise(resolve => {
+            const jiggleDuration = 0.6; // seconds for the jiggle effect
+            const startTime = Date.now();
+
+            const jiggle = () => {
+                const elapsed = (Date.now() - startTime) / 1000;
+                const progress = Math.min(elapsed / jiggleDuration, 1);
+
+                this.cube.placedObjects.forEach(item => {
+                    const obj = item.object;
+                    const originalScale = this.objectInitialScales.get(obj.uuid);
+                    if (!originalScale) return;
+
+                    // Dampened sine wave for a spring-like jiggle
+                    const overshoot = Math.sin(progress * Math.PI * 3) * Math.exp(-progress * 4.5);
+                    const scale = 1 + overshoot * 0.25;
+
+                    obj.scale.set(
+                        originalScale.x * scale,
+                        originalScale.y * scale,
+                        originalScale.z * scale
+                    );
+                });
+
+                if (progress < 1) {
+                    requestAnimationFrame(jiggle);
+                } else {
+                    // Ensure final scale is exact
+                    this.cube.placedObjects.forEach(item => {
+                        const obj = item.object;
+                        const originalScale = this.objectInitialScales.get(obj.uuid);
+                        if (originalScale) {
+                            obj.scale.set(originalScale.x, originalScale.y, originalScale.z);
+                        }
+                    });
+                    resolve();
+                }
+            };
+
+            jiggle();
+        });
+    }
+
     async unfold(duration = CONSTANTS.UNFOLD_DURATION) {
         if (this.animating || !this.cube.isFolded) return;
         this.animating = true;
@@ -199,28 +243,13 @@ export class FoldingAnimator {
                     surface.scale.setScalar(currentScale);
                 });
 
-                // Animate objects with spring jiggle at the end
+                // Animate objects growing to full size along with the walls
                 this.cube.placedObjects.forEach(item => {
                     const obj = item.object;
                     const originalScale = this.objectInitialScales.get(obj.uuid);
                     if (!originalScale) return;
 
-                    let scale = 0;
-                    const growthEndTime = 0.85; // Start jiggle later in the animation
-                    const jiggleDuration = 1.0 - growthEndTime;
-
-                    if (progress < growthEndTime) {
-                        // Grow from 0 to 1 over first 85% of animation
-                        scale = progress / growthEndTime;
-                    } else {
-                        // Spring jiggle in last 15%
-                        const jiggleProgress = (progress - growthEndTime) / jiggleDuration;
-                        // Overshoot, undershoot, settle
-                        // Using a dampened sine wave
-                        const overshoot = Math.sin(jiggleProgress * Math.PI * 3) * Math.exp(-jiggleProgress * 4);
-                        scale = 1 + overshoot * 0.3;
-                    }
-
+                    const scale = eased; // Grow smoothly with the walls
                     obj.scale.set(
                         originalScale.x * scale,
                         originalScale.y * scale,
@@ -231,18 +260,10 @@ export class FoldingAnimator {
                 // Update particle effects
                 this.updateParticles(progress);
 
-                if (progress < 1) requestAnimationFrame(animate);
-                else { 
-                    // Ensure objects are at exact scale
-                    this.cube.placedObjects.forEach(item => {
-                        const obj = item.object;
-                        const originalScale = this.objectInitialScales.get(obj.uuid);
-                        if (originalScale) {
-                            obj.scale.set(originalScale.x, originalScale.y, originalScale.z);
-                        }
-                    });
-
-                    this.animating = false; 
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Wall animation complete. Now, trigger the object jiggle.
                     this.cube.isFolded = false;
                     this.removeUnfoldParticles();
 
@@ -252,7 +273,11 @@ export class FoldingAnimator {
                         window.dispatchEvent(new CustomEvent('cubeUnfolded'));
                     }
 
-                    resolve(); 
+                    // Start the jiggle animation *after* walls are down
+                    this.animateObjectJiggle().then(() => {
+                        this.animating = false;
+                        resolve();
+                    });
                 }
             };
             animate();
@@ -329,17 +354,17 @@ export class FoldingAnimator {
                 });
 
                 if (progress < 1) requestAnimationFrame(animate);
-                else { 
+                else {
                     // Hide all objects when fully folded
                     this.cube.placedObjects.forEach(item => {
                         item.object.visible = false;
                     });
 
-                    this.animating = false; 
+                    this.animating = false;
                     this.cube.isFolded = true;
                     // Switch to exterior texture when folded
                     this.cube.setExteriorTexture();
-                    resolve(); 
+                    resolve();
                 }
             };
             animate();
