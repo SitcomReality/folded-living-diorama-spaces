@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         progressFill.style.width = `${percentage}%`;
         loadingDetails.textContent = `Loading asset ${progress.loaded}/${progress.total}: ${progress.file}`;
     };
-    
+
     // Load asset manifest and preload models before initializing app
     await initializeAssets(onProgress);
 

@@ -2,6 +2,8 @@ import { setupCore } from './setupCore.js';
 import { setupCube } from './setupCube.js';
 import { setupSystems } from './setupSystems.js';
 import { setupInput } from './setupInput.js';
+import { initializeApp, resetCube, getSnapshot, applySnapshot, updateHistoryButtons, loadCubeData } from './lifecycle.js';
+import { createUpdateLoop } from './updateLoop.js';
 import * as THREE from 'three';
 
 export class FoldedLivingApp {
@@ -10,137 +12,58 @@ export class FoldedLivingApp {
         setupCube(this);
         setupSystems(this);
         setupInput(this);
-        this.initialize();
+        this.startApp();
     }
 
-    async initialize() {
-        const loadingOverlay = document.getElementById('loading');
-        try {
-            await this.databaseManager.initialize();
-            const reward = this.economyManager.claimDailyReward();
-            if (reward > 0) this.hudManager.showNotification(`Daily reward claimed: ${reward} ✨`);
-            const savedData = this.saveManager.loadFromLocalStorage();
-            if (savedData) {
-                await this.loadCubeData(savedData);
-            } else {
-                // Apply initial random skybox settings for new cubes
-                await this.settingsManager.applySettings(this.settingsManager.settings);
-            }
-            this.outlinerManager.populate(this.cube.placedObjects.map(item => item.object));
-            this.camera.setDefaultPosition();
-            await new Promise(r => setTimeout(r, 500));
-            await this.foldingAnimator.unfold();
-            this.animationLoop.add((dt) => this.update(dt));
-            this.animationLoop.start();
-            loadingOverlay.classList.add('hidden');
-            this.historyManager.push(this.getSnapshot());
-            this.updateHistoryButtons();
-        } catch (error) {
-            console.error('Failed to initialize:', error);
-            loadingOverlay.innerHTML = '<p>Error loading application</p>';
-        }
+    async startApp() {
+        await initializeApp(this);
+        const updateFn = createUpdateLoop(this);
+        this.animationLoop.add(updateFn);
+        this.animationLoop.start();
+    }
+
+    // Lifecycle methods
+    resetCube() {
+        resetCube(this);
+    }
+
+    getSnapshot() {
+        return getSnapshot(this);
+    }
+
+    applySnapshot(data) {
+        applySnapshot(this, data);
+    }
+
+    updateHistoryButtons() {
+        updateHistoryButtons(this);
     }
 
     async loadCubeData(data) {
-        if (data.settings) await this.settingsManager.applySettings(data.settings);
-        if (Array.isArray(data.objects)) {
-            const { getAssetById } = await import('../config/assets.js');
-            for (const item of data.objects) {
-                let object;
-                const asset = getAssetById(item.assetId);
-                if (asset && asset.modelPath) {
-                    object = await this.placementSystem.loadModel(asset.modelPath);
-                    object.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } });
-                } else {
-                    object = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshStandardMaterial({ color: 0x4a9eff }));
-                    object.castShadow = true;
-                }
-                object.userData.assetId = item.assetId;
-                this.cube.addObject(object, item.surface, new THREE.Vector3(item.position.x, item.position.y, item.position.z));
-                if (item.rotation) object.rotation.set(item.rotation.x, item.rotation.y, item.rotation.z);
-                if (item.scale) object.scale.set(item.scale.x, item.scale.y, item.scale.z);
-                if (item.assetId) this.budgetManager.addAsset(item.assetId);
-            }
-        }
-        this.outlinerManager.populate(this.cube.placedObjects.map(item => item.object));
+        await loadCubeData(this, data);
     }
 
-    resetCube() {
-        this.cube.placedObjects.slice().forEach(item => { this.cube.removeObject(item.object); });
-        this.budgetManager.currentPolyCount = 0;
-        this.budgetManager.currentLightCount = 0;
-        this.budgetManager.notifyListeners();
-        this.outlinerManager.clear();
-        this.settingsManager.settings = this.settingsManager.createDefaultSettings();
-        this.settingsManager.randomizeSkybox();
-        this.settingsManager.applySettings(this.settingsManager.settings);
-        this.historyManager.push(this.getSnapshot());
-    }
-
-    getSnapshot() { return this.saveManager.serializeCube(); }
-
-    applySnapshot(data) {
-        this.cube.placedObjects.slice().forEach(item => this.cube.removeObject(item.object));
-        this.budgetManager.currentPolyCount = 0;
-        this.budgetManager.currentLightCount = 0;
-        this.budgetManager.notifyListeners();
-        if (data.settings) this.settingsManager.applySettings(data.settings);
-        if (Array.isArray(data.objects)) this.loadCubeData(data);
-        this.outlinerManager.populate(this.cube.placedObjects.map(item => item.object));
-    }
-
-    update(dt) {
-        const cls = document.body.classList;
-        cls.remove('cursor-wait', 'cursor-crosshair', 'cursor-none', 'cursor-pointer');
-        if (this.placementSystem.isLoadingAsset) {
-            cls.add('cursor-wait');
-        } else if (this.toolbarManager.getActiveTool() === 'place') {
-            if (this.placementSystem.previewObject && this.placementSystem.previewObject.visible) cls.add('cursor-none');
-            else cls.add('cursor-crosshair');
-        } else if (this.toolbarManager.getActiveTool() === 'delete' || this.toolbarManager.getActiveTool() === 'move') {
-            const hoveredObject = this.selectionSystem.highlightAt(this.camera.getCamera(), this.input.getMousePosition());
-            if (hoveredObject) cls.add('cursor-pointer');
-        } else {
-            this.selectionSystem.clearHighlight();
-        }
-
-        if (this.toolbarManager.getActiveTool() === 'place') {
-            const snapActive = this.toolbarManager.isSnapEnabled() || this.input.isKeyPressed('shift');
-            if (!this.placementSystem.isRotating) {
-                this.placementSystem.updatePreview(this.camera.getCamera(), this.input.getMousePosition(), snapActive);
-            }
-        }
-        // Keyboard pan (WASD / Arrow keys)
-        const im = this.input, speed = 600;
-        let dx = 0, dy = 0;
-        if (im.isKeyPressed('a') || im.isKeyPressed('arrowleft')) dx += 1;
-        if (im.isKeyPressed('d') || im.isKeyPressed('arrowright')) dx -= 1;
-        if (im.isKeyPressed('w') || im.isKeyPressed('arrowup')) dy += 1;
-        if (im.isKeyPressed('s') || im.isKeyPressed('arrowdown')) dy -= 1;
-        if (dx || dy) this.camera.pan(dx * speed * (dt || 0.016), dy * speed * (dt || 0.016));
-        this.renderer.render(this.scene.getScene(), this.camera.getCamera());
-    }
-
+    // Tool and interaction methods
     onToolSelected(toolId, assetId) {
         this.input.resetCursor();
         this.selectionSystem.clearHighlight();
+
         if (toolId === 'place') {
-            if (assetId) this.placementSystem.startPlacement(assetId);
-            else this.placementSystem.cancelPlacement();
+            if (assetId) {
+                this.placementSystem.startPlacement(assetId);
+            } else {
+                this.placementSystem.cancelPlacement();
+            }
         } else {
             this.placementSystem.cancelPlacement();
         }
     }
 
     async toggleFold() {
-        if (this.cube.isFolded) await this.foldingAnimator.unfold();
-        else await this.foldingAnimator.fold();
-    }
-
-    updateHistoryButtons() {
-        const undoBtn = document.getElementById('undo-btn');
-        const redoBtn = document.getElementById('redo-btn');
-        undoBtn.disabled = !this.historyManager.canUndo();
-        redoBtn.disabled = !this.historyManager.canRedo();
+        if (this.cube.isFolded) {
+            await this.foldingAnimator.unfold();
+        } else {
+            await this.foldingAnimator.fold();
+        }
     }
 }

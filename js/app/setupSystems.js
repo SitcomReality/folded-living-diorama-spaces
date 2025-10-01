@@ -13,6 +13,7 @@ import { TransitionManager } from '../gallery/transitions.js';
 import { HistoryManager } from '../ui/history.js';
 import { OutlinerManager } from '../ui/outliner.js';
 import { NamingModal } from '../ui/naming.js';
+import { getSnapshot, applySnapshot, updateHistoryButtons } from './lifecycle.js';
 
 export function setupSystems(app) {
     app.placementSystem = new PlacementSystem(app.scene.getScene(), app.cube);
@@ -34,8 +35,20 @@ export function setupSystems(app) {
     app.outlinerManager = new OutlinerManager();
 
     window.addEventListener('newCube', () => app.resetCube());
-    document.getElementById('undo-btn').addEventListener('click', () => { const snap = app.historyManager.undo(); if (snap) app.applySnapshot(snap); app.updateHistoryButtons(); });
-    document.getElementById('redo-btn').addEventListener('click', () => { const snap = app.historyManager.redo(); if (snap) app.applySnapshot(snap); app.updateHistoryButtons(); });
+    
+    document.getElementById('undo-btn').addEventListener('click', () => {
+        const snap = app.historyManager.undo();
+        if (snap) applySnapshot(app, snap);
+        updateHistoryButtons(app);
+    });
+    
+    document.getElementById('redo-btn').addEventListener('click', () => {
+        const snap = app.historyManager.redo();
+        if (snap) applySnapshot(app, snap);
+        updateHistoryButtons(app);
+    });
+    
     document.getElementById('fold-btn').addEventListener('click', () => app.toggleFold());
     document.getElementById('hide-ui-btn').addEventListener('click', () => document.body.classList.toggle('ui-hidden'));
 }
+
