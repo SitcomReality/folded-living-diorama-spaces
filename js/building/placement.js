@@ -49,7 +49,9 @@ export class PlacementSystem {
 
         // Capture the object's world rotation to extract yaw
         const worldQuaternion = objectToMove.getWorldQuaternion(new THREE.Quaternion());
-        this.previewYaw = new THREE.Euler().setFromQuaternion(worldQuaternion, 'YXZ').y;
+        // Objects were appearing flipped when picked up — rotate captured yaw by 180° so the preview faces correctly.
+        const worldEuler = new THREE.Euler().setFromQuaternion(worldQuaternion, 'YXZ');
+        this.previewYaw = worldEuler.y + Math.PI;
 
         this.cube.removeObject(objectToMove);
         window.app.outlinerManager.removeObject(objectToMove);
