@@ -33,6 +33,8 @@ class AssetLibrary {
     this.assets = new Map();
     this.groupedAssets = new Map();
     this.loaded = false;
+    this.gltfLoader = new GLTFLoader();
+    this.modelCache = new Map();
   }
 
   async load() {
@@ -55,6 +57,42 @@ class AssetLibrary {
       console.error('Failed to load asset manifest:', error);
       this.loadFallbackAssets();
     }
+  }
+
+  async preloadAll(onProgress) {
+    if (!this.loaded) await this.load();
+
+    const allAssets = Array.from(this.assets.values()).filter(a => a.modelPath);
+    const totalAssets = allAssets.length;
+    let loadedCount = 0;
+
+    const promises = allAssets.map(asset => {
+        return new Promise((resolve) => {
+            this.gltfLoader.load(
+                asset.modelPath,
+                (gltf) => {
+                    this.modelCache.set(asset.modelPath, gltf.scene);
+                    loadedCount++;
+                    if (onProgress) {
+                        onProgress({ loaded: loadedCount, total: totalAssets, file: asset.filename });
+                    }
+                    resolve();
+                },
+                undefined,
+                (error) => {
+                    console.error(`Failed to preload ${asset.modelPath}`, error);
+                    loadedCount++;
+                    if (onProgress) {
+                        onProgress({ loaded: loadedCount, total: totalAssets, file: asset.filename });
+                    }
+                    resolve(); // Resolve even on error to not block everything
+                }
+            );
+        });
+    });
+
+    await Promise.all(promises);
+    console.log('All assets preloaded.');
   }
 
   parseAndAddAsset(category, filename) {
@@ -202,14 +240,37 @@ class AssetLibrary {
   getAssetGroup(groupId) {
     return this.groupedAssets.get(groupId);
   }
+
+  async loadModel(path) {
+    if (this.modelCache.has(path)) {
+        const cachedModel = this.modelCache.get(path);
+        // Ensure we always return a clone to avoid shared state issues
+        return cachedModel.clone();
+    }
+    
+    // Fallback for models not in cache (shouldn't happen with preloading)
+    return new Promise((resolve, reject) => {
+        this.gltfLoader.load(
+            path,
+            (gltf) => {
+                const model = gltf.scene;
+                this.modelCache.set(path, model);
+                resolve(model.clone());
+            },
+            undefined,
+            reject
+        );
+    });
+  }
 }
 
 // Global instance
 export const assetLibrary = new AssetLibrary();
 
 // Legacy compatibility functions
-export async function initializeAssets() {
+export async function initializeAssets(onProgress) {
   await assetLibrary.load();
+  await assetLibrary.preloadAll(onProgress);
 }
 
 export function getAssetById(id) {

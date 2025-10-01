@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { getAssetById } from '../config/assets.js';
+import { assetLibrary, getAssetById } from '../config/assets.js';
 
 export class PlacementSystem {
     constructor(scene, cube) {
@@ -10,8 +9,6 @@ export class PlacementSystem {
         this.isPlacing = false;
         this.isLoadingAsset = false;
         this.raycaster = new THREE.Raycaster();
-        this.gltfLoader = new GLTFLoader();
-        this.modelCache = new Map();
         this.lastHitSurfaceName = null;
         this.previewYaw = 0;
         this.appliedYaw = 0;
@@ -88,24 +85,8 @@ export class PlacementSystem {
     }
     
     async loadModel(path) {
-        // Check cache first
-        if (this.modelCache.has(path)) {
-            return this.modelCache.get(path).clone();
-        }
-        
-        // Load model
-        return new Promise((resolve, reject) => {
-            this.gltfLoader.load(
-                path,
-                (gltf) => {
-                    const model = gltf.scene;
-                    this.modelCache.set(path, model);
-                    resolve(model.clone());
-                },
-                undefined,
-                reject
-            );
-        });
+        // Models are preloaded, so this should be fast
+        return assetLibrary.loadModel(path);
     }
     
     updatePreview(camera, mousePos, snapActive = false) {
