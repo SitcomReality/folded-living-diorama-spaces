@@ -46,17 +46,23 @@ export function renderSettingsHTML(settings) {
       </div>`).join('');
 
     const skyboxOptions = [
-        { id: null, name: 'Flat Color', icon: '🎨' },
-        { id: 'sky_16', name: 'Cool Sky', icon: '🌙' },
-        { id: 'sky_17', name: 'Dramatic Sky', icon: '🎭' },
-        { id: 'sky_38', name: 'Bright Sky', icon: '☀️' }
+        { id: null, name: 'Flat Color', thumbnail: null },
+        { id: 'sky_16', name: 'Cool Sky', thumbnail: '/assets/img/sky/sky_16_thumbnail.png' },
+        { id: 'sky_17', name: 'Dramatic Sky', thumbnail: '/assets/img/sky/sky_17_thumbnail.png' },
+        { id: 'sky_38', name: 'Bright Sky', thumbnail: '/assets/img/sky/sky_38_thumbnail.png' }
     ];
 
-    const skyboxHTML = skyboxOptions.map(s => `
-      <div class="skybox-option ${settings.environment.skybox===s.id?'active':''}" data-skybox="${s.id}">
-        <div class="skybox-icon">${s.icon}</div>
-        <div class="skybox-name">${s.name}</div>
-      </div>`).join('');
+    const skyboxHTML = skyboxOptions.map(s => {
+        const isActive = settings.environment.skybox === s.id;
+        const content = s.thumbnail
+            ? `<img src="${s.thumbnail}" alt="${s.name}" class="skybox-thumbnail">`
+            : `<div class="skybox-flat-color"><span class="skybox-icon">🎨</span><span class="skybox-name">Flat Color</span></div>`;
+
+        return `
+            <div class="skybox-option ${isActive ? 'active' : ''}" data-skybox="${s.id === null ? 'null' : s.id}" title="${s.name}">
+                ${content}
+            </div>`;
+    }).join('');
 
     return `
       <div class="settings-section" data-section="surfaces">

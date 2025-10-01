@@ -42,6 +42,13 @@ export function attachSettingsEvents(content, ctx) {
             option.classList.add('active');
             const skyboxId = option.dataset.skybox === 'null' ? null : option.dataset.skybox;
             ctx.settings.environment.skybox = skyboxId;
+
+            // Auto-apply lighting preset
+            const { getSkyboxPreset } = await import('./state.js');
+            const newPreset = getSkyboxPreset(skyboxId);
+            ctx.settings.environment.preset = newPreset;
+            ctx.applyPreset(ctx.scene, newPreset);
+
             await ctx.loadSkybox(ctx.scene, skyboxId);
             ctx.onSettingsChanged();
         });
