@@ -42,7 +42,9 @@ body.ui-hidden #info-banner,
 body.ui-hidden #settings-panel,
 body.ui-hidden #gallery-view,
 body.ui-hidden #inspector,
-body.ui-hidden #outliner {
+body.ui-hidden #outliner,
+body.ui-hidden .asset-picker,
+body.ui-hidden .naming-modal {
     display: none !important;
 }
 
