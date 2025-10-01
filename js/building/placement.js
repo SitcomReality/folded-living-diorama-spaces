@@ -44,6 +44,12 @@ export class PlacementSystem {
             position: objectToMove.position.clone(),
             quaternion: objectToMove.quaternion.clone()
         };
+        // Use the object's current world yaw for the ghost orientation
+        const worldQ = new THREE.Quaternion();
+        objectToMove.getWorldQuaternion(worldQ);
+        const euler = new THREE.Euler().setFromQuaternion(worldQ, 'YXZ');
+        this.previewYaw = euler.y;
+        this.appliedYaw = this.previewYaw;
 
         const assetId = objectToMove.userData.assetId;
         this.cube.removeObject(objectToMove);
@@ -52,6 +58,10 @@ export class PlacementSystem {
         window.app.inspectorManager.hide();
         
         await this.startPlacement(assetId);
+        // Preserve scale on the ghost for better fidelity when moving
+        if (this.previewObject) {
+            this.previewObject.scale.copy(objectToMove.scale);
+        }
     }
     
     async createPreview(assetId) {
