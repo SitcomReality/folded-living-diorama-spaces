@@ -4,6 +4,7 @@ export class NamingModal {
         this.selectedWords = [];
         this.availableWords = [];
         this.isUpdate = false;
+        this.saveAsNewPending = false;
 
         this.createModal();
     }
@@ -55,10 +56,16 @@ export class NamingModal {
 
     show(isUpdate = false) {
         this.isUpdate = isUpdate;
+        this.saveAsNewPending = false;
         this.selectedWords = [];
         this.modal.classList.remove('hidden');
-        this.rerollWords();
-        this.updateUI();
+        if (isUpdate) {
+            this.showUpdateOptionsFirst();
+        } else {
+            this.buildNamingUI();
+            this.rerollWords();
+            this.updateUI();
+        }
     }
 
     hide() {
@@ -126,22 +133,28 @@ export class NamingModal {
     async save() {
         const name = this.selectedWords.join(' ');
 
-        if (this.isUpdate) {
-            // Show options: update or save as new
-            this.showUpdateOptions(name);
+        if (!name || this.selectedWords.length < 2) return;
+
+        if (this.saveAsNewPending) {
+            await this.saveManager.saveAsNew(name);
         } else {
             await this.saveManager.manualSave(name);
-            this.hide();
         }
+
+        this.hide();
     }
 
     showUpdateOptions(name) {
+        // remove old post-name flow; use showUpdateOptionsFirst instead
+        this.showUpdateOptionsFirst();
+    }
+
+    showUpdateOptionsFirst() {
         const body = this.modal.querySelector('.naming-modal-body');
         body.innerHTML = `
             <div class="update-options">
                 <h3>Save Options</h3>
-                <p>Current cube: <strong>${this.saveManager.getCubeName()}</strong></p>
-                <p>New name: <strong>${name}</strong></p>
+                <p>Current cube: <strong>${this.saveManager.getCubeName() || 'Untitled'}</strong></p>
                 <div class="update-buttons">
                     <button class="update-existing-btn">Update Existing Cube</button>
                     <button class="save-as-new-btn">Save as New Cube</button>
@@ -153,13 +166,40 @@ export class NamingModal {
         const saveAsNewBtn = body.querySelector('.save-as-new-btn');
 
         updateBtn.addEventListener('click', async () => {
-            await this.saveManager.manualSave(name);
+            const currentName = this.saveManager.getCubeName();
+            await this.saveManager.manualSave(currentName);
             this.hide();
         });
 
-        saveAsNewBtn.addEventListener('click', async () => {
-            await this.saveManager.saveAsNew(name);
-            this.hide();
+        saveAsNewBtn.addEventListener('click', () => {
+            this.saveAsNewPending = true;
+            this.buildNamingUI();
+            this.rerollWords();
+            this.updateUI();
         });
+    }
+
+    buildNamingUI() {
+        const body = this.modal.querySelector('.naming-modal-body');
+        body.innerHTML = `
+            <div class="name-preview">
+                <span class="name-preview-text">Select words to build your name</span>
+            </div>
+            <div class="selected-words"></div>
+            <div class="word-selection">
+                <div class="word-grid"></div>
+                <button class="reroll-btn">🎲 Reroll Words</button>
+            </div>
+        `;
+
+        // rebind dynamic controls
+        const rerollBtn = body.querySelector('.reroll-btn');
+        rerollBtn.addEventListener('click', () => this.rerollWords());
+
+        const saveBtn = this.modal.querySelector('.save-btn');
+        saveBtn.disabled = true;
+        saveBtn.removeEventListener?.('click', this._boundSave);
+        this._boundSave = () => this.save();
+        saveBtn.addEventListener('click', this._boundSave);
     }
 }
