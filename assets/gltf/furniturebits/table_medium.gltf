@@ -15,7 +15,7 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "rug_rectangle_stripes_B"
+            "name" : "table_medium"
         }
     ],
     "materials" : [
@@ -32,7 +32,7 @@
     ],
     "meshes" : [
         {
-            "name" : "Cube.011",
+            "name" : "Cube.003",
             "primitives" : [
                 {
                     "attributes" : {
@@ -63,15 +63,15 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 72,
+            "count" : 260,
             "max" : [
-                1.5,
-                0.09999996423721313,
+                1,
+                1,
                 1
             ],
             "min" : [
-                -1.5,
-                0,
+                -1,
+                -7.450580596923828e-09,
                 -1
             ],
             "type" : "VEC3"
@@ -79,45 +79,45 @@
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 72,
+            "count" : 260,
             "type" : "VEC2"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 72,
+            "count" : 260,
             "type" : "VEC3"
         },
         {
             "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 204,
+            "count" : 504,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 864,
+            "byteLength" : 3120,
             "byteOffset" : 0,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 576,
-            "byteOffset" : 864,
+            "byteLength" : 2080,
+            "byteOffset" : 3120,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 864,
-            "byteOffset" : 1440,
+            "byteLength" : 3120,
+            "byteOffset" : 5200,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 408,
-            "byteOffset" : 2304,
+            "byteLength" : 1008,
+            "byteOffset" : 8320,
             "target" : 34963
         }
     ],
@@ -129,8 +129,8 @@
     ],
     "buffers" : [
         {
-            "byteLength" : 2712,
-            "uri" : "rug_rectangle_stripes_B.bin"
+            "byteLength" : 9328,
+            "uri" : "table_medium.bin"
         }
     ]
 }

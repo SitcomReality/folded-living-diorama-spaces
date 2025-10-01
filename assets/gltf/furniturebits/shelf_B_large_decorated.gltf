@@ -15,7 +15,7 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "pictureframe_standing_B"
+            "name" : "shelf_B_large_decorated"
         }
     ],
     "materials" : [
@@ -32,7 +32,7 @@
     ],
     "meshes" : [
         {
-            "name" : "Cube.023",
+            "name" : "Cube.050",
             "primitives" : [
                 {
                     "attributes" : {
@@ -63,61 +63,61 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 117,
+            "count" : 715,
             "max" : [
-                0.3500000834465027,
-                0.46797534823417664,
-                0.1713285744190216
+                1.0000001192092896,
+                0.7175151109695435,
+                0.5000000596046448
             ],
             "min" : [
-                -0.3500000238418579,
-                -0.00021269917488098145,
-                -0.18568862974643707
+                -1,
+                -0.10000038146972656,
+                -1.1970611168976575e-08
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 117,
+            "count" : 715,
             "type" : "VEC2"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 117,
+            "count" : 715,
             "type" : "VEC3"
         },
         {
             "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 222,
+            "count" : 1446,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 1404,
+            "byteLength" : 8580,
             "byteOffset" : 0,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 936,
-            "byteOffset" : 1404,
+            "byteLength" : 5720,
+            "byteOffset" : 8580,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 1404,
-            "byteOffset" : 2340,
+            "byteLength" : 8580,
+            "byteOffset" : 14300,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 444,
-            "byteOffset" : 3744,
+            "byteLength" : 2892,
+            "byteOffset" : 22880,
             "target" : 34963
         }
     ],
@@ -129,8 +129,8 @@
     ],
     "buffers" : [
         {
-            "byteLength" : 4188,
-            "uri" : "pictureframe_standing_B.bin"
+            "byteLength" : 25772,
+            "uri" : "shelf_B_large_decorated.bin"
         }
     ]
 }
