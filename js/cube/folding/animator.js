@@ -206,18 +206,13 @@ export class FoldingAnimator {
                     if (!originalScale) return;
 
                     let scale = 0;
-                    if (progress < 0.7) {
-                        // Grow from 0 to 1 over first 70% of animation
-                        scale = (progress / 0.7);
+                    if (progress < 0.85) {
+                        scale = (progress / 0.85);
                     } else {
-                        // Spring jiggle in last 30%
-                        const jiggleProgress = (progress - 0.7) / 0.3;
-                        // Overshoot, undershoot, settle
-                        // Using a dampened sine wave
+                        const jiggleProgress = (progress - 0.85) / 0.15;
                         const overshoot = Math.sin(jiggleProgress * Math.PI * 3) * Math.exp(-jiggleProgress * 4);
                         scale = 1 + overshoot * 0.3;
                     }
-
                     obj.scale.set(
                         originalScale.x * scale,
                         originalScale.y * scale,
