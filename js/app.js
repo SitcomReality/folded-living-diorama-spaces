@@ -95,6 +95,10 @@ export class FoldedLivingApp {
         document.getElementById('fold-btn').addEventListener('click', () => {
             this.toggleFold();
         });
+        
+        document.getElementById('hide-ui-btn').addEventListener('click', () => {
+            document.body.classList.toggle('ui-hidden');
+        });
     }
 
     setupInput() {
@@ -179,6 +183,7 @@ export class FoldedLivingApp {
 
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                document.body.classList.remove('ui-hidden');
                 this.placementSystem.cancelPlacement();
                 this.selectionSystem.deselect();
                 this.inspectorManager.hide();
@@ -196,6 +201,11 @@ export class FoldedLivingApp {
                 }
             } else if (e.key === 'g') {
                 this.scene.toggleGrid();
+            }
+            if (e.altKey && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                document.body.classList.toggle('ui-hidden');
+                return;
             }
             // Undo / Redo
             if (e.ctrlKey && e.key.toLowerCase() === 'z') {

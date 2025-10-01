@@ -37,6 +37,15 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+body.ui-hidden .hud,
+body.ui-hidden #info-banner,
+body.ui-hidden #settings-panel,
+body.ui-hidden #gallery-view,
+body.ui-hidden #inspector,
+body.ui-hidden #outliner {
+    display: none !important;
+}
+
 #app {
     width: 100%;
     height: 100%;
@@ -119,4 +128,3 @@ canvas {
     opacity: 0.3;
     cursor: not-allowed;
 }
-
