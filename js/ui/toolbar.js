@@ -15,15 +15,15 @@ export class ToolbarManager {
         const tools = [
             { id: 'select', label: 'Select', icon: '👆' },
             { id: 'place', label: 'Place', icon: '➕' },
-            { id: 'delete', label: 'Delete', icon: '🗑️' },
-            { id: 'fold', label: 'Fold/Unfold', icon: '📦' }
+            { id: 'move', label: 'Move', icon: '✋' },
+            { id: 'delete', label: 'Delete', icon: '🗑️' }
         ];
         
         tools.forEach(tool => {
             const btn = document.createElement('button');
             btn.className = 'tool-btn';
             btn.dataset.tool = tool.id;
-            btn.innerHTML = `${tool.icon} ${tool.label}`;
+            btn.innerHTML = `<span class="tool-icon">${tool.icon}</span><span>${tool.label}</span>`;
             
             btn.addEventListener('click', () => {
                 this.selectTool(tool.id);
@@ -37,7 +37,7 @@ export class ToolbarManager {
         const snapBtn = document.createElement('button');
         snapBtn.className = 'tool-btn';
         snapBtn.dataset.tool = 'snap';
-        snapBtn.textContent = '🧲 Snap';
+        snapBtn.innerHTML = '<span class="tool-icon">🧲</span><span>Snap</span>';
         snapBtn.addEventListener('click', () => {
             this.snapEnabled = !this.snapEnabled;
             snapBtn.classList.toggle('active', this.snapEnabled);
@@ -49,7 +49,6 @@ export class ToolbarManager {
         this.assetPicker = document.createElement('div');
         this.assetPicker.className = 'asset-picker hidden';
         
-        // Add header with close button
         const header = document.createElement('div');
         header.className = 'asset-picker-header';
         header.innerHTML = `
@@ -58,7 +57,6 @@ export class ToolbarManager {
         `;
         this.assetPicker.appendChild(header);
         
-        // Add close button handler
         header.querySelector('.close-picker-btn').addEventListener('click', () => {
             this.hideAssetPicker();
             this.selectTool('select');
@@ -102,13 +100,11 @@ export class ToolbarManager {
     }
     
     selectTool(toolId) {
-        // Deselect previous tool
         const prevBtn = this.container.querySelector('.tool-btn.active');
         if (prevBtn) {
             prevBtn.classList.remove('active');
         }
         
-        // Select new tool
         const newBtn = this.container.querySelector(`[data-tool="${toolId}"]`);
         if (newBtn) {
             newBtn.classList.add('active');
@@ -116,10 +112,8 @@ export class ToolbarManager {
         
         this.activeTool = toolId;
         
-        // Show/hide asset picker
         if (toolId === 'place') {
             this.showAssetPicker();
-            // If there's a selected asset, notify about it
             const selectedAsset = this.assetPicker.querySelector('.asset-btn.selected');
             if (selectedAsset && this.onToolSelected) {
                 this.onToolSelected(toolId, selectedAsset.dataset.assetId);
@@ -145,7 +139,6 @@ export class ToolbarManager {
     }
     
     selectAsset(assetId) {
-        // Highlight selected asset
         const prevSelected = this.assetPicker.querySelector('.asset-btn.selected');
         if (prevSelected) {
             prevSelected.classList.remove('selected');
@@ -156,7 +149,6 @@ export class ToolbarManager {
             assetBtn.classList.add('selected');
         }
         
-        // Notify with special event for asset selection
         if (this.onToolSelected) {
             this.onToolSelected('place', assetId);
         }

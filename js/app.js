@@ -75,6 +75,24 @@ export class FoldedLivingApp {
         this.historyManager = new HistoryManager(50);
         
         window.addEventListener('newCube', () => this.resetCube());
+        
+        // Undo/Redo button handlers
+        document.getElementById('undo-btn').addEventListener('click', () => {
+            const snap = this.historyManager.undo();
+            if (snap) this.applySnapshot(snap);
+            this.updateHistoryButtons();
+        });
+        
+        document.getElementById('redo-btn').addEventListener('click', () => {
+            const snap = this.historyManager.redo();
+            if (snap) this.applySnapshot(snap);
+            this.updateHistoryButtons();
+        });
+        
+        // Fold button handler (moved from toolbar)
+        document.getElementById('fold-btn').addEventListener('click', () => {
+            this.toggleFold();
+        });
     }
 
     setupInput() {
@@ -164,6 +182,7 @@ export class FoldedLivingApp {
                     this.inspectorManager.hide();
                     this.saveManager.autoSave();
                     this.historyManager.push(this.getSnapshot());
+                    this.updateHistoryButtons();
                 }
             } else if (e.key === 'g') {
                 this.scene.toggleGrid();
@@ -173,10 +192,12 @@ export class FoldedLivingApp {
                 e.preventDefault();
                 const snap = e.shiftKey ? this.historyManager.redo() : this.historyManager.undo();
                 if (snap) this.applySnapshot(snap);
+                this.updateHistoryButtons();
             } else if (e.ctrlKey && e.key.toLowerCase() === 'y') {
                 e.preventDefault();
                 const snap = this.historyManager.redo();
                 if (snap) this.applySnapshot(snap);
+                this.updateHistoryButtons();
             }
         });
         
@@ -184,10 +205,12 @@ export class FoldedLivingApp {
         window.addEventListener('objectModified', () => {
             this.saveManager.autoSave();
             this.historyManager.push(this.getSnapshot());
+            this.updateHistoryButtons();
         });
         window.addEventListener('settingsChanged', () => {
             this.saveManager.autoSave();
             this.historyManager.push(this.getSnapshot());
+            this.updateHistoryButtons();
         });
     }
 
@@ -211,6 +234,7 @@ export class FoldedLivingApp {
             this.animationLoop.start();
             loadingOverlay.classList.add('hidden');
             this.historyManager.push(this.getSnapshot());
+            this.updateHistoryButtons();
             console.log('🎮 Folded Living initialized');
         } catch (error) {
             console.error('Failed to initialize:', error);
@@ -305,9 +329,7 @@ export class FoldedLivingApp {
         } else {
             this.placementSystem.cancelPlacement();
         }
-        if (toolId === 'fold') {
-            this.toggleFold();
-        }
+        // Fold tool is now handled by the fold button, not the toolbar
     }
 
     async toggleFold() {
@@ -316,5 +338,12 @@ export class FoldedLivingApp {
         } else {
             await this.foldingAnimator.fold();
         }
+    }
+
+    updateHistoryButtons() {
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
+        undoBtn.disabled = !this.historyManager.canUndo();
+        redoBtn.disabled = !this.historyManager.canRedo();
     }
 }

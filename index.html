@@ -12,9 +12,10 @@
     <link rel="stylesheet" href="styles/settings.css">
     <link rel="stylesheet" href="styles/gallery.css">
     <link rel="stylesheet" href="styles/naming.css">
+    <link rel="stylesheet" href="styles/info-banner.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body data-theme="light">
     <div id="app">
         <!-- Three.js Canvas Container -->
         <div id="canvas-container"></div>
@@ -22,20 +23,54 @@
         <!-- HUD Overlay -->
         <div id="hud" class="hud">
             <div class="hud-top">
-                <button id="settings-btn" class="settings-btn">⚙️</button>
-                <div class="currency-display">
-                    <span class="sparkle-icon">✨</span>
-                    <span id="sparkle-count">0</span>
+                <div class="hud-left">
+                    <button id="settings-btn" class="icon-btn">⚙️</button>
+                    <button id="theme-toggle" class="icon-btn" title="Toggle Dark Mode">🌓</button>
                 </div>
-                <button id="save-btn" class="icon-btn">💾 Save</button>
-                <button id="new-cube-btn" class="icon-btn">📦 New</button>
-                <button id="gallery-btn" class="icon-btn">📂</button>
+                
+                <div class="hud-center">
+                    <div class="cube-name-display">
+                        <span id="cube-name">Unsaved Cube</span>
+                    </div>
+                </div>
+                
+                <div class="hud-right">
+                    <div class="currency-display">
+                        <span class="sparkle-icon">✨</span>
+                        <span id="sparkle-count">0</span>
+                    </div>
+                    <div class="budget-display">
+                        <div class="budget-bar">
+                            <span class="budget-label">📊</span>
+                            <div class="budget-progress">
+                                <div class="budget-fill budget-poly" style="width: 0%"></div>
+                            </div>
+                            <span class="budget-value" id="poly-count">0/0</span>
+                        </div>
+                        <div class="budget-bar">
+                            <span class="budget-label">💡</span>
+                            <div class="budget-progress">
+                                <div class="budget-fill budget-light" style="width: 0%"></div>
+                            </div>
+                            <span class="budget-value" id="light-count">0/0</span>
+                        </div>
+                    </div>
+                    <button id="undo-btn" class="icon-btn" title="Undo (Ctrl+Z)" disabled>↶</button>
+                    <button id="redo-btn" class="icon-btn" title="Redo (Ctrl+Shift+Z)" disabled>↷</button>
+                    <button id="save-btn" class="icon-btn">💾</button>
+                    <button id="new-cube-btn" class="icon-btn">📄</button>
+                    <button id="fold-btn" class="icon-btn">📦</button>
+                    <button id="gallery-btn" class="icon-btn">📂</button>
+                </div>
             </div>
             
             <div class="hud-bottom">
                 <div id="toolbar" class="toolbar"></div>
             </div>
         </div>
+        
+        <!-- Info Banner -->
+        <div id="info-banner" class="info-banner"></div>
         
         <!-- Settings Panel -->
         <div id="settings-panel" class="settings-panel">

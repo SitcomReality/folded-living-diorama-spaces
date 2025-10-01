@@ -1,5 +1,57 @@
-.toolbar { background:var(--panel-bg); border:1px solid var(--border-color); border-radius:12px; padding:10px; display:flex; gap:8px; box-shadow:0 4px 16px rgba(0,0,0,.08); }
-.tool-btn { background:transparent; border:1px solid var(--border-color); border-radius:8px; padding:12px 20px; color:var(--text-color); font-family:'Space Mono', monospace; font-size:14px; cursor:pointer; transition:all .2s ease; }
-.tool-btn:hover { background:rgba(232,155,111,.1); transform:translateY(-1px); }
-.tool-btn.active { background:var(--accent-color); border-color:var(--accent-color); color:#fff; }
+.toolbar {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    gap: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    max-width: 90vw;
+    overflow-x: auto;
+}
+
+.toolbar::-webkit-scrollbar {
+    height: 4px;
+}
+
+.toolbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+}
+
+.toolbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.tool-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 16px;
+    color: var(--text-color);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tool-btn:hover {
+    background: var(--hover-bg);
+    transform: translateY(-1px);
+}
+
+.tool-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
+.tool-icon {
+    font-size: 16px;
+}
 

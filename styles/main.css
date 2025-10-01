@@ -5,6 +5,7 @@
 }
 
 :root {
+    /* Light theme */
     --bg-color: #f5f1e8;
     --text-color: #3a3428;
     --accent-color: #e89b6f;
@@ -12,6 +13,18 @@
     --border-color: rgba(58, 52, 40, 0.15);
     --success-color: #8ab68a;
     --warning-color: #e8a56f;
+    --hover-bg: rgba(232, 155, 111, 0.1);
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #e8e8e8;
+    --accent-color: #e89b6f;
+    --panel-bg: rgba(30, 30, 30, 0.95);
+    --border-color: rgba(255, 255, 255, 0.15);
+    --success-color: #8ab68a;
+    --warning-color: #e8a56f;
+    --hover-bg: rgba(232, 155, 111, 0.15);
 }
 
 body {
@@ -21,6 +34,7 @@ body {
     overflow: hidden;
     width: 100vw;
     height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #app {
@@ -81,3 +95,28 @@ canvas {
 .hidden {
     display: none !important;
 }
+
+.icon-btn {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--text-color);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.icon-btn:hover:not(:disabled) {
+    background: var(--hover-bg);
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.icon-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
