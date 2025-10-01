@@ -15,6 +15,9 @@ export class PlacementSystem {
         this.isRotating = false;
         this.baseQuat = null;
         this.anchorWorldPos = null;
+
+        this.isMoving = false;
+        this.moveOriginalState = null;
     }
     
     async startPlacement(assetId) {
@@ -28,6 +31,27 @@ export class PlacementSystem {
         await this.createPreview(assetId);
         
         this.isLoadingAsset = false;
+    }
+    
+    async startMove(objectToMove) {
+        const objectData = this.cube.placedObjects.find(item => item.object === objectToMove);
+        if (!objectData) return;
+
+        this.isMoving = true;
+        this.moveOriginalState = {
+            object: objectToMove,
+            surfaceName: objectData.surface,
+            position: objectToMove.position.clone(),
+            quaternion: objectToMove.quaternion.clone()
+        };
+
+        const assetId = objectToMove.userData.assetId;
+        this.cube.removeObject(objectToMove);
+        window.app.outlinerManager.removeObject(objectToMove);
+        window.app.selectionSystem.deselect();
+        window.app.inspectorManager.hide();
+        
+        await this.startPlacement(assetId);
     }
     
     async createPreview(assetId) {
@@ -154,6 +178,7 @@ export class PlacementSystem {
     
     async placeObject() {
         if (!this.isPlacing || !this.previewObject || !this.previewObject.visible) {
+            this.cancelPlacement();
             return null;
         }
         
@@ -194,6 +219,13 @@ export class PlacementSystem {
         this.cube.addObject(object, surfaceName, object.position.clone());
         
         return object;
+    }
+    
+    completeMove() {
+        if (!this.isMoving) return;
+        console.log('Move complete');
+        this.isMoving = false;
+        this.moveOriginalState = null;
     }
     
     findSurfaceForPosition(worldPos) {
@@ -240,6 +272,25 @@ export class PlacementSystem {
             this.scene.remove(this.previewObject);
             this.previewObject = null;
         }
+
+        if (this.isMoving && this.moveOriginalState) {
+            console.log('Move cancelled, restoring object.');
+            const { object, surfaceName, position, quaternion } = this.moveOriginalState;
+            const surface = this.cube.surfaces[surfaceName];
+            if (surface) {
+                // Re-add to the scene, reparent, then set original local transform
+                this.scene.add(object);
+                surface.attach(object);
+                object.position.copy(position);
+                object.quaternion.copy(quaternion);
+                this.cube.addObject(object, surfaceName, position);
+                window.app.outlinerManager.addObject(object);
+            }
+        }
+        
+        this.isMoving = false;
+        this.moveOriginalState = null;
+
         this.previewYaw = 0;
         this.isRotating = false;
         this.baseQuat = null;

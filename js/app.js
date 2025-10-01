@@ -125,15 +125,24 @@ export class FoldedLivingApp {
                     this.saveManager.autoSave();
                     this.historyManager.push(this.getSnapshot());
                     this.outlinerManager.addObject(placed);
+                    if (this.placementSystem.isMoving) {
+                        this.placementSystem.completeMove();
+                    }
+                }
+            } else if (activeTool === 'move') {
+                const objectToMove = this.selectionSystem.getObjectAt(this.camera.getCamera(), this.input.getMousePosition());
+                if (objectToMove) {
+                    this.placementSystem.startMove(objectToMove);
+                    this.toolbarManager.selectTool('place', false); // Switch to place tool visually
                 }
             } else if (activeTool === 'delete') {
                 // Select and delete in one action
-                const selected = this.selectionSystem.selectAt(
+                const selected = this.selectionSystem.getObjectAt(
                     this.camera.getCamera(),
                     this.input.getMousePosition()
                 );
                 if (selected) {
-                    const assetId = this.selectionSystem.deleteSelected();
+                    const assetId = this.selectionSystem.deleteObject(selected);
                     if (assetId) {
                         this.budgetManager.removeAsset(assetId);
                         this.inspectorManager.hide();
@@ -160,6 +169,9 @@ export class FoldedLivingApp {
                     this.saveManager.autoSave();
                     this.historyManager.push(this.getSnapshot());
                     this.outlinerManager.addObject(placed);
+                    if (this.placementSystem.isMoving) {
+                        this.placementSystem.completeMove();
+                    }
                 }
             }
         });
@@ -184,10 +196,15 @@ export class FoldedLivingApp {
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 document.body.classList.remove('ui-hidden');
-                this.placementSystem.cancelPlacement();
-                this.selectionSystem.deselect();
-                this.inspectorManager.hide();
-                this.outlinerManager.highlight(null);
+                if (this.placementSystem.isMoving) {
+                    this.placementSystem.cancelPlacement();
+                    this.toolbarManager.selectTool('move');
+                } else {
+                    this.placementSystem.cancelPlacement();
+                    this.selectionSystem.deselect();
+                    this.inspectorManager.hide();
+                    this.outlinerManager.highlight(null);
+                }
             } else if (e.code === 'Space') {
                 e.preventDefault();
                 this.toggleFold();
@@ -343,7 +360,7 @@ export class FoldedLivingApp {
     update() {
         // preserve ui-hidden; only mutate cursor classes
         const cls = document.body.classList;
-        cls.remove('cursor-wait', 'cursor-crosshair', 'cursor-none');
+        cls.remove('cursor-wait', 'cursor-crosshair', 'cursor-none', 'cursor-pointer');
         if (this.placementSystem.isLoadingAsset) {
             cls.add('cursor-wait');
         } else if (this.toolbarManager.getActiveTool() === 'place') {
@@ -352,7 +369,15 @@ export class FoldedLivingApp {
             } else {
                 cls.add('cursor-crosshair');
             }
+        } else if (this.toolbarManager.getActiveTool() === 'delete' || this.toolbarManager.getActiveTool() === 'move') {
+            const hoveredObject = this.selectionSystem.highlightAt(this.camera.getCamera(), this.input.getMousePosition());
+            if (hoveredObject) {
+                cls.add('cursor-pointer');
+            }
+        } else {
+            this.selectionSystem.clearHighlight();
         }
+
         if (this.toolbarManager.getActiveTool() === 'place') {
             const snapActive = this.toolbarManager.isSnapEnabled() || this.input.isKeyPressed('shift');
             
@@ -372,6 +397,7 @@ export class FoldedLivingApp {
     onToolSelected(toolId, assetId) {
         console.log('Tool selected:', toolId, assetId);
         this.input.resetCursor();
+        this.selectionSystem.clearHighlight();
         if (toolId === 'place') {
             if (assetId) {
                 this.placementSystem.startPlacement(assetId);

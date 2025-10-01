@@ -146,7 +146,7 @@ export class ToolbarManager {
         document.body.appendChild(this.assetPicker);
     }
     
-    selectTool(toolId) {
+    selectTool(toolId, triggerCallback = true) {
         const prevBtn = this.container.querySelector('.tool-btn.active');
         if (prevBtn) {
             prevBtn.classList.remove('active');
@@ -162,14 +162,14 @@ export class ToolbarManager {
         if (toolId === 'place') {
             this.showAssetPicker();
             const selectedAsset = this.assetPicker.querySelector('.asset-btn.selected');
-            if (selectedAsset && this.onToolSelected) {
+            if (selectedAsset && this.onToolSelected && triggerCallback) {
                 this.onToolSelected(toolId, selectedAsset.dataset.assetId);
-            } else if (this.onToolSelected) {
+            } else if (this.onToolSelected && triggerCallback) {
                 this.onToolSelected(toolId);
             }
         } else {
             this.hideAssetPicker();
-            if (this.onToolSelected) {
+            if (this.onToolSelected && triggerCallback) {
                 this.onToolSelected(toolId);
             }
         }
