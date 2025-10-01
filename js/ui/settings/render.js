@@ -6,8 +6,12 @@ export function renderSettingsHTML(settings) {
     // Compact surface grid
     const surfaceCards = surfaces.map(surfaceName => {
         const s = settings.surfaces[surfaceName];
+        if (!s) {
+            console.warn(`Settings for surface "${surfaceName}" not found.`);
+            return ''; // Skip rendering this card if settings are missing
+        }
         const displayName = surfaceName.charAt(0).toUpperCase() + surfaceName.slice(1);
-        const hasPivot = ['back','left','right'].includes(surfaceName);
+        const hasPivot = ['back','left','right', 'front'].includes(surfaceName);
         
         return `
         <div class="surface-card" data-surface="${surfaceName}">

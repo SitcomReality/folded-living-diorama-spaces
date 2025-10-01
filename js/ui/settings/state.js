@@ -16,7 +16,7 @@ export function createDefaultSettings(cube) {
     // Surfaces that can fold and are visually 'down' (horizontal) in the initial unfolded state
     const foldingSurfaces = [CONSTANTS.SURFACES.FRONT, CONSTANTS.SURFACES.BACK, CONSTANTS.SURFACES.LEFT, CONSTANTS.SURFACES.RIGHT];
 
-    Object.keys(cube.surfaces).forEach(surfaceName => {
+    Object.values(CONSTANTS.SURFACES).forEach(surfaceName => {
         settings.surfaces[surfaceName] = {
             visible: true,
             color: defaults[surfaceName] || '#ffffff',

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CONSTANTS } from '../../config/constants.js';
 
 export function toggleVisibility(cube, settings, surfaceName) {
     const surface = cube.surfaces[surfaceName];
@@ -39,10 +40,10 @@ export function updateOrientation(cube, settings, surfaceName, orientation) {
 
 export function getPivotTargetRotation(surfaceName, orientation) {
     switch (surfaceName) {
-        case 'back': return orientation==='down' ? new THREE.Euler(Math.PI/2,0,0) : new THREE.Euler(0,0,0);
-        case 'left': return orientation==='down' ? new THREE.Euler(0,0,Math.PI/2) : new THREE.Euler(0,0,0);
-        case 'right': return orientation==='down' ? new THREE.Euler(0,0,-Math.PI/2) : new THREE.Euler(0,0,0);
-        case 'front': return orientation==='down' ? new THREE.Euler(-Math.PI/2,0,0) : new THREE.Euler(0,0,0);
+        case CONSTANTS.SURFACES.BACK: return orientation==='down' ? new THREE.Euler(Math.PI/2,0,0) : new THREE.Euler(0,0,0);
+        case CONSTANTS.SURFACES.LEFT: return orientation==='down' ? new THREE.Euler(0,0,Math.PI/2) : new THREE.Euler(0,0,0);
+        case CONSTANTS.SURFACES.RIGHT: return orientation==='down' ? new THREE.Euler(0,0,-Math.PI/2) : new THREE.Euler(0,0,0);
+        case CONSTANTS.SURFACES.FRONT: return orientation==='down' ? new THREE.Euler(-Math.PI/2,0,0) : new THREE.Euler(0,0,0);
         default: return null;
     }
 }

@@ -50,7 +50,7 @@ export function setupPivots(cube) {
     if (ceilingSurface && backSurface) {
         cube.group.remove(ceilingSurface);
         ceilingSurface.position.set(0, halfSize, halfSize);
-        ceilingSurface.rotation.set(-Math.PI/2, 0, 0);
+        ceilingSurface.rotation.set(0, 0, 0);
         backSurface.add(ceilingSurface);
         ceilingSurface.userData.parentedToBackdrop = true;
     }
