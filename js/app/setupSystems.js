@@ -12,6 +12,7 @@ import { GalleryManager } from '../gallery/gallery.js';
 import { TransitionManager } from '../gallery/transitions.js';
 import { HistoryManager } from '../ui/history.js';
 import { OutlinerManager } from '../ui/outliner.js';
+import { NamingModal } from '../ui/naming.js';
 
 export function setupSystems(app) {
     app.placementSystem = new PlacementSystem(app.scene.getScene(), app.cube);
@@ -22,7 +23,7 @@ export function setupSystems(app) {
     app.economyManager = new EconomyManager();
     app.saveManager = new SaveManager(app.cube, app.databaseManager);
 
-    app.namingModal = new (await import('../ui/naming.js')).NamingModal(app.saveManager);
+    app.namingModal = new NamingModal(app.saveManager);
     app.hudManager = new HUDManager(app.economyManager, app.budgetManager, app.saveManager, app.namingModal);
     app.toolbarManager = new ToolbarManager(document.getElementById('toolbar'), (toolId, assetId) => app.onToolSelected(toolId, assetId));
     app.inspectorManager = new InspectorManager();
@@ -38,4 +39,3 @@ export function setupSystems(app) {
     document.getElementById('fold-btn').addEventListener('click', () => app.toggleFold());
     document.getElementById('hide-ui-btn').addEventListener('click', () => document.body.classList.toggle('ui-hidden'));
 }
-
