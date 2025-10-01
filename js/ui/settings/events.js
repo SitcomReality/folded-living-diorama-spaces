@@ -56,14 +56,53 @@ export function attachSettingsEvents(content, ctx) {
 
     // Environment presets
     content.querySelectorAll('.environment-preset').forEach(preset => {
-        preset.addEventListener('click', () => {
+        preset.addEventListener('click', async () => {
             content.querySelectorAll('.environment-preset').forEach(p => p.classList.remove('active'));
             preset.classList.add('active');
-            ctx.settings.environment.preset = preset.dataset.preset;
-            ctx.applyPreset(ctx.scene, ctx.settings.environment.preset);
+            const presetId = preset.dataset.preset;
+            ctx.settings.environment.preset = presetId;
+
+            // update sun position from preset
+            const { PRESETS } = await import('./environmentPresets.js');
+            const presetData = PRESETS[presetId];
+            if (presetData) {
+                if (presetData.sunAzimuth !== undefined) ctx.settings.environment.sunAzimuth = presetData.sunAzimuth;
+                if (presetData.sunInclination !== undefined) ctx.settings.environment.sunInclination = presetData.sunInclination;
+            }
+
+            ctx.applyPreset(ctx.scene, presetId); // This applies colors etc
+
+            // And now apply the new sun position
+            ctx.updateSunPosition(ctx.scene, ctx.settings.environment.sunAzimuth, ctx.settings.environment.sunInclination);
+
             ctx.onSettingsChanged();
         });
     });
+
+    // Sun sliders
+    const sunAzimuthSlider = content.querySelector('[data-control="sun-azimuth"]');
+    if (sunAzimuthSlider) {
+        const sunAzimuthValue = sunAzimuthSlider.parentElement.querySelector('.slider-value');
+        sunAzimuthSlider.addEventListener('input', (e) => {
+            const v = parseFloat(e.target.value);
+            sunAzimuthValue.textContent = `${Math.round(v)}°`;
+            ctx.settings.environment.sunAzimuth = v;
+            ctx.updateSunPosition(ctx.scene, ctx.settings.environment.sunAzimuth, ctx.settings.environment.sunInclination);
+        });
+        sunAzimuthSlider.addEventListener('change', () => ctx.onSettingsChanged());
+    }
+
+    const sunInclinationSlider = content.querySelector('[data-control="sun-inclination"]');
+    if (sunInclinationSlider) {
+        const sunInclinationValue = sunInclinationSlider.parentElement.querySelector('.slider-value');
+        sunInclinationSlider.addEventListener('input', (e) => {
+            const v = parseFloat(e.target.value);
+            sunInclinationValue.textContent = `${Math.round(v)}°`;
+            ctx.settings.environment.sunInclination = v;
+            ctx.updateSunPosition(ctx.scene, ctx.settings.environment.sunAzimuth, ctx.settings.environment.sunInclination);
+        });
+        sunInclinationSlider.addEventListener('change', () => ctx.onSettingsChanged());
+    }
 
     // Ambient slider
     const ambientSlider = content.querySelector('[data-control="ambient"]');

@@ -15,6 +15,7 @@ export class SceneManager {
     setupLighting() {
         // Warm ambient light
         const ambient = new THREE.AmbientLight(0xfff5e6, 0.6);
+        ambient.userData.type = 'ambient';
         this.scene.add(ambient);
 
         // Warm key light
@@ -23,16 +24,19 @@ export class SceneManager {
         keyLight.castShadow = true;
         keyLight.shadow.mapSize.width = 2048;
         keyLight.shadow.mapSize.height = 2048;
+        keyLight.userData.type = 'key';
         this.scene.add(keyLight);
 
         // Soft fill light
         const fillLight = new THREE.DirectionalLight(0xd4e6ff, 0.25);
         fillLight.position.set(-5, 5, -5);
+        fillLight.userData.type = 'fill';
         this.scene.add(fillLight);
 
         // Subtle rim light for depth
         const rimLight = new THREE.DirectionalLight(0xffe8cc, 0.3);
         rimLight.position.set(0, 3, -10);
+        rimLight.userData.type = 'rim';
         this.scene.add(rimLight);
     }
 
@@ -60,6 +64,27 @@ export class SceneManager {
 
     setGroundVisible(visible) {
         if (this.groundPlane) this.groundPlane.visible = visible;
+    }
+
+    updateSunPosition(azimuth, inclination) { // angles in degrees
+        let keyLight = null;
+        this.scene.traverse(obj => {
+            if (obj.isLight && obj.userData.type === 'key') {
+                keyLight = obj;
+            }
+        });
+
+        if (!keyLight) return;
+
+        const radius = 20; // A fixed distance for the light source position
+
+        // inclination is 0-90 degrees (0 to PI/2). 0 is horizon, 90 is overhead.
+        // azimuth is 0-360 degrees (0 to 2*PI).
+
+        const phi = THREE.MathUtils.degToRad(90 - inclination); // polar angle from y-axis
+        const theta = THREE.MathUtils.degToRad(azimuth); // azimuthal angle around y-axis
+
+        keyLight.position.setFromSphericalCoords(radius, phi, theta);
     }
 
     async loadSkybox(skyboxId) {

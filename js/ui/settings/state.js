@@ -17,7 +17,9 @@ export function createDefaultSettings(cube) {
             backgroundColor: '#87ceeb', 
             groundColor: '#6fbf73',
             skybox: null, // null means use backgroundColor, otherwise 'sky_16', 'sky_17', 'sky_38'
-            groundVisible: true
+            groundVisible: true,
+            sunAzimuth: 45, // 0-360 degrees
+            sunInclination: 55 // 0-90 degrees
         }
     };
     // Surfaces that can fold and are visually 'down' (horizontal) in the initial unfolded state

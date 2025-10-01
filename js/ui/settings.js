@@ -3,7 +3,7 @@ import { CONSTANTS } from '../config/constants.js';
 import { createDefaultSettings, getRandomSkybox, getSkyboxPreset } from './settings/state.js';
 import { renderSettingsHTML } from './settings/render.js';
 import { attachSettingsEvents } from './settings/events.js';
-import { applyPreset, updateAmbientLight, updateBackgroundColor, updateGroundColor, loadSkybox, setGroundVisible } from './settings/environmentPresets.js';
+import { applyPreset, updateAmbientLight, updateBackgroundColor, updateGroundColor, loadSkybox, setGroundVisible, updateSunPosition } from './settings/environmentPresets.js';
 import { toggleVisibility, updateColor, updateTexture, updateOrientation } from './settings/surfaceControls.js';
 
 export class SettingsManager {
@@ -53,6 +53,7 @@ export class SettingsManager {
             updateGroundColor,
             loadSkybox,
             setGroundVisible,
+            updateSunPosition,
             toggleVisibility,
             updateColor,
             updateTexture,
@@ -94,6 +95,7 @@ export class SettingsManager {
         applyPreset(this.scene, this.settings.environment.preset);
         updateAmbientLight(this.scene, this.settings.environment.ambientIntensity);
         updateBackgroundColor(this.scene, this.settings.environment.backgroundColor);
+        updateSunPosition(this.scene, this.settings.environment.sunAzimuth, this.settings.environment.sunInclination);
         this.scene.setGroundColor(this.settings.environment.groundColor);
 
         // Apply ground visibility

@@ -98,6 +98,16 @@ export function renderSettingsHTML(settings) {
             <div class="environment-presets">${presetHTML}</div>
           </div>
           <div class="control-row">
+            <div class="control-label">Sun Direction</div>
+            <input type="range" class="slider-input" data-control="sun-azimuth" min="0" max="360" step="1" value="${settings.environment.sunAzimuth}">
+            <div class="slider-value">${Math.round(settings.environment.sunAzimuth)}°</div>
+          </div>
+          <div class="control-row">
+            <div class="control-label">Sun Angle</div>
+            <input type="range" class="slider-input" data-control="sun-inclination" min="0" max="90" step="1" value="${settings.environment.sunInclination}">
+            <div class="slider-value">${Math.round(settings.environment.sunInclination)}°</div>
+          </div>
+          <div class="control-row">
             <div class="control-label">Ambient</div>
             <input type="range" class="slider-input" data-control="ambient" min="0" max="1" step="0.1" value="${settings.environment.ambientIntensity}">
             <div class="slider-value">${Math.round(settings.environment.ambientIntensity*100)}%</div>
