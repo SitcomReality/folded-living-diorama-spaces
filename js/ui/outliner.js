@@ -1,18 +1,17 @@
-import { getAssetById } from '../config/assets.js';
+import { getAssetById, assetLibrary } from '../config/assets.js';
 
 export class OutlinerManager {
     constructor() {
-        this.el = document.getElementById('outliner');
+        this.el = document.getElementById('outliner-embedded') || document.getElementById('outliner');
         this.listEl = document.getElementById('outliner-list');
         this.closeBtn = document.getElementById('close-outliner');
-        this.objects = new Map(); // Map uuid to object
-        
-        this.closeBtn.addEventListener('click', () => this.hide());
-        this.listEl.addEventListener('click', (e) => this.onItemClick(e));
+        if (this.closeBtn) this.closeBtn.addEventListener('click', () => this.hide());
+        this.objects = new Map();
+        if (this.listEl) this.listEl.addEventListener('click', (e) => this.onItemClick(e));
     }
     
-    show() { this.el.classList.remove('hidden'); }
-    hide() { this.el.classList.add('hidden'); }
+    show() { /* embedded version stays inline; no-op */ }
+    hide() { /* embedded version stays inline; no-op */ }
 
     populate(objects) {
         this.clear();
@@ -42,6 +41,7 @@ export class OutlinerManager {
     }
     
     render() {
+        if (!this.listEl) return;
         this.listEl.innerHTML = '';
         if (this.objects.size === 0) {
             this.listEl.innerHTML = '<li class="outliner-item" style="opacity: 0.5; pointer-events: none;">No objects placed yet.</li>';
@@ -49,14 +49,16 @@ export class OutlinerManager {
         }
 
         this.objects.forEach(object => {
-            const assetId = object.userData.assetId;
-            const asset = getAssetById(assetId);
-            const name = asset ? asset.name : 'Unknown Object';
+            const asset = getAssetById(object.userData.assetId);
+            const groupId = asset ? `${asset.category}_${asset.baseName}` : null;
+            const group = groupId ? assetLibrary.getAssetGroup(groupId) : null;
+            const name = group ? group.displayName : (asset?.displayName || 'Unknown Object');
+            const variant = asset?.variant ? ` — ${asset.variant}` : '';
             
             const li = document.createElement('li');
             li.className = 'outliner-item';
             li.dataset.uuid = object.uuid;
-            li.textContent = name;
+            li.textContent = `${name}${variant}`;
             
             this.listEl.appendChild(li);
         });
@@ -81,4 +83,3 @@ export class OutlinerManager {
         }
     }
 }
-

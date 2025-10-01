@@ -78,5 +78,16 @@ export function renderSettingsHTML(settings) {
             </div>
           </div>
         </div>
+      </div>
+      <div class="settings-section" data-section="outliner">
+        <div class="settings-section-header">
+          <div class="settings-section-title">🧾 Scene Outliner</div>
+          <div class="settings-section-toggle">▼</div>
+        </div>
+        <div class="settings-section-content">
+          <div id="outliner-embedded" class="settings-outliner">
+            <ul id="outliner-list" class="outliner-list"></ul>
+          </div>
+        </div>
       </div>`;
 }
