@@ -111,6 +111,16 @@ export class PlacementSystem {
     updatePreview(camera, mousePos, snapActive = false) {
         if (!this.isPlacing || !this.previewObject) return;
         
+        // keep position fixed while rotating
+        if (this.isRotating && this.anchorWorldPos && this.baseQuat) {
+            const targetYaw = snapActive ? Math.round(this.previewYaw / (Math.PI/4)) * (Math.PI/4) : this.previewYaw;
+            const qYaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetYaw);
+            this.previewObject.quaternion.copy(qYaw).multiply(this.baseQuat);
+            this.previewObject.position.copy(this.anchorWorldPos);
+            this.previewObject.visible = true;
+            return;
+        }
+        
         this.raycaster.setFromCamera(mousePos, camera);
         
         const surfaces = Object.values(this.cube.surfaces);
@@ -267,4 +277,22 @@ export class PlacementSystem {
     }
     
     endRotation() { this.isRotating = false; }
+    
+    lockAnchor(camera, mousePos, snapActive = false) {
+        if (!this.isPlacing || !this.previewObject) return;
+        this.raycaster.setFromCamera(mousePos, camera);
+        const intersects = this.raycaster.intersectObjects(Object.values(this.cube.surfaces), true);
+        if (intersects.length === 0) return;
+        const hit = intersects[0];
+        const normalMatrix = new THREE.Matrix4().lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0,1,0));
+        this.baseQuat = new THREE.Quaternion().setFromRotationMatrix(normalMatrix);
+        this.lastHitSurfaceName = hit.object.userData?.surfaceName || hit.object.parent?.userData?.surfaceName || null;
+        const surface = this.cube.surfaces[this.lastHitSurfaceName];
+        const cell = this.cube.size / 8;
+        const local = surface.worldToLocal(hit.point.clone());
+        if (snapActive) { local.x = Math.round(local.x / cell) * cell; local.y = Math.round(local.y / cell) * cell; }
+        this.anchorWorldPos = surface.localToWorld(local);
+        this.previewObject.position.copy(this.anchorWorldPos);
+        this.isRotating = true;
+    }
 }
