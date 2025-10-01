@@ -2,14 +2,22 @@ import { getAssetById, assetLibrary } from '../config/assets.js';
 
 export class OutlinerManager {
     constructor() {
-        this.el = document.getElementById('outliner-embedded') || document.getElementById('outliner');
-        this.listEl = this.el ? this.el.querySelector('.outliner-list') : document.getElementById('outliner-list');
-        this.closeBtn = document.getElementById('close-outliner');
-        if (this.closeBtn) this.closeBtn.addEventListener('click', () => this.hide());
+        // Elements are now dynamically created, so we'll get them during render.
+        this.el = null;
+        this.listEl = null;
         this.objects = new Map();
-        if (this.listEl) this.listEl.addEventListener('click', (e) => this.onItemClick(e));
     }
     
+    _ensureElements() {
+        if (!this.listEl || !document.body.contains(this.listEl)) {
+            this.el = document.getElementById('outliner-embedded');
+            this.listEl = this.el ? this.el.querySelector('.outliner-list') : null;
+            if (this.listEl) {
+                this.listEl.addEventListener('click', (e) => this.onItemClick(e));
+            }
+        }
+    }
+
     show() { /* embedded version stays inline; no-op */ }
     hide() { /* embedded version stays inline; no-op */ }
 
@@ -23,7 +31,6 @@ export class OutlinerManager {
         
         this.objects.set(object.uuid, object);
         this.render();
-        if (this.objects.size > 0) this.show();
     }
     
     removeObject(object) {
@@ -31,17 +38,17 @@ export class OutlinerManager {
         
         this.objects.delete(object.uuid);
         this.render();
-        if (this.objects.size === 0) this.hide();
     }
 
     clear() {
         this.objects.clear();
         this.render();
-        this.hide();
     }
     
     render() {
+        this._ensureElements();
         if (!this.listEl) return;
+        
         this.listEl.innerHTML = '';
         if (this.objects.size === 0) {
             this.listEl.innerHTML = '<li class="outliner-item" style="opacity: 0.5; pointer-events: none;">No objects placed yet.</li>';
@@ -65,6 +72,8 @@ export class OutlinerManager {
     }
 
     highlight(uuid) {
+        this._ensureElements();
+        if (!this.listEl) return;
         this.listEl.querySelectorAll('.outliner-item').forEach(item => {
             item.classList.toggle('active', item.dataset.uuid === uuid);
         });
