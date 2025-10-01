@@ -52,6 +52,18 @@
     aspect-ratio: 1;
     background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
     position: relative;
+    overflow: hidden;
+}
+
+.cube-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.cube-card:hover .cube-thumbnail {
+    transform: scale(1.05);
 }
 
 .cube-info {

@@ -56,14 +56,18 @@ export class GalleryManager {
         const card = document.createElement('div');
         card.className = 'cube-card';
         
-        const displayName = (cube.data && cube.data.name) || cube.name || 'Untitled Cube';
+        const displayName = cube.name || (cube.data && cube.data.name) || 'Untitled Cube';
         const polyCount = cube.poly_count || (cube.data && cube.data.polyCount) || 0;
         const lightCount = cube.light_count || (cube.data && cube.data.lightCount) || 0;
+        const thumbnailUrl = cube.data?.thumbnailUrl;
+        
+        const previewHTML = thumbnailUrl 
+            ? `<img src="${thumbnailUrl}" class="cube-thumbnail" alt="Preview of ${displayName}">`
+            : '<div class="preview-placeholder">📦</div>';
         
         card.innerHTML = `
             <div class="cube-preview">
-                <!-- 3D preview will be rendered here -->
-                <div class="preview-placeholder">📦</div>
+                ${previewHTML}
             </div>
             <div class="cube-info">
                 <div class="cube-title">${displayName}</div>
@@ -133,7 +137,7 @@ export class GalleryManager {
         
         // Set cube ID and name in save manager
         window.app.saveManager.currentCubeId = cube.id;
-        window.app.saveManager.currentCubeName = cube.data?.name || 'Untitled Cube';
+        window.app.saveManager.currentCubeName = cube.name || cube.data?.name || 'Untitled Cube';
         window.app.saveManager.autoSave();
         window.app.hudManager.updateCubeNameDisplay();
         

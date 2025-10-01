@@ -17,6 +17,7 @@ export class DatabaseManager {
         try {
             const cube = await room.collection('cube_v1').create({
                 data: JSON.stringify(cubeData),
+                name: cubeData.name || 'Untitled Cube',
                 poly_count: cubeData.polyCount || 0,
                 light_count: cubeData.lightCount || 0
             });
@@ -51,18 +52,32 @@ export class DatabaseManager {
         await this.initialize();
         
         const cubes = room.collection('cube_v1').getList();
-        return cubes.map(cube => ({
-            ...cube,
-            data: JSON.parse(cube.data)
-        }));
+        return cubes.map(cube => {
+            try {
+                return {
+                    ...cube,
+                    data: JSON.parse(cube.data)
+                };
+            } catch (e) {
+                console.warn("Failed to parse cube data for cube:", cube.id, e);
+                return { ...cube, data: {} };
+            }
+        });
     }
     
     subscribeToCubes(callback) {
         return room.collection('cube_v1').subscribe((cubes) => {
-            const parsed = cubes.map(cube => ({
-                ...cube,
-                data: JSON.parse(cube.data)
-            }));
+            const parsed = cubes.map(cube => {
+                try {
+                    return {
+                        ...cube,
+                        data: JSON.parse(cube.data)
+                    };
+                } catch (e) {
+                    console.warn("Failed to parse cube data for cube:", cube.id, e);
+                    return { ...cube, data: {} };
+                }
+            });
             callback(parsed);
         });
     }
@@ -73,6 +88,7 @@ export class DatabaseManager {
         try {
             await room.collection('cube_v1').update(cubeId, {
                 data: JSON.stringify(cubeData),
+                name: cubeData.name || 'Untitled Cube',
                 poly_count: cubeData.polyCount || 0,
                 light_count: cubeData.lightCount || 0
             });
@@ -93,4 +109,3 @@ export class DatabaseManager {
         }
     }
 }
-

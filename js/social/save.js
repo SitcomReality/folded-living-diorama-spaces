@@ -1,5 +1,36 @@
 import * as THREE from 'three';
 
+async function captureThumbnail(renderer, scene, camera) {
+    // 1. Save current camera state
+    const originalPosition = camera.position.clone();
+    const originalQuaternion = camera.quaternion.clone();
+
+    // 2. Set to default "front-on" state for a consistent thumbnail
+    camera.position.set(0, 2, -20);
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+
+    // 3. Render the scene
+    renderer.render(scene, camera);
+
+    // 4. Capture canvas to blob
+    const blob = await new Promise(resolve => renderer.domElement.toBlob(resolve, 'image/png'));
+    
+    // 5. Restore camera
+    camera.position.copy(originalPosition);
+    camera.quaternion.copy(originalQuaternion);
+    camera.updateProjectionMatrix();
+    
+    // 6. Upload blob to get URL
+    try {
+        const url = await window.websim.upload(blob);
+        return url;
+    } catch (error) {
+        console.error('Thumbnail upload failed:', error);
+        return null;
+    }
+}
+
 export class SaveManager {
     constructor(cube, databaseManager) {
         this.cube = cube;
@@ -75,6 +106,13 @@ export class SaveManager {
 
     async manualSave(cubeName) {
         const data = this.serializeCube();
+        
+        // Generate thumbnail
+        const app = window.app;
+        const thumbnailUrl = await captureThumbnail(app.renderer.getRenderer(), app.scene.getScene(), app.camera.getCamera());
+        if (thumbnailUrl) {
+            data.thumbnailUrl = thumbnailUrl;
+        }
 
         if (this.currentCubeId && this.currentCubeName) {
             // Update existing cube
@@ -84,9 +122,11 @@ export class SaveManager {
             });
         } else {
             // Create new cube
-            const cube = await this.databaseManager.saveCube(data);
+            const cube = await this.databaseManager.saveCube({
+                ...data,
+                name: cubeName
+            });
             this.currentCubeId = cube.id;
-            this.currentCubeName = cubeName;
         }
 
         this.currentCubeName = cubeName;
