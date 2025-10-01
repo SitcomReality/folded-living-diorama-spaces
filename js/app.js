@@ -77,8 +77,13 @@ export class FoldedLivingApp {
 
     setupInput() {
         const canvas = this.renderer.getRenderer().domElement;
+        const canvasContainer = document.getElementById('canvas-container');
+
         canvas.addEventListener('click', async (e) => {
             if (e.button !== 0) return;
+            // Do not place object if we just finished rotating
+            if (this.input.didMouseMoveSinceMouseDown()) return;
+
             const activeTool = this.toolbarManager.getActiveTool();
             if (activeTool === 'select') {
                 const selected = this.selectionSystem.selectAt(
@@ -112,14 +117,40 @@ export class FoldedLivingApp {
             if (e.button === 0 && this.toolbarManager.getActiveTool() === 'place') {
                 const snapActive = this.toolbarManager.isSnapEnabled() || this.input.isKeyPressed('shift');
                 this.placementSystem.lockAnchor(this.camera.getCamera(), this.input.getMousePosition(), snapActive);
-                this.input.saveCursor();
+                canvas.requestPointerLock();
             }
         });
-        canvas.addEventListener('mouseup', (e) => {
+        canvas.addEventListener('mouseup', async (e) => {
             if (e.button === 0 && this.toolbarManager.getActiveTool() === 'place') {
-                this.input.restoreCursor();
+                document.exitPointerLock();
+                // If the mouse moved, we were rotating. The object is placed on mouse up.
+                if (this.input.didMouseMoveSinceMouseDown()) {
+                    const placed = await this.placementSystem.placeObject();
+                     if (placed) {
+                        console.log('Object placed after rotation');
+                        this.saveManager.autoSave();
+                    }
+                }
             }
         });
+
+        document.addEventListener('pointerlockchange', () => {
+            if (document.pointerLockElement === canvas) {
+                canvasContainer.classList.add('pointer-locked');
+            } else {
+                canvasContainer.classList.remove('pointer-locked');
+                this.placementSystem.endRotation();
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (document.pointerLockElement === canvas && this.toolbarManager.getActiveTool() === 'place') {
+                const snapActive = this.toolbarManager.isSnapEnabled() || this.input.isKeyPressed('shift');
+                const dx = e.movementX / window.innerWidth;
+                this.placementSystem.rotateByDelta(dx, snapActive);
+            }
+        });
+
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.placementSystem.cancelPlacement();
@@ -214,21 +245,16 @@ export class FoldedLivingApp {
         }
         if (this.toolbarManager.getActiveTool() === 'place') {
             const snapActive = this.toolbarManager.isSnapEnabled() || this.input.isKeyPressed('shift');
-            if (this.input.isMouseDown()) {
-                this._prevMouse = this._prevMouse || { x: this.input.getMousePosition().x, y: this.input.getMousePosition().y };
-                const cur = this.input.getMousePosition();
-                const dx = cur.x - this._prevMouse.x;
-                this.placementSystem.rotateByDelta(dx, snapActive);
-                this._prevMouse = { x: cur.x, y: cur.y };
-            } else {
-                this._prevMouse = null;
-                this.placementSystem.endRotation();
+            
+            // Rotation is now handled by the new 'mousemove' listener when pointer is locked.
+            // We only need to handle the preview update here when not rotating.
+            if (!this.placementSystem.isRotating) {
+                 this.placementSystem.updatePreview(
+                    this.camera.getCamera(),
+                    this.input.getMousePosition(),
+                    snapActive
+                );
             }
-            this.placementSystem.updatePreview(
-                this.camera.getCamera(),
-                this.input.getMousePosition(),
-                snapActive
-            );
         }
         this.renderer.render(this.scene.getScene(), this.camera.getCamera());
     }
