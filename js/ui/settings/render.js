@@ -2,7 +2,7 @@ import { CONSTANTS } from '../../config/constants.js';
 
 export function renderSettingsHTML(settings) {
     const surfaces = Object.keys(CONSTANTS.SURFACES).map(k => CONSTANTS.SURFACES[k]);
-    
+
     // Compact surface grid
     const surfaceCards = surfaces.map(surfaceName => {
         const s = settings.surfaces[surfaceName];
@@ -11,8 +11,8 @@ export function renderSettingsHTML(settings) {
             return ''; // Skip rendering this card if settings are missing
         }
         const displayName = surfaceName.charAt(0).toUpperCase() + surfaceName.slice(1);
-        const hasPivot = ['back','left','right', 'front'].includes(surfaceName);
-        
+        const hasPivot = ['back','left','right'].includes(surfaceName);
+
         return `
         <div class="surface-card" data-surface="${surfaceName}">
           <div class="surface-card-header">
@@ -31,20 +31,20 @@ export function renderSettingsHTML(settings) {
           </select>`:''}
         </div>`;
     }).join('');
-    
+
     const presets = [
         { id: 'warm', name: 'Warm', icon: '🌅' },
         { id: 'bright', name: 'Bright', icon: '☀️' },
         { id: 'cool', name: 'Cool', icon: '🌙' },
         { id: 'dramatic', name: 'Drama', icon: '🎭' }
     ];
-    
+
     const presetHTML = presets.map(p=>`
       <div class="environment-preset ${settings.environment.preset===p.id?'active':''}" data-preset="${p.id}">
         <div class="preset-icon">${p.icon}</div>
         <div class="preset-name">${p.name}</div>
       </div>`).join('');
-    
+
     return `
       <div class="settings-section" data-section="surfaces">
         <div class="settings-section-header">

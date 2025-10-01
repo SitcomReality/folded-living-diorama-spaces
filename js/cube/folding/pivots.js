@@ -49,8 +49,10 @@ export function setupPivots(cube) {
     const backSurface = cube.surfaces[CONSTANTS.SURFACES.BACK];
     if (ceilingSurface && backSurface) {
         cube.group.remove(ceilingSurface);
-        ceilingSurface.position.set(0, halfSize, halfSize);
-        ceilingSurface.rotation.set(0, 0, 0);
+        // Correctly position ceiling relative to the back surface's top edge
+        ceilingSurface.position.set(0, halfSize, 0); 
+        // Correctly orient ceiling to be perpendicular to back surface
+        ceilingSurface.rotation.set(-Math.PI / 2, 0, 0); 
         backSurface.add(ceilingSurface);
         ceilingSurface.userData.parentedToBackdrop = true;
     }

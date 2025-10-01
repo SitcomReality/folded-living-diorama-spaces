@@ -87,7 +87,7 @@
 .surfaces-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 8px;
 }
 
 .surface-card {
@@ -297,4 +297,3 @@
     position: absolute;
     pointer-events: none;
 }
-
