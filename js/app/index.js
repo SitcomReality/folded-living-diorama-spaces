@@ -89,7 +89,7 @@ export class FoldedLivingApp {
         this.outlinerManager.populate(this.cube.placedObjects.map(item => item.object));
     }
 
-    update() {
+    update(dt) {
         const cls = document.body.classList;
         cls.remove('cursor-wait', 'cursor-crosshair', 'cursor-none', 'cursor-pointer');
         if (this.placementSystem.isLoadingAsset) {
@@ -110,6 +110,14 @@ export class FoldedLivingApp {
                 this.placementSystem.updatePreview(this.camera.getCamera(), this.input.getMousePosition(), snapActive);
             }
         }
+        // Keyboard pan (WASD / Arrow keys)
+        const im = this.input, speed = 600;
+        let dx = 0, dy = 0;
+        if (im.isKeyPressed('a') || im.isKeyPressed('arrowleft')) dx += 1;
+        if (im.isKeyPressed('d') || im.isKeyPressed('arrowright')) dx -= 1;
+        if (im.isKeyPressed('w') || im.isKeyPressed('arrowup')) dy += 1;
+        if (im.isKeyPressed('s') || im.isKeyPressed('arrowdown')) dy -= 1;
+        if (dx || dy) this.camera.pan(dx * speed * (dt || 0.016), dy * speed * (dt || 0.016));
         this.renderer.render(this.scene.getScene(), this.camera.getCamera());
     }
 
