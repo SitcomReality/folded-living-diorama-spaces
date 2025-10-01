@@ -2,12 +2,12 @@ import { CONSTANTS } from '../../config/constants.js';
 
 export function createDefaultSettings(cube) {
     const defaults = {
-        front: '#f5e6d3',
-        back: '#e8d4c0',
-        ceiling: '#d4e8f5',
-        floor: '#a8c9a3',
-        left: '#f0d8c4',
-        right: '#f0d8c4'
+        [CONSTANTS.SURFACES.FRONT]: '#f5e6d3',
+        [CONSTANTS.SURFACES.BACK]: '#e8d4c0',
+        [CONSTANTS.SURFACES.CEILING]: '#d4e8f5',
+        [CONSTANTS.SURFACES.FLOOR]: '#a8c9a3',
+        [CONSTANTS.SURFACES.LEFT]: '#f0d8c4',
+        [CONSTANTS.SURFACES.RIGHT]: '#f0d8c4'
     };
     const settings = {
         surfaces: {},

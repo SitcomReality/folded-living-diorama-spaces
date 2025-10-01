@@ -57,15 +57,15 @@ export class SettingsManager {
     }
 
     getSettings() { return this.settings; }
-    
+
     createDefaultSettings() {
         return createDefaultSettings(this.cube);
     }
 
     applySettings(settings) {
-        this.settings = settings;
-        Object.keys(settings.surfaces).forEach(surfaceName => {
-            const s = settings.surfaces[surfaceName];
+        this.settings = this.migrateSettings(settings);
+        Object.keys(this.settings.surfaces).forEach(surfaceName => {
+            const s = this.settings.surfaces[surfaceName];
             const surface = this.cube.surfaces[surfaceName];
             if (!surface) return;
             surface.visible = s.visible;
@@ -75,10 +75,41 @@ export class SettingsManager {
                 updateOrientation(this.cube, this.settings, surfaceName, s.orientation);
             }
         });
-        applyPreset(this.scene, settings.environment.preset);
-        updateAmbientLight(this.scene, settings.environment.ambientIntensity);
-        updateBackgroundColor(this.scene, settings.environment.backgroundColor);
-        this.scene.setGroundColor(settings.environment.groundColor);
+        applyPreset(this.scene, this.settings.environment.preset);
+        updateAmbientLight(this.scene, this.settings.environment.ambientIntensity);
+        updateBackgroundColor(this.scene, this.settings.environment.backgroundColor);
+        this.scene.setGroundColor(this.settings.environment.groundColor);
         this.renderSettings();
+    }
+
+    migrateSettings(oldSettings) {
+        if (!oldSettings || !oldSettings.surfaces) return createDefaultSettings(this.cube);
+
+        const newSettings = createDefaultSettings(this.cube);
+
+        // Copy environment settings
+        if (oldSettings.environment) {
+            newSettings.environment = { ...newSettings.environment, ...oldSettings.environment };
+        }
+
+        const nameMap = {
+            portal: CONSTANTS.SURFACES.FRONT,
+            backdrop: CONSTANTS.SURFACES.BACK,
+            sky: CONSTANTS.SURFACES.CEILING,
+            earth: CONSTANTS.SURFACES.FLOOR,
+            'wing-left': CONSTANTS.SURFACES.LEFT,
+            'wing-right': CONSTANTS.SURFACES.RIGHT,
+        };
+
+        // migrate surface settings
+        Object.entries(oldSettings.surfaces).forEach(([key, value]) => {
+            const newKey = nameMap[key] || key; // Map old name or keep if already new
+            if (newSettings.surfaces[newKey]) {
+                // merge, giving preference to loaded value
+                Object.assign(newSettings.surfaces[newKey], value);
+            }
+        });
+
+        return newSettings;
     }
 }
