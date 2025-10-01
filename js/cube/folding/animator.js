@@ -14,8 +14,9 @@ export class FoldingAnimator {
         this.particles = null;
         this.glowLights = [];
         this.hasUnfoldedOnce = false;
+        this.objectInitialScales = new Map(); // Store original scales
     }
-    
+
     createUnfoldParticles() {
         // Create gentle glowing particles for the reveal
         const particleCount = 50;
@@ -23,32 +24,32 @@ export class FoldingAnimator {
         const positions = new Float32Array(particleCount * 3);
         const colors = new Float32Array(particleCount * 3);
         const sizes = new Float32Array(particleCount);
-        
+
         const color1 = new THREE.Color(0xe89b6f); // Accent color
         const color2 = new THREE.Color(0xf5e6d3); // Light warm
         const color3 = new THREE.Color(0x8ab68a); // Soft green
-        
+
         for (let i = 0; i < particleCount; i++) {
             const i3 = i * 3;
             // Start particles near cube center
             positions[i3] = (Math.random() - 0.5) * this.cube.size * 0.5;
             positions[i3 + 1] = (Math.random() - 0.5) * this.cube.size * 0.5;
             positions[i3 + 2] = (Math.random() - 0.5) * this.cube.size * 0.5;
-            
+
             // Random color from palette
             const colorChoice = Math.random();
             const chosenColor = colorChoice < 0.33 ? color1 : (colorChoice < 0.66 ? color2 : color3);
             colors[i3] = chosenColor.r;
             colors[i3 + 1] = chosenColor.g;
             colors[i3 + 2] = chosenColor.b;
-            
+
             sizes[i] = Math.random() * 0.15 + 0.1;
         }
-        
+
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
         geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-        
+
         const material = new THREE.PointsMaterial({
             size: 0.2,
             vertexColors: true,
@@ -58,10 +59,10 @@ export class FoldingAnimator {
             depthWrite: false,
             sizeAttenuation: true
         });
-        
+
         this.particles = new THREE.Points(geometry, material);
         this.cube.group.add(this.particles);
-        
+
         // Add subtle glow lights
         const glowColors = [0xe89b6f, 0xf5e6d3, 0x8ab68a];
         for (let i = 0; i < 3; i++) {
@@ -75,7 +76,7 @@ export class FoldingAnimator {
             this.cube.group.add(light);
         }
     }
-    
+
     removeUnfoldParticles() {
         if (this.particles) {
             this.cube.group.remove(this.particles);
@@ -83,64 +84,82 @@ export class FoldingAnimator {
             this.particles.material.dispose();
             this.particles = null;
         }
-        
+
         this.glowLights.forEach(light => {
             this.cube.group.remove(light);
         });
         this.glowLights = [];
     }
-    
+
     updateParticles(progress) {
         if (!this.particles) return;
-        
+
         const positions = this.particles.geometry.attributes.position.array;
         const particleCount = positions.length / 3;
-        
+
         // Gentle upward and outward drift
         for (let i = 0; i < particleCount; i++) {
             const i3 = i * 3;
             const angle = (i / particleCount) * Math.PI * 2;
             const radius = progress * 2;
             const drift = Math.sin(progress * Math.PI) * 0.5;
-            
+
             positions[i3] += Math.cos(angle) * 0.02;
             positions[i3 + 1] += 0.03 + drift * 0.01;
             positions[i3 + 2] += Math.sin(angle) * 0.02;
         }
-        
+
         this.particles.geometry.attributes.position.needsUpdate = true;
-        
+
         // Fade particles
         const fadeStart = 0.6;
         if (progress > fadeStart) {
             const fadeProgress = (progress - fadeStart) / (1 - fadeStart);
             this.particles.material.opacity = 0.8 * (1 - fadeProgress);
         }
-        
+
         // Animate glow lights
         this.glowLights.forEach((light, index) => {
             const intensity = Math.sin(progress * Math.PI) * 0.5;
             light.intensity = intensity;
-            
+
             // Gentle orbit
             const orbitAngle = progress * Math.PI * 2 + (index * Math.PI * 2 / 3);
             light.position.x = Math.cos(orbitAngle) * this.cube.size * 0.4;
             light.position.z = Math.sin(orbitAngle) * this.cube.size * 0.4;
         });
     }
-    
+
     async unfold(duration = CONSTANTS.UNFOLD_DURATION) {
         if (this.animating || !this.cube.isFolded) return;
         this.animating = true;
         const startTime = Date.now();
         const startPositions = {};
-        
+
         // Switch to interior texture
         this.cube.setInteriorTexture();
-        
+
         // Create particle effects
         this.createUnfoldParticles();
-        
+
+        // Show and prepare objects for animation
+        this.cube.placedObjects.forEach(item => {
+            const obj = item.object;
+            obj.visible = true;
+
+            // Store original scale if not already stored
+            if (!this.objectInitialScales.has(obj.uuid)) {
+                this.objectInitialScales.set(obj.uuid, {
+                    x: obj.scale.x,
+                    y: obj.scale.y,
+                    z: obj.scale.z
+                });
+            }
+
+            // Start from tiny scale
+            obj.scale.set(0.01, 0.01, 0.01);
+        });
+
         Object.keys(this.cube.surfaces).forEach(name => {
             const surface = this.cube.surfaces[name];
             const pivot = surface.userData.pivot;
@@ -151,16 +170,15 @@ export class FoldingAnimator {
                 scale: surface.scale.x
             };
         });
+
         return new Promise((resolve) => {
             const animate = () => {
                 const elapsed = (Date.now() - startTime) / 1000;
                 const progress = Math.min(elapsed / duration, 1);
-                
-                // More dramatic easing with anticipation
-                const eased = progress < 0.1 
-                    ? progress * 5 // Quick start
-                    : 0.5 + easeOutCubic((progress - 0.1) / 0.9) * 0.5; // Smooth unfold
-                
+
+                // Ease in (start slow, accelerate)
+                const eased = easeInCubic(progress);
+
                 Object.keys(this.cube.surfaces).forEach(name => {
                     const surface = this.cube.surfaces[name];
                     const pivot = surface.userData.pivot;
@@ -180,33 +198,70 @@ export class FoldingAnimator {
                     const currentScale = start.scale + (targetScale - start.scale) * eased;
                     surface.scale.setScalar(currentScale);
                 });
-                
+
+                // Animate objects with spring jiggle at the end
+                this.cube.placedObjects.forEach(item => {
+                    const obj = item.object;
+                    const originalScale = this.objectInitialScales.get(obj.uuid);
+                    if (!originalScale) return;
+
+                    let scale = 0;
+                    if (progress < 0.7) {
+                        // Grow from 0 to 1 over first 70% of animation
+                        scale = (progress / 0.7);
+                    } else {
+                        // Spring jiggle in last 30%
+                        const jiggleProgress = (progress - 0.7) / 0.3;
+                        // Overshoot, undershoot, settle
+                        // Using a dampened sine wave
+                        const overshoot = Math.sin(jiggleProgress * Math.PI * 3) * Math.exp(-jiggleProgress * 4);
+                        scale = 1 + overshoot * 0.3;
+                    }
+
+                    obj.scale.set(
+                        originalScale.x * scale,
+                        originalScale.y * scale,
+                        originalScale.z * scale
+                    );
+                });
+
                 // Update particle effects
                 this.updateParticles(progress);
-                
+
                 if (progress < 1) requestAnimationFrame(animate);
                 else { 
+                    // Ensure objects are at exact scale
+                    this.cube.placedObjects.forEach(item => {
+                        const obj = item.object;
+                        const originalScale = this.objectInitialScales.get(obj.uuid);
+                        if (originalScale) {
+                            obj.scale.set(originalScale.x, originalScale.y, originalScale.z);
+                        }
+                    });
+
                     this.animating = false; 
                     this.cube.isFolded = false;
                     this.removeUnfoldParticles();
-                    
+
                     // Dispatch event on first unfold
                     if (!this.hasUnfoldedOnce) {
                         this.hasUnfoldedOnce = true;
                         window.dispatchEvent(new CustomEvent('cubeUnfolded'));
                     }
-                    
+
                     resolve(); 
                 }
             };
             animate();
         });
     }
+
     async fold(duration = CONSTANTS.FOLD_DURATION) {
         if (this.animating || this.cube.isFolded) return;
         this.animating = true;
         const startTime = Date.now();
         const startPositions = {};
+
         Object.keys(this.cube.surfaces).forEach(name => {
             const surface = this.cube.surfaces[name];
             const pivot = surface.userData.pivot;
@@ -217,11 +272,13 @@ export class FoldingAnimator {
                 scale: surface.scale.x
             };
         });
+
         return new Promise((resolve) => {
             const animate = () => {
                 const elapsed = (Date.now() - startTime) / 1000;
                 const progress = Math.min(elapsed / duration, 1);
                 const eased = easeInCubic(progress);
+
                 Object.keys(this.cube.surfaces).forEach(name => {
                     const surface = this.cube.surfaces[name];
                     const pivot = surface.userData.pivot;
@@ -240,8 +297,41 @@ export class FoldingAnimator {
                     const currentScale = start.scale + (1.0 - start.scale) * eased;
                     surface.scale.setScalar(currentScale);
                 });
+
+                // Animate objects with bounce before shrinking
+                this.cube.placedObjects.forEach(item => {
+                    const obj = item.object;
+                    const originalScale = this.objectInitialScales.get(obj.uuid);
+                    if (!originalScale) return;
+
+                    let scale = 1;
+                    if (progress < 0.15) {
+                        // Quick bounce up in first 15%
+                        const bounceProgress = progress / 0.15;
+                        scale = 1 + (Math.sin(bounceProgress * Math.PI) * 0.3);
+                    } else {
+                        // Shrink from 1 to 0 over remaining 85%
+                        const shrinkProgress = (progress - 0.15) / 0.85;
+                        scale = 1 - shrinkProgress;
+                    }
+
+                    obj.scale.set(
+                        originalScale.x * scale,
+                        originalScale.y * scale,
+                        originalScale.z * scale
+                    );
+
+                    // Hide when very small
+                    obj.visible = scale > 0.01;
+                });
+
                 if (progress < 1) requestAnimationFrame(animate);
                 else { 
+                    // Hide all objects when fully folded
+                    this.cube.placedObjects.forEach(item => {
+                        item.object.visible = false;
+                    });
+
                     this.animating = false; 
                     this.cube.isFolded = true;
                     // Switch to exterior texture when folded
