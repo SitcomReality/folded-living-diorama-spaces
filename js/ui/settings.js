@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { CONSTANTS } from '../config/constants.js';
-import { createDefaultSettings } from './settings/state.js';
+import { createDefaultSettings, getRandomSkybox, getSkyboxPreset } from './settings/state.js';
 import { renderSettingsHTML } from './settings/render.js';
 import { attachSettingsEvents } from './settings/events.js';
-import { applyPreset, updateAmbientLight, updateBackgroundColor, updateGroundColor } from './settings/environmentPresets.js';
+import { applyPreset, updateAmbientLight, updateBackgroundColor, updateGroundColor, loadSkybox, setGroundVisible } from './settings/environmentPresets.js';
 import { toggleVisibility, updateColor, updateTexture, updateOrientation } from './settings/surfaceControls.js';
 
 export class SettingsManager {
@@ -17,11 +17,20 @@ export class SettingsManager {
         this.closeBtn = document.getElementById('close-settings');
 
         this.settings = createDefaultSettings(cube);
+        
+        // Randomize skybox and set associated preset for new cubes
+        this.randomizeSkybox();
 
         this.openBtn.addEventListener('click', () => this.open());
         this.closeBtn.addEventListener('click', () => this.close());
 
         this.renderSettings();
+    }
+
+    randomizeSkybox() {
+        const skyboxId = getRandomSkybox();
+        this.settings.environment.skybox = skyboxId;
+        this.settings.environment.preset = getSkyboxPreset(skyboxId);
     }
 
     open() {
@@ -42,6 +51,8 @@ export class SettingsManager {
             updateAmbientLight,
             updateBackgroundColor,
             updateGroundColor,
+            loadSkybox,
+            setGroundVisible,
             toggleVisibility,
             updateColor,
             updateTexture,
@@ -62,7 +73,7 @@ export class SettingsManager {
         return createDefaultSettings(this.cube);
     }
 
-    applySettings(settings) {
+    async applySettings(settings) {
         this.settings = this.migrateSettings(settings);
         Object.keys(this.settings.surfaces).forEach(surfaceName => {
             const s = this.settings.surfaces[surfaceName];
@@ -75,10 +86,21 @@ export class SettingsManager {
                 updateOrientation(this.cube, this.settings, surfaceName, s.orientation);
             }
         });
+
+        // Load skybox first
+        await loadSkybox(this.scene, this.settings.environment.skybox);
+
+        // Apply environment settings
         applyPreset(this.scene, this.settings.environment.preset);
         updateAmbientLight(this.scene, this.settings.environment.ambientIntensity);
         updateBackgroundColor(this.scene, this.settings.environment.backgroundColor);
         this.scene.setGroundColor(this.settings.environment.groundColor);
+
+        // Apply ground visibility
+        if (this.settings.environment.groundVisible !== undefined) {
+            this.scene.setGroundVisible(this.settings.environment.groundVisible);
+        }
+
         this.renderSettings();
     }
 
@@ -90,6 +112,11 @@ export class SettingsManager {
         // Copy environment settings
         if (oldSettings.environment) {
             newSettings.environment = { ...newSettings.environment, ...oldSettings.environment };
+        }
+
+        // Ensure groundVisible exists
+        if (newSettings.environment.groundVisible === undefined) {
+            newSettings.environment.groundVisible = true;
         }
 
         const nameMap = {

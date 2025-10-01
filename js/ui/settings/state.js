@@ -11,7 +11,14 @@ export function createDefaultSettings(cube) {
     };
     const settings = {
         surfaces: {},
-        environment: { preset: 'warm', ambientIntensity: 0.6, backgroundColor: '#87ceeb', groundColor: '#6fbf73' }
+        environment: { 
+            preset: 'warm', 
+            ambientIntensity: 0.6, 
+            backgroundColor: '#87ceeb', 
+            groundColor: '#6fbf73',
+            skybox: null, // null means use backgroundColor, otherwise 'sky_16', 'sky_17', 'sky_38'
+            groundVisible: true
+        }
     };
     // Surfaces that can fold and are visually 'down' (horizontal) in the initial unfolded state
     const foldingSurfaces = [CONSTANTS.SURFACES.FRONT, CONSTANTS.SURFACES.BACK, CONSTANTS.SURFACES.LEFT, CONSTANTS.SURFACES.RIGHT];
@@ -25,4 +32,18 @@ export function createDefaultSettings(cube) {
         };
     });
     return settings;
+}
+
+export function getRandomSkybox() {
+    const skyboxes = ['sky_16', 'sky_17', 'sky_38'];
+    return skyboxes[Math.floor(Math.random() * skyboxes.length)];
+}
+
+export function getSkyboxPreset(skyboxId) {
+    const presets = {
+        'sky_38': 'bright',
+        'sky_17': 'dramatic',
+        'sky_16': 'cool'
+    };
+    return presets[skyboxId] || 'warm';
 }

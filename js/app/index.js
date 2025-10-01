@@ -20,7 +20,12 @@ export class FoldedLivingApp {
             const reward = this.economyManager.claimDailyReward();
             if (reward > 0) this.hudManager.showNotification(`Daily reward claimed: ${reward} ✨`);
             const savedData = this.saveManager.loadFromLocalStorage();
-            if (savedData) await this.loadCubeData(savedData);
+            if (savedData) {
+                await this.loadCubeData(savedData);
+            } else {
+                // Apply initial random skybox settings for new cubes
+                await this.settingsManager.applySettings(this.settingsManager.settings);
+            }
             this.outlinerManager.populate(this.cube.placedObjects.map(item => item.object));
             this.camera.setDefaultPosition();
             await new Promise(r => setTimeout(r, 500));
@@ -37,7 +42,7 @@ export class FoldedLivingApp {
     }
 
     async loadCubeData(data) {
-        if (data.settings) this.settingsManager.applySettings(data.settings);
+        if (data.settings) await this.settingsManager.applySettings(data.settings);
         if (Array.isArray(data.objects)) {
             const { getAssetById } = await import('../config/assets.js');
             for (const item of data.objects) {
@@ -66,7 +71,9 @@ export class FoldedLivingApp {
         this.budgetManager.currentLightCount = 0;
         this.budgetManager.notifyListeners();
         this.outlinerManager.clear();
-        this.settingsManager.applySettings(this.settingsManager.createDefaultSettings());
+        this.settingsManager.settings = this.settingsManager.createDefaultSettings();
+        this.settingsManager.randomizeSkybox();
+        this.settingsManager.applySettings(this.settingsManager.settings);
         this.historyManager.push(this.getSnapshot());
     }
 
@@ -129,4 +136,3 @@ export class FoldedLivingApp {
         redoBtn.disabled = !this.historyManager.canRedo();
     }
 }
-
