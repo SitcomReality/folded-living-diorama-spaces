@@ -1,3 +1,5 @@
+import { InfoBannerManager } from './infoBanner.js';
+
 export class HUDManager {
     constructor(economyManager, budgetManager, saveManager, namingModal) {
         this.economyManager = economyManager;
@@ -11,8 +13,12 @@ export class HUDManager {
         this.updateBudgetDisplay();
         this.updateCubeNameDisplay();
         this.setupListeners();
-        this.setupInfoBanner();
         this.setupThemeToggle();
+        
+        this.infoBanner = new InfoBannerManager(
+            document.getElementById('info-banner'),
+            ['Check out <a href="https://websim.com/@SitcomReality/webgem" target="_blank">WebGem</a> for Websim\'s highest quality overlooked projects!']
+        );
     }
     
     setupListeners() {
@@ -57,19 +63,6 @@ export class HUDManager {
             document.body.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
         });
-    }
-    
-    setupInfoBanner() {
-        this.infoBanner = document.getElementById('info-banner');
-        this.bannerMessages = [
-            'Check out <a href="https://websim.com/@SitcomReality/webgem" target="_blank">WebGem</a> for Websim\'s highest quality overlooked projects!'
-        ];
-        
-        // Show first message after 5 seconds
-        setTimeout(() => this.showBannerMessage(), 5000);
-        
-        // Cycle through messages every 30 seconds
-        setInterval(() => this.showBannerMessage(), 30000);
     }
     
     showBannerMessage() {
