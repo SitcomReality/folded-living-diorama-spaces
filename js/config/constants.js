@@ -22,13 +22,13 @@ export const CONSTANTS = {
     REACTION_REWARD: 2,
     DAILY_REWARD: 50,
     
-    // Surface names (fold-agnostic nomenclature)
+    // Surface names (simplified and intuitive)
     SURFACES: {
-        PORTAL: 'Front',      // Front wall (always faces viewer)
-        BACKDROP: 'Back',  // Back wall
-        SKY: 'Ceiling',           // Ceiling
-        EARTH: 'Floor',       // Ground
-        WING_LEFT: 'Left',   // Left wall
-        WING_RIGHT: 'Right'  // Right wall
+        FRONT: 'front',       // Front wall (always faces viewer)
+        BACK: 'back',         // Back wall
+        CEILING: 'ceiling',   // Ceiling
+        FLOOR: 'floor',       // Ground
+        LEFT: 'left',         // Left wall
+        RIGHT: 'right'        // Right wall
     }
 };

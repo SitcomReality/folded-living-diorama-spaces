@@ -39,10 +39,10 @@ export function updateOrientation(cube, settings, surfaceName, orientation) {
 
 export function getPivotTargetRotation(surfaceName, orientation) {
     switch (surfaceName) {
-        case 'backdrop': return orientation==='down' ? new THREE.Euler(Math.PI/2,0,0) : new THREE.Euler(0,0,0);
-        case 'wing_left': return orientation==='down' ? new THREE.Euler(0,0,Math.PI/2) : new THREE.Euler(0,0,0);
-        case 'wing_right': return orientation==='down' ? new THREE.Euler(0,0,-Math.PI/2) : new THREE.Euler(0,0,0);
-        case 'portal': return orientation==='down' ? new THREE.Euler(-Math.PI/2,0,0) : new THREE.Euler(0,0,0);
+        case 'back': return orientation==='down' ? new THREE.Euler(Math.PI/2,0,0) : new THREE.Euler(0,0,0);
+        case 'left': return orientation==='down' ? new THREE.Euler(0,0,Math.PI/2) : new THREE.Euler(0,0,0);
+        case 'right': return orientation==='down' ? new THREE.Euler(0,0,-Math.PI/2) : new THREE.Euler(0,0,0);
+        case 'front': return orientation==='down' ? new THREE.Euler(-Math.PI/2,0,0) : new THREE.Euler(0,0,0);
         default: return null;
     }
 }

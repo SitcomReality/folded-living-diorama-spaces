@@ -65,12 +65,12 @@ export class DioramaCube {
         
         // Warm, cozy colors for surfaces
         const surfaceConfigs = [
-            { name: CONSTANTS.SURFACES.PORTAL, color: 0xf5e6d3, position: [0, 0, -halfSize], rotation: [0, 0, 0] },
-            { name: CONSTANTS.SURFACES.BACKDROP, color: 0xe8d4c0, position: [0, 0, halfSize], rotation: [0, Math.PI, 0] },
-            { name: CONSTANTS.SURFACES.SKY, color: 0xd4e8f5, position: [0, halfSize, 0], rotation: [-Math.PI/2, 0, 0] },
-            { name: CONSTANTS.SURFACES.EARTH, color: 0xa8c9a3, position: [0, -halfSize, 0], rotation: [Math.PI/2, 0, 0] },
-            { name: CONSTANTS.SURFACES.WING_LEFT, color: 0xf0d8c4, position: [-halfSize, 0, 0], rotation: [0, -Math.PI/2, 0] },
-            { name: CONSTANTS.SURFACES.WING_RIGHT, color: 0xf0d8c4, position: [halfSize, 0, 0], rotation: [0, Math.PI/2, 0] }
+            { name: CONSTANTS.SURFACES.FRONT, color: 0xf5e6d3, position: [0, 0, -halfSize], rotation: [0, 0, 0] },
+            { name: CONSTANTS.SURFACES.BACK, color: 0xe8d4c0, position: [0, 0, halfSize], rotation: [0, Math.PI, 0] },
+            { name: CONSTANTS.SURFACES.CEILING, color: 0xd4e8f5, position: [0, halfSize, 0], rotation: [-Math.PI/2, 0, 0] },
+            { name: CONSTANTS.SURFACES.FLOOR, color: 0xa8c9a3, position: [0, -halfSize, 0], rotation: [Math.PI/2, 0, 0] },
+            { name: CONSTANTS.SURFACES.LEFT, color: 0xf0d8c4, position: [-halfSize, 0, 0], rotation: [0, -Math.PI/2, 0] },
+            { name: CONSTANTS.SURFACES.RIGHT, color: 0xf0d8c4, position: [halfSize, 0, 0], rotation: [0, Math.PI/2, 0] }
         ];
         
         surfaceConfigs.forEach(config => {

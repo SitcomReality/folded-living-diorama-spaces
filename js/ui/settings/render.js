@@ -3,20 +3,16 @@ import { CONSTANTS } from '../../config/constants.js';
 export function renderSettingsHTML(settings) {
     const surfaces = Object.keys(CONSTANTS.SURFACES).map(k => CONSTANTS.SURFACES[k]);
     
-    // Reorder surfaces for grid layout: Front, Back, Ceiling on top; Left, Floor, Right on bottom
-    const topRow = ['Front', 'Back', 'Ceiling'];
-    const bottomRow = ['Left', 'Floor', 'Right'];
-    const orderedSurfaces = [...topRow, ...bottomRow];
-    
     // Compact surface grid
-    const surfaceCards = orderedSurfaces.map(surfaceName => {
-        const s = settings.surfaces[surfaceName] || { visible: true, color: '#ffffff', orientation: 'up' };
-        const hasPivot = ['Back','Left','Right'].includes(surfaceName);
+    const surfaceCards = surfaces.map(surfaceName => {
+        const s = settings.surfaces[surfaceName];
+        const displayName = surfaceName.charAt(0).toUpperCase() + surfaceName.slice(1);
+        const hasPivot = ['back','left','right'].includes(surfaceName);
         
         return `
         <div class="surface-card" data-surface="${surfaceName}">
           <div class="surface-card-header">
-            <div class="surface-name">${surfaceName}</div>
+            <div class="surface-name">${displayName}</div>
             <div class="surface-visibility-toggle ${s.visible ? 'visible' : ''}" data-control="visible">
               ${s.visible ? '👁' : ''}
             </div>
@@ -49,7 +45,7 @@ export function renderSettingsHTML(settings) {
       <div class="settings-section" data-section="surfaces">
         <div class="settings-section-header">
           <div class="settings-section-title">🎨 Surfaces</div>
-          <div class="p">▼</div>
+          <div class="settings-section-toggle">▼</div>
         </div>
         <div class="settings-section-content">
           <div class="surfaces-grid">${surfaceCards}</div>

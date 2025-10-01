@@ -167,8 +167,8 @@ export class FoldingAnimator {
                     const start = startPositions[name];
                     const end = this.unfoldedPositions[name];
                     const settings = window.app?.settingsManager?.getSettings?.();
-                    const isConfigurable = [CONSTANTS.SURFACES.BACKDROP, CONSTANTS.SURFACES.WING_LEFT, CONSTANTS.SURFACES.WING_RIGHT].includes(name);
-                    const shouldMove = (name === CONSTANTS.SURFACES.PORTAL) || (isConfigurable && settings?.surfaces?.[name]?.orientation === 'down');
+                    const isConfigurable = [CONSTANTS.SURFACES.BACK, CONSTANTS.SURFACES.LEFT, CONSTANTS.SURFACES.RIGHT].includes(name);
+                    const shouldMove = (name === CONSTANTS.SURFACES.FRONT) || (isConfigurable && settings?.surfaces?.[name]?.orientation === 'down');
                     if (pivot) {
                         if (shouldMove) {
                             pivot.rotation.x = lerpAngle(start.pivotRotation.x, end.pivotRotation.x, eased);
@@ -228,8 +228,8 @@ export class FoldingAnimator {
                     const start = startPositions[name];
                     const end = this.foldedPositions[name];
                     const settings = window.app?.settingsManager?.getSettings?.();
-                    const isConfigurable = [CONSTANTS.SURFACES.BACKDROP, CONSTANTS.SURFACES.WING_LEFT, CONSTANTS.SURFACES.WING_RIGHT].includes(name);
-                    const shouldMove = (name === CONSTANTS.SURFACES.PORTAL) || (isConfigurable && settings?.surfaces?.[name]?.orientation === 'down');
+                    const isConfigurable = [CONSTANTS.SURFACES.BACK, CONSTANTS.SURFACES.LEFT, CONSTANTS.SURFACES.RIGHT].includes(name);
+                    const shouldMove = (name === CONSTANTS.SURFACES.FRONT) || (isConfigurable && settings?.surfaces?.[name]?.orientation === 'down');
                     if (pivot) {
                         if (shouldMove) {
                             pivot.rotation.x = lerpAngle(start.pivotRotation.x, end.pivotRotation.x, eased);

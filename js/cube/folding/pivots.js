@@ -7,9 +7,9 @@ export function setupPivots(cube) {
         const surface = cube.surfaces[name];
         const pivot = new THREE.Group();
         switch(name) {
-            case CONSTANTS.SURFACES.EARTH:
+            case CONSTANTS.SURFACES.FLOOR:
                 break;
-            case CONSTANTS.SURFACES.BACKDROP:
+            case CONSTANTS.SURFACES.BACK:
                 pivot.position.set(0, -halfSize, halfSize);
                 cube.group.remove(surface);
                 surface.position.set(0, halfSize, 0);
@@ -17,9 +17,9 @@ export function setupPivots(cube) {
                 cube.group.add(pivot);
                 surface.userData.pivot = pivot;
                 break;
-            case CONSTANTS.SURFACES.SKY:
+            case CONSTANTS.SURFACES.CEILING:
                 break;
-            case CONSTANTS.SURFACES.WING_LEFT:
+            case CONSTANTS.SURFACES.LEFT:
                 pivot.position.set(-halfSize, -halfSize, 0);
                 cube.group.remove(surface);
                 surface.position.set(0, halfSize, 0);
@@ -27,7 +27,7 @@ export function setupPivots(cube) {
                 cube.group.add(pivot);
                 surface.userData.pivot = pivot;
                 break;
-            case CONSTANTS.SURFACES.WING_RIGHT:
+            case CONSTANTS.SURFACES.RIGHT:
                 pivot.position.set(halfSize, -halfSize, 0);
                 cube.group.remove(surface);
                 surface.position.set(0, halfSize, 0);
@@ -35,7 +35,7 @@ export function setupPivots(cube) {
                 cube.group.add(pivot);
                 surface.userData.pivot = pivot;
                 break;
-            case CONSTANTS.SURFACES.PORTAL:
+            case CONSTANTS.SURFACES.FRONT:
                 pivot.position.set(0, -halfSize, -halfSize);
                 cube.group.remove(surface);
                 surface.position.set(0, halfSize, 0);
@@ -45,13 +45,13 @@ export function setupPivots(cube) {
                 break;
         }
     });
-    const skySurface = cube.surfaces[CONSTANTS.SURFACES.SKY];
-    const backdropSurface = cube.surfaces[CONSTANTS.SURFACES.BACKDROP];
-    if (skySurface && backdropSurface) {
-        cube.group.remove(skySurface);
-        skySurface.position.set(0, halfSize, halfSize);
-        skySurface.rotation.set(-Math.PI/2, 0, 0);
-        backdropSurface.add(skySurface);
-        skySurface.userData.parentedToBackdrop = true;
+    const ceilingSurface = cube.surfaces[CONSTANTS.SURFACES.CEILING];
+    const backSurface = cube.surfaces[CONSTANTS.SURFACES.BACK];
+    if (ceilingSurface && backSurface) {
+        cube.group.remove(ceilingSurface);
+        ceilingSurface.position.set(0, halfSize, halfSize);
+        ceilingSurface.rotation.set(-Math.PI/2, 0, 0);
+        backSurface.add(ceilingSurface);
+        ceilingSurface.userData.parentedToBackdrop = true;
     }
 }
