@@ -56,7 +56,7 @@ export class InputManager {
     }
 
     resetCursor() {
-        document.body.className = '';
+        document.body.classList.remove('cursor-wait', 'cursor-crosshair', 'cursor-none');
     }
     saveCursor() { this._savedCursor = { x: this.mousePos.x, y: this.mousePos.y }; }
     restoreCursor() { if (this._savedCursor) { this.mousePos = { ...this._savedCursor }; this._savedCursor = null; } }

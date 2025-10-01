@@ -335,16 +335,17 @@ export class FoldedLivingApp {
     }
 
     update() {
+        // preserve ui-hidden; only mutate cursor classes
+        const cls = document.body.classList;
+        cls.remove('cursor-wait', 'cursor-crosshair', 'cursor-none');
         if (this.placementSystem.isLoadingAsset) {
-            document.body.className = 'cursor-wait';
+            cls.add('cursor-wait');
         } else if (this.toolbarManager.getActiveTool() === 'place') {
             if (this.placementSystem.previewObject && this.placementSystem.previewObject.visible) {
-                document.body.className = 'cursor-none';
+                cls.add('cursor-none');
             } else {
-                document.body.className = 'cursor-crosshair';
+                cls.add('cursor-crosshair');
             }
-        } else {
-            document.body.className = '';
         }
         if (this.toolbarManager.getActiveTool() === 'place') {
             const snapActive = this.toolbarManager.isSnapEnabled() || this.input.isKeyPressed('shift');
