@@ -37,10 +37,15 @@ export class FoldingAnimator {
                     const pivot = surface.userData.pivot;
                     const start = startPositions[name];
                     const end = this.unfoldedPositions[name];
+                    const settings = window.app?.settingsManager?.getSettings?.();
+                    const isConfigurable = [CONSTANTS.SURFACES.BACKDROP, CONSTANTS.SURFACES.WING_LEFT, CONSTANTS.SURFACES.WING_RIGHT].includes(name);
+                    const shouldMove = (name === CONSTANTS.SURFACES.PORTAL) || (isConfigurable && settings?.surfaces?.[name]?.orientation === 'down');
                     if (pivot) {
-                        pivot.rotation.x = lerpAngle(start.pivotRotation.x, end.pivotRotation.x, eased);
-                        pivot.rotation.y = lerpAngle(start.pivotRotation.y, end.pivotRotation.y, eased);
-                        pivot.rotation.z = lerpAngle(start.pivotRotation.z, end.pivotRotation.z, eased);
+                        if (shouldMove) {
+                            pivot.rotation.x = lerpAngle(start.pivotRotation.x, end.pivotRotation.x, eased);
+                            pivot.rotation.y = lerpAngle(start.pivotRotation.y, end.pivotRotation.y, eased);
+                            pivot.rotation.z = lerpAngle(start.pivotRotation.z, end.pivotRotation.z, eased);
+                        }
                     }
                     const targetScale = end.scale || 1.0;
                     const currentScale = start.scale + (targetScale - start.scale) * eased;
@@ -77,10 +82,15 @@ export class FoldingAnimator {
                     const pivot = surface.userData.pivot;
                     const start = startPositions[name];
                     const end = this.foldedPositions[name];
+                    const settings = window.app?.settingsManager?.getSettings?.();
+                    const isConfigurable = [CONSTANTS.SURFACES.BACKDROP, CONSTANTS.SURFACES.WING_LEFT, CONSTANTS.SURFACES.WING_RIGHT].includes(name);
+                    const shouldMove = (name === CONSTANTS.SURFACES.PORTAL) || (isConfigurable && settings?.surfaces?.[name]?.orientation === 'down');
                     if (pivot) {
-                        pivot.rotation.x = lerpAngle(start.pivotRotation.x, end.pivotRotation.x, eased);
-                        pivot.rotation.y = lerpAngle(start.pivotRotation.y, end.pivotRotation.y, eased);
-                        pivot.rotation.z = lerpAngle(start.pivotRotation.z, end.pivotRotation.z, eased);
+                        if (shouldMove) {
+                            pivot.rotation.x = lerpAngle(start.pivotRotation.x, end.pivotRotation.x, eased);
+                            pivot.rotation.y = lerpAngle(start.pivotRotation.y, end.pivotRotation.y, eased);
+                            pivot.rotation.z = lerpAngle(start.pivotRotation.z, end.pivotRotation.z, eased);
+                        }
                     }
                     const currentScale = start.scale + (1.0 - start.scale) * eased;
                     surface.scale.setScalar(currentScale);
