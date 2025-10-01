@@ -112,6 +112,12 @@ export class FoldedLivingApp {
             if (e.button === 0 && this.toolbarManager.getActiveTool() === 'place') {
                 const snapActive = this.toolbarManager.isSnapEnabled() || this.input.isKeyPressed('shift');
                 this.placementSystem.lockAnchor(this.camera.getCamera(), this.input.getMousePosition(), snapActive);
+                this.input.saveCursor();
+            }
+        });
+        canvas.addEventListener('mouseup', (e) => {
+            if (e.button === 0 && this.toolbarManager.getActiveTool() === 'place') {
+                this.input.restoreCursor();
             }
         });
         window.addEventListener('keydown', (e) => {

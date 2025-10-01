@@ -58,4 +58,6 @@ export class InputManager {
     resetCursor() {
         document.body.className = '';
     }
+    saveCursor() { this._savedCursor = { x: this.mousePos.x, y: this.mousePos.y }; }
+    restoreCursor() { if (this._savedCursor) { this.mousePos = { ...this._savedCursor }; this._savedCursor = null; } }
 }
