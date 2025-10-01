@@ -1,4 +1,6 @@
 // Asset grouping and variant detection system
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 const ASSET_MANIFEST_URL = '/assets/asset-manifest.json';
 
 // Poly cost estimates based on asset type
