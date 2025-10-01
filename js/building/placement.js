@@ -18,6 +18,7 @@ export class PlacementSystem {
         this.isRotating = false;
         this.baseQuat = null;
         this.anchorWorldPos = null;
+        this.freezeAnchor = false;
     }
     
     async startPlacement(assetId) {
@@ -111,8 +112,7 @@ export class PlacementSystem {
     updatePreview(camera, mousePos, snapActive = false) {
         if (!this.isPlacing || !this.previewObject) return;
         
-        // keep position fixed while rotating
-        if (this.isRotating && this.anchorWorldPos && this.baseQuat) {
+        if ((this.isRotating || this.freezeAnchor) && this.anchorWorldPos && this.baseQuat) {
             const targetYaw = snapActive ? Math.round(this.previewYaw / (Math.PI/4)) * (Math.PI/4) : this.previewYaw;
             const qYaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetYaw);
             this.previewObject.quaternion.copy(qYaw).multiply(this.baseQuat);
@@ -212,6 +212,11 @@ export class PlacementSystem {
         // Track via cube with current local position
         this.cube.addObject(object, surfaceName, object.position.clone());
         
+        // Unfreeze anchor after placement
+        this.freezeAnchor = false;
+        this.anchorWorldPos = null;
+        this.baseQuat = null;
+        
         return object;
     }
     
@@ -263,6 +268,7 @@ export class PlacementSystem {
         this.isRotating = false;
         this.baseQuat = null;
         this.anchorWorldPos = null;
+        this.freezeAnchor = false;
     }
     
     rotateByDelta(deltaX, snapActive = false) {
@@ -276,7 +282,10 @@ export class PlacementSystem {
         }
     }
     
-    endRotation() { this.isRotating = false; }
+    endRotation() { 
+        this.isRotating = false; 
+        this.freezeAnchor = true;
+    }
     
     lockAnchor(camera, mousePos, snapActive = false) {
         if (!this.isPlacing || !this.previewObject) return;
