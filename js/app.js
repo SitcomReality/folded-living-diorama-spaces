@@ -228,8 +228,14 @@ export class FoldedLivingApp {
                 await this.loadCubeData(savedData);
             }
             
+            // Ensure camera is in default front-facing position
+            this.camera.setDefaultPosition();
+            
             await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Unfold animation after camera is in position
             await this.foldingAnimator.unfold();
+            
             this.animationLoop.add((dt) => this.update(dt));
             this.animationLoop.start();
             loadingOverlay.classList.add('hidden');

@@ -10,19 +10,21 @@ export class CameraController {
             CONSTANTS.CAMERA_FAR
         );
         
-        this.camera.position.set(
-            CONSTANTS.CAMERA_DISTANCE,
-            CONSTANTS.CAMERA_DISTANCE * 0.6,
-            CONSTANTS.CAMERA_DISTANCE
-        );
-        this.camera.lookAt(0, 0, 0);
+        // Start with front-facing position that frames the open cube
+        this.setDefaultPosition();
         
-        this.target = new THREE.Vector3(0, 0, 0);
         this.isOrbiting = false;
         this.isPanning = false;
         this.orbitSpeed = 0.005;
         
         this.setupControls(renderer);
+    }
+    
+    setDefaultPosition() {
+        // Front-facing camera position that perfectly frames the open cube
+        this.camera.position.set(0, 2, -20);
+        this.target = new THREE.Vector3(0, 0, 0);
+        this.camera.lookAt(this.target);
     }
     
     setupControls(renderer) {
