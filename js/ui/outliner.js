@@ -3,7 +3,7 @@ import { getAssetById, assetLibrary } from '../config/assets.js';
 export class OutlinerManager {
     constructor() {
         this.el = document.getElementById('outliner-embedded') || document.getElementById('outliner');
-        this.listEl = document.getElementById('outliner-list');
+        this.listEl = this.el ? this.el.querySelector('.outliner-list') : document.getElementById('outliner-list');
         this.closeBtn = document.getElementById('close-outliner');
         if (this.closeBtn) this.closeBtn.addEventListener('click', () => this.hide());
         this.objects = new Map();
