@@ -10,12 +10,11 @@ export function renderSettingsHTML(settings) {
     
     // Compact surface grid
     const surfaceCards = orderedSurfaces.map(surfaceName => {
-        const surfaceKey = Object.keys(CONSTANTS.SURFACES).find(k => CONSTANTS.SURFACES[k] === surfaceName);
-        const s = settings.surfaces[surfaceKey];
+        const s = settings.surfaces[surfaceName] || { visible: true, color: '#ffffff', orientation: 'up' };
         const hasPivot = ['Back','Left','Right'].includes(surfaceName);
         
         return `
-        <div class="surface-card" data-surface="${surfaceKey}">
+        <div class="surface-card" data-surface="${surfaceName}">
           <div class="surface-card-header">
             <div class="surface-name">${surfaceName}</div>
             <div class="surface-visibility-toggle ${s.visible ? 'visible' : ''}" data-control="visible">
