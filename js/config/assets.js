@@ -1,349 +1,238 @@
-export const ASSET_LIBRARY = {
-    basic: [
-        {
-            id: 'cube_small',
-            name: 'Small Cube',
-            type: 'prop',
-            polys: 24,
-            cost: 0,
-            category: 'basic'
-        },
-        {
-            id: 'sphere_low',
-            name: 'Low-Poly Sphere',
-            type: 'prop',
-            polys: 80,
-            cost: 0,
-            category: 'basic'
-        },
-        {
-            id: 'cylinder',
-            name: 'Cylinder',
-            type: 'prop',
-            polys: 48,
-            cost: 0,
-            category: 'basic'
-        },
-        {
-            id: 'cone',
-            name: 'Cone',
-            type: 'prop',
-            polys: 32,
-            cost: 0,
-            category: 'basic'
-        }
-    ],
-    
-    furniture: [
-        {
-            id: 'bed_single_a',
-            name: 'Single Bed A',
-            type: 'prop',
-            polys: 500,
-            cost: 30,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/bed_single_A.gltf'
-        },
-        {
-            id: 'bed_single_b',
-            name: 'Single Bed B',
-            type: 'prop',
-            polys: 500,
-            cost: 30,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/bed_single_B.gltf'
-        },
-        {
-            id: 'bed_double_a',
-            name: 'Double Bed A',
-            type: 'prop',
-            polys: 800,
-            cost: 50,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/bed_double_A.gltf'
-        },
-        {
-            id: 'bed_double_b',
-            name: 'Double Bed B',
-            type: 'prop',
-            polys: 800,
-            cost: 50,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/bed_double_B.gltf'
-        },
-        {
-            id: 'armchair',
-            name: 'Armchair',
-            type: 'prop',
-            polys: 600,
-            cost: 35,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/armchair.gltf'
-        },
-        {
-            id: 'armchair_pillows',
-            name: 'Armchair with Pillows',
-            type: 'prop',
-            polys: 700,
-            cost: 40,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/armchair_pillows.gltf'
-        },
-        {
-            id: 'cabinet_medium',
-            name: 'Medium Cabinet',
-            type: 'prop',
-            polys: 400,
-            cost: 25,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/cabinet_medium.gltf'
-        },
-        {
-            id: 'book_single',
-            name: 'Single Book',
-            type: 'prop',
-            polys: 50,
-            cost: 5,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/book_single.gltf'
-        },
-        {
-            id: 'book_set',
-            name: 'Book Set',
-            type: 'prop',
-            polys: 200,
-            cost: 15,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/book_set.gltf'
-        },
-        {
-            id: 'couch',
-            name: 'Couch',
-            type: 'prop',
-            polys: 800,
-            cost: 45,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/couch.gltf'
-        },
-        {
-            id: 'couch_pillows',
-            name: 'Couch with Pillows',
-            type: 'prop',
-            polys: 900,
-            cost: 50,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/couch_pillows.gltf'
-        },
-        {
-            id: 'chair_a',
-            name: 'Chair',
-            type: 'prop',
-            polys: 300,
-            cost: 15,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/chair_A.gltf'
-        },
-        {
-            id: 'chair_a_wood',
-            name: 'Wooden Chair',
-            type: 'prop',
-            polys: 300,
-            cost: 15,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/chair_A_wood.gltf'
-        },
-        {
-            id: 'chair_b',
-            name: 'Chair B',
-            type: 'prop',
-            polys: 350,
-            cost: 18,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/chair_B.gltf'
-        },
-        {
-            id: 'chair_b_wood',
-            name: 'Wooden Chair B',
-            type: 'prop',
-            polys: 350,
-            cost: 18,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/chair_B_wood.gltf'
-        },
-        {
-            id: 'chair_c',
-            name: 'Chair C',
-            type: 'prop',
-            polys: 320,
-            cost: 16,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/chair_C.gltf'
-        },
-        {
-            id: 'chair_stool',
-            name: 'Stool',
-            type: 'prop',
-            polys: 200,
-            cost: 10,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/chair_stool.gltf'
-        },
-        {
-            id: 'chair_stool_wood',
-            name: 'Wooden Stool',
-            type: 'prop',
-            polys: 200,
-            cost: 10,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/chair_stool_wood.gltf'
-        },
-        {
-            id: 'cabinet_small',
-            name: 'Small Cabinet',
-            type: 'prop',
-            polys: 300,
-            cost: 20,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/cabinet_small.gltf'
-        },
-        {
-            id: 'cabinet_small_decorated',
-            name: 'Decorated Small Cabinet',
-            type: 'prop',
-            polys: 350,
-            cost: 25,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/cabinet_small_decorated.gltf'
-        },
-        {
-            id: 'cabinet_medium_decorated',
-            name: 'Decorated Medium Cabinet',
-            type: 'prop',
-            polys: 450,
-            cost: 30,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/cabinet_medium_decorated.gltf'
-        },
-        {
-            id: 'lamp_table',
-            name: 'Table Lamp',
-            type: 'prop',
-            polys: 150,
-            cost: 12,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/lamp_table.gltf'
-        },
-        {
-            id: 'lamp_standing',
-            name: 'Standing Lamp',
-            type: 'prop',
-            polys: 200,
-            cost: 15,
-            category: 'furniture',
-            modelPath: '/assets/gltf/furniturebits/lamp_standing.gltf'
-        }
-    ],
-    
-    nature: [
-        {
-            id: 'cactus_small_a',
-            name: 'Small Cactus',
-            type: 'prop',
-            polys: 100,
-            cost: 8,
-            category: 'nature',
-            modelPath: '/assets/gltf/furniturebits/cactus_small_A.gltf'
-        },
-        {
-            id: 'cactus_small_b',
-            name: 'Small Cactus B',
-            type: 'prop',
-            polys: 100,
-            cost: 8,
-            category: 'nature',
-            modelPath: '/assets/gltf/furniturebits/cactus_small_B.gltf'
-        },
-        {
-            id: 'cactus_medium_b',
-            name: 'Medium Cactus',
-            type: 'prop',
-            polys: 180,
-            cost: 12,
-            category: 'nature',
-            modelPath: '/assets/gltf/furniturebits/cactus_medium_B.gltf'
-        },
-        {
-            id: 'tree_simple',
-            name: 'Simple Tree',
-            type: 'prop',
-            polys: 200,
-            cost: 10,
-            category: 'nature'
-        },
-        {
-            id: 'grass_patch',
-            name: 'Grass Patch',
-            type: 'prop',
-            polys: 50,
-            cost: 5,
-            category: 'nature'
-        },
-        {
-            id: 'rock_small',
-            name: 'Small Rock',
-            type: 'prop',
-            polys: 40,
-            cost: 5,
-            category: 'nature'
-        },
-        {
-            id: 'flower_patch',
-            name: 'Flower Patch',
-            type: 'prop',
-            polys: 120,
-            cost: 15,
-            category: 'nature'
-        }
-    ],
-    
-    lighting: [
-        {
-            id: 'point_light',
-            name: 'Point Light',
-            type: 'light',
-            polys: 0,
-            lightCost: 1,
-            cost: 0,
-            category: 'lighting'
-        },
-        {
-            id: 'spot_light',
-            name: 'Spot Light',
-            type: 'light',
-            polys: 0,
-            lightCost: 1,
-            cost: 10,
-            category: 'lighting'
-        }
-    ]
+// Asset grouping and variant detection system
+const ASSET_MANIFEST_URL = '/assets/asset-manifest.json';
+
+// Poly cost estimates based on asset type
+const POLY_ESTIMATES = {
+  bed: 600,
+  chair: 300,
+  table: 250,
+  cabinet: 350,
+  couch: 850,
+  armchair: 650,
+  lamp: 150,
+  book: 100,
+  cactus: 120,
+  pillow: 80,
+  pictureframe: 100,
+  rug: 200,
+  shelf: 300,
+  bush: 150,
+  grass: 80,
+  tree: 400,
+  default: 200
 };
 
-export function getAssetById(id) {
-    for (const category of Object.values(ASSET_LIBRARY)) {
-        const asset = category.find(a => a.id === id);
-        if (asset) return asset;
+// Category display names
+const CATEGORY_NAMES = {
+  furniturebits: 'Furniture',
+  forest: 'Nature'
+};
+
+class AssetLibrary {
+  constructor() {
+    this.assets = new Map();
+    this.groupedAssets = new Map();
+    this.loaded = false;
+  }
+
+  async load() {
+    if (this.loaded) return;
+    
+    try {
+      const response = await fetch(ASSET_MANIFEST_URL);
+      const manifest = await response.json();
+      
+      for (const [category, files] of Object.entries(manifest)) {
+        for (const file of files) {
+          this.parseAndAddAsset(category, file);
+        }
+      }
+      
+      this.groupVariants();
+      this.loaded = true;
+      console.log(`✅ Loaded ${this.assets.size} assets in ${this.groupedAssets.size} groups`);
+    } catch (error) {
+      console.error('Failed to load asset manifest:', error);
+      this.loadFallbackAssets();
     }
-    return null;
+  }
+
+  parseAndAddAsset(category, filename) {
+    const baseName = filename.replace('.gltf', '');
+    const id = `${category}_${baseName}`;
+    
+    // Parse name components
+    const parsed = this.parseFilename(baseName);
+    
+    // Estimate poly cost
+    const polyCost = this.estimatePolyCost(parsed.base);
+    
+    const asset = {
+      id,
+      filename,
+      category,
+      modelPath: `/assets/gltf/${category}/${filename}`,
+      baseName: parsed.base,
+      variant: parsed.variant,
+      displayName: this.humanizeName(parsed.base),
+      polys: polyCost,
+      cost: Math.ceil(polyCost / 10),
+      type: 'prop'
+    };
+    
+    this.assets.set(id, asset);
+  }
+
+  parseFilename(name) {
+    // Remove common suffixes like _Color1
+    name = name.replace(/_Color1$/, '');
+    
+    // Detect variants: _wood, _pillows, _decorated, _A, _B, etc.
+    const variantMatch = name.match(/^(.+?)_(wood|pillows|decorated|standing|oval|rectangle|stripes|[A-G]|small|medium|large|big|low|long|single|double)$/i);
+    
+    if (variantMatch) {
+      return {
+        base: variantMatch[1],
+        variant: variantMatch[2]
+      };
+    }
+    
+    return {
+      base: name,
+      variant: null
+    };
+  }
+
+  humanizeName(name) {
+    // Convert snake_case to Title Case
+    return name
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  estimatePolyCost(baseName) {
+    const lower = baseName.toLowerCase();
+    
+    for (const [key, cost] of Object.entries(POLY_ESTIMATES)) {
+      if (lower.includes(key)) return cost;
+    }
+    
+    return POLY_ESTIMATES.default;
+  }
+
+  groupVariants() {
+    // Group assets by base name and category
+    const groups = new Map();
+    
+    for (const asset of this.assets.values()) {
+      const groupKey = `${asset.category}_${asset.baseName}`;
+      
+      if (!groups.has(groupKey)) {
+        groups.set(groupKey, {
+          id: groupKey,
+          category: asset.category,
+          baseName: asset.baseName,
+          displayName: asset.displayName,
+          variants: [],
+          defaultVariant: null,
+          polys: asset.polys,
+          cost: asset.cost
+        });
+      }
+      
+      const group = groups.get(groupKey);
+      group.variants.push(asset);
+      
+      // Set default variant (prefer non-variant, or first one)
+      if (!asset.variant || !group.defaultVariant) {
+        group.defaultVariant = asset.id;
+      }
+    }
+    
+    this.groupedAssets = groups;
+  }
+
+  loadFallbackAssets() {
+    // Minimal fallback if manifest fails to load
+    const fallbacks = [
+      { category: 'basic', name: 'cube', polys: 24 },
+      { category: 'basic', name: 'sphere', polys: 80 },
+    ];
+    
+    for (const fb of fallbacks) {
+      const id = `${fb.category}_${fb.name}`;
+      this.assets.set(id, {
+        id,
+        category: fb.category,
+        displayName: this.humanizeName(fb.name),
+        polys: fb.polys,
+        cost: 0,
+        type: 'basic'
+      });
+    }
+    
+    this.loaded = true;
+  }
+
+  getAssetGroups() {
+    return Array.from(this.groupedAssets.values());
+  }
+
+  getAssetGroupsByCategory(category) {
+    return this.getAssetGroups().filter(g => g.category === category);
+  }
+
+  getCategories() {
+    const categories = new Set();
+    for (const group of this.groupedAssets.values()) {
+      categories.add(group.category);
+    }
+    return Array.from(categories);
+  }
+
+  getCategoryDisplayName(category) {
+    return CATEGORY_NAMES[category] || category.charAt(0).toUpperCase() + category.slice(1);
+  }
+
+  getAssetById(id) {
+    return this.assets.get(id);
+  }
+
+  getAssetGroup(groupId) {
+    return this.groupedAssets.get(groupId);
+  }
+}
+
+// Global instance
+export const assetLibrary = new AssetLibrary();
+
+// Legacy compatibility functions
+export async function initializeAssets() {
+  await assetLibrary.load();
+}
+
+export function getAssetById(id) {
+  return assetLibrary.getAssetById(id);
 }
 
 export function getAllAssets() {
-    return Object.values(ASSET_LIBRARY).flat();
+  return Array.from(assetLibrary.assets.values());
 }
 
 export function getAssetsByCategory(category) {
-    return ASSET_LIBRARY[category] || [];
+  return getAllAssets().filter(a => a.category === category);
 }
 
 export function getCategories() {
-    return Object.keys(ASSET_LIBRARY);
+  return assetLibrary.getCategories();
+}
+
+// New functions for grouped assets
+export function getAssetGroups() {
+  return assetLibrary.getAssetGroups();
+}
+
+export function getAssetGroupsByCategory(category) {
+  return assetLibrary.getAssetGroupsByCategory(category);
 }

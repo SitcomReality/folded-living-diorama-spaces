@@ -1,4 +1,4 @@
-import { ASSET_LIBRARY } from '../config/assets.js';
+import { assetLibrary } from '../config/assets.js';
 
 export class ToolbarManager {
     constructor(container, onToolSelected) {
@@ -6,6 +6,7 @@ export class ToolbarManager {
         this.onToolSelected = onToolSelected;
         this.activeTool = null;
         this.assetPickerVisible = false;
+        this.selectedVariant = new Map(); // Track selected variant per group
         
         this.createToolbar();
         this.createAssetPicker();
@@ -62,7 +63,7 @@ export class ToolbarManager {
             this.selectTool('select');
         });
         
-        const categories = Object.keys(ASSET_LIBRARY);
+        const categories = assetLibrary.getCategories();
         
         categories.forEach(category => {
             const categorySection = document.createElement('div');
@@ -70,26 +71,72 @@ export class ToolbarManager {
             
             const categoryTitle = document.createElement('div');
             categoryTitle.className = 'asset-category-title';
-            categoryTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+            categoryTitle.textContent = assetLibrary.getCategoryDisplayName(category);
             categorySection.appendChild(categoryTitle);
             
             const assetsGrid = document.createElement('div');
             assetsGrid.className = 'assets-grid';
             
-            ASSET_LIBRARY[category].forEach(asset => {
+            const groups = assetLibrary.getAssetGroupsByCategory(category);
+            
+            groups.forEach(group => {
+                const groupContainer = document.createElement('div');
+                groupContainer.className = 'asset-group';
+                
                 const assetBtn = document.createElement('button');
                 assetBtn.className = 'asset-btn';
-                assetBtn.dataset.assetId = asset.id;
+                assetBtn.dataset.groupId = group.id;
+                
+                // Use default variant for initial display
+                const defaultAsset = assetLibrary.getAssetById(group.defaultVariant);
+                assetBtn.dataset.assetId = defaultAsset.id;
+                
                 assetBtn.innerHTML = `
-                    <div class="asset-name">${asset.name}</div>
-                    <div class="asset-cost">${asset.cost} ✨</div>
+                    <div class="asset-name">${group.displayName}</div>
+                    <div class="asset-cost">${group.cost} ✨</div>
                 `;
                 
                 assetBtn.addEventListener('click', () => {
-                    this.selectAsset(asset.id);
+                    this.selectAsset(defaultAsset.id);
                 });
                 
-                assetsGrid.appendChild(assetBtn);
+                groupContainer.appendChild(assetBtn);
+                
+                // Add variant selector if multiple variants exist
+                if (group.variants.length > 1) {
+                    const variantSelector = document.createElement('div');
+                    variantSelector.className = 'variant-selector';
+                    
+                    group.variants.forEach((variant, index) => {
+                        const variantBtn = document.createElement('button');
+                        variantBtn.className = 'variant-btn';
+                        variantBtn.dataset.variantId = variant.id;
+                        variantBtn.textContent = variant.variant || '•';
+                        variantBtn.title = variant.variant ? `${group.displayName} (${variant.variant})` : group.displayName;
+                        
+                        if (index === 0) variantBtn.classList.add('active');
+                        
+                        variantBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            // Update active variant
+                            variantSelector.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
+                            variantBtn.classList.add('active');
+                            // Update main button
+                            assetBtn.dataset.assetId = variant.id;
+                            this.selectedVariant.set(group.id, variant.id);
+                            // If this group is currently selected, update placement
+                            if (assetBtn.classList.contains('selected')) {
+                                this.selectAsset(variant.id);
+                            }
+                        });
+                        
+                        variantSelector.appendChild(variantBtn);
+                    });
+                    
+                    groupContainer.appendChild(variantSelector);
+                }
+                
+                assetsGrid.appendChild(groupContainer);
             });
             
             categorySection.appendChild(assetsGrid);

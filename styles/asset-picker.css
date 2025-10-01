@@ -17,3 +17,39 @@
 .asset-picker::-webkit-scrollbar-thumb { background:rgba(255,255,255,.2); border-radius:3px; }
 .asset-picker::-webkit-scrollbar-thumb:hover { background:rgba(255,255,255,.3); }
 
+.asset-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.variant-selector {
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+}
+
+.variant-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: var(--text-color);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 24px;
+    text-align: center;
+}
+
+.variant-btn:hover {
+    background: rgba(232, 155, 111, 0.15);
+    border-color: var(--accent-color);
+}
+
+.variant-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
