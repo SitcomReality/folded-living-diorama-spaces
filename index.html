@@ -131,26 +131,7 @@
 
     <!-- App styles -->
     <style>
-        .cursor-wait { cursor: wait !important; }
-        .cursor-crosshair { cursor: crosshair !important; }
-        .cursor-none { cursor: none !important; }
-        .cursor-pointer { cursor: pointer !important; }
-        #canvas-container.pointer-locked {
-            cursor: none;
-        }
-        /* Style fix for surface card layout */
-        .surfaces-grid {
-            grid-template-areas:
-                "front ceiling back"
-                "left floor right";
-            grid-template-columns: 1fr 1fr 1fr;
-        }
-        .surface-card[data-surface="front"] { grid-area: front; }
-        .surface-card[data-surface="ceiling"] { grid-area: ceiling; }
-        .surface-card[data-surface="back"] { grid-area: back; }
-        .surface-card[data-surface="left"] { grid-area: left; }
-        .surface-card[data-surface="floor"] { grid-area: floor; }
-        .surface-card[data-surface="right"] { grid-area: right; }
+        /* removed inline styles: cursor classes and surfaces-grid area mapping moved to styles/settings.css */
     </style>
 
     <!-- Main Application -->

@@ -1,4 +1,4 @@
-import { FoldedLivingApp } from './app/index.js';
+import { FoldedLivingApp } from './app/App.js';
 import { initializeAssets } from './config/assets.js';
 
 window.addEventListener('DOMContentLoaded', async () => {

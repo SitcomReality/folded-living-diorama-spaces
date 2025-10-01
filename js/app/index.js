@@ -144,3 +144,5 @@ export class FoldedLivingApp {
         redoBtn.disabled = !this.historyManager.canRedo();
     }
 }
+
+export { FoldedLivingApp } from './App.js';
