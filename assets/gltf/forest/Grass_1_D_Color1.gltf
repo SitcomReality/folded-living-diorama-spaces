@@ -15,7 +15,7 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "Bush_2_A_Color1"
+            "name" : "Grass_1_D_Color1"
         }
     ],
     "materials" : [
@@ -32,7 +32,7 @@
     ],
     "meshes" : [
         {
-            "name" : "Bush_2_A_Color1",
+            "name" : "Grass_1_D_Color1",
             "primitives" : [
                 {
                     "attributes" : {
@@ -63,61 +63,61 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 24,
+            "count" : 672,
             "max" : [
-                0.2639999985694885,
-                0.527999997138977,
-                0.2639999985694885
+                0.5801786184310913,
+                0.5463452339172363,
+                0.5666427612304688
             ],
             "min" : [
-                -0.2639999985694885,
-                1.9669533557475916e-08,
-                -0.2639999985694885
+                -0.5004293322563171,
+                -0.04217022657394409,
+                -0.6108884811401367
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 24,
+            "count" : 672,
             "type" : "VEC2"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 24,
+            "count" : 672,
             "type" : "VEC3"
         },
         {
             "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 132,
+            "count" : 1584,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 288,
+            "byteLength" : 8064,
             "byteOffset" : 0,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 192,
-            "byteOffset" : 288,
+            "byteLength" : 5376,
+            "byteOffset" : 8064,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 288,
-            "byteOffset" : 480,
+            "byteLength" : 8064,
+            "byteOffset" : 13440,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 264,
-            "byteOffset" : 768,
+            "byteLength" : 3168,
+            "byteOffset" : 21504,
             "target" : 34963
         }
     ],
@@ -129,8 +129,8 @@
     ],
     "buffers" : [
         {
-            "byteLength" : 1032,
-            "uri" : "Bush_2_A_Color1.bin"
+            "byteLength" : 24672,
+            "uri" : "Grass_1_D_Color1.bin"
         }
     ]
 }
