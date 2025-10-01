@@ -50,7 +50,8 @@ export function setupPivots(cube) {
     if (ceilingSurface && backSurface) {
         cube.group.remove(ceilingSurface);
         // Correctly position ceiling relative to the back surface's top edge
-        ceilingSurface.position.set(0, halfSize, 0); 
+        // Move the ceiling forward so its back edge meets the top edge of the back wall
+        ceilingSurface.position.set(0, halfSize, -halfSize); 
         // Correctly orient ceiling to be perpendicular to back surface
         ceilingSurface.rotation.set(-Math.PI / 2, 0, 0); 
         backSurface.add(ceilingSurface);
