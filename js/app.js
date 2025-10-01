@@ -81,8 +81,8 @@ export class FoldedLivingApp {
 
         canvas.addEventListener('click', async (e) => {
             if (e.button !== 0) return;
-            // Do not place object if we just finished rotating
-            if (this.input.didMouseMoveSinceMouseDown()) return;
+            // removed: Do not place object if we just finished rotating
+            // removed: if (this.input.didMouseMoveSinceMouseDown()) return;
 
             const activeTool = this.toolbarManager.getActiveTool();
             if (activeTool === 'select') {
