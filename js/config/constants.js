@@ -8,7 +8,7 @@ export const CONSTANTS = {
     
     // Animation timings
     FOLD_DURATION: 1.0,
-    UNFOLD_DURATION: 1.2,
+    UNFOLD_DURATION: 2.5, // Slower, more spectacular reveal
     TRANSITION_DURATION: 0.8,
     
     // Camera settings
@@ -32,4 +32,3 @@ export const CONSTANTS = {
         WING_RIGHT: 'wing_right'  // Right wall
     }
 };
-

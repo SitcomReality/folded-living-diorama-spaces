@@ -12,8 +12,56 @@ export class DioramaCube {
         this.createCube();
     }
     
+    createWhimsicalTexture() {
+        // Create a canvas-based texture with a cute dotted pattern
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+        
+        // Soft gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+        gradient.addColorStop(0, '#f5e6d3');
+        gradient.addColorStop(0.5, '#f0d8c4');
+        gradient.addColorStop(1, '#e8d4c0');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 512, 512);
+        
+        // Add whimsical dots pattern
+        ctx.fillStyle = 'rgba(232, 155, 111, 0.3)';
+        const dotSize = 8;
+        const spacing = 32;
+        for (let x = spacing / 2; x < 512; x += spacing) {
+            for (let y = spacing / 2; y < 512; y += spacing) {
+                ctx.beginPath();
+                ctx.arc(x, y, dotSize, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // Add smaller accent dots
+        ctx.fillStyle = 'rgba(138, 182, 138, 0.2)';
+        for (let x = spacing; x < 512; x += spacing) {
+            for (let y = spacing; y < 512; y += spacing) {
+                ctx.beginPath();
+                ctx.arc(x, y, dotSize * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(2, 2);
+        
+        return texture;
+    }
+    
     createCube() {
         const halfSize = this.size / 2;
+        
+        // Create whimsical exterior texture
+        const exteriorTexture = this.createWhimsicalTexture();
         
         // Warm, cozy colors for surfaces
         const surfaceConfigs = [
@@ -39,6 +87,16 @@ export class DioramaCube {
             mesh.rotation.set(...config.rotation);
             mesh.receiveShadow = true;
             mesh.userData.surfaceName = config.name;
+            mesh.userData.interiorMaterial = material;
+            
+            // Create exterior material with texture (will be used when folded)
+            const exteriorMaterial = new THREE.MeshStandardMaterial({
+                map: exteriorTexture,
+                side: THREE.DoubleSide,
+                roughness: 0.8,
+                metalness: 0.1
+            });
+            mesh.userData.exteriorMaterial = exteriorMaterial;
             
             this.surfaces[config.name] = mesh;
             this.group.add(mesh);
@@ -46,6 +104,25 @@ export class DioramaCube {
         
         // Add edge outlines
         this.addEdges();
+        
+        // Start with exterior texture
+        this.setExteriorTexture();
+    }
+    
+    setExteriorTexture() {
+        Object.values(this.surfaces).forEach(surface => {
+            if (surface.userData.exteriorMaterial) {
+                surface.material = surface.userData.exteriorMaterial;
+            }
+        });
+    }
+    
+    setInteriorTexture() {
+        Object.values(this.surfaces).forEach(surface => {
+            if (surface.userData.interiorMaterial) {
+                surface.material = surface.userData.interiorMaterial;
+            }
+        });
     }
     
     addEdges() {
