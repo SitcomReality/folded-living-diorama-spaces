@@ -19,6 +19,17 @@ export class HUDManager {
             document.getElementById('info-banner'),
             ['Check out <a href="https://websim.com/@SitcomReality/webgem" target="_blank">WebGem</a> for Websim\'s highest quality overlooked projects!']
         );
+        
+        this.unfoldHintBanner = this.createUnfoldHintBanner();
+    }
+    
+    createUnfoldHintBanner() {
+        const banner = document.createElement('div');
+        banner.className = 'unfold-hint-banner';
+        banner.innerHTML = '<span>Press <strong>SPACE</strong> to unfold the cube</span>';
+        banner.style.display = 'none';
+        document.body.appendChild(banner);
+        return banner;
     }
     
     setupListeners() {
@@ -50,6 +61,14 @@ export class HUDManager {
         window.addEventListener('newCube', () => {
             this.updateCubeNameDisplay();
         });
+        
+        window.addEventListener('cubeLoaded', () => {
+            this.showUnfoldHint();
+        });
+        
+        window.addEventListener('cubeUnfolded', () => {
+            this.hideUnfoldHint();
+        });
     }
     
     setupThemeToggle() {
@@ -80,6 +99,14 @@ export class HUDManager {
             this.saveManager.newCube();
             this.showNotification('Starting new cube', 'info');
         }
+    }
+    
+    showUnfoldHint() {
+        this.unfoldHintBanner.style.display = 'flex';
+    }
+    
+    hideUnfoldHint() {
+        this.unfoldHintBanner.style.display = 'none';
     }
     
     updateSparkleDisplay() {

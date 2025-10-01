@@ -57,6 +57,9 @@ export class GalleryManager {
         card.className = 'cube-card';
         
         const displayName = (cube.data && cube.data.name) || cube.name || 'Untitled Cube';
+        const polyCount = cube.poly_count || (cube.data && cube.data.polyCount) || 0;
+        const lightCount = cube.light_count || (cube.data && cube.data.lightCount) || 0;
+        
         card.innerHTML = `
             <div class="cube-preview">
                 <!-- 3D preview will be rendered here -->
@@ -69,8 +72,8 @@ export class GalleryManager {
                     <span class="creator-name">${cube.username}</span>
                 </div>
                 <div class="cube-stats">
-                    <span class="cube-stat">📊 ${cube.poly_count || 0} polys</span>
-                    <span class="cube-stat">💡 ${cube.light_count || 0} lights</span>
+                    <span class="cube-stat">📊 ${polyCount} polys</span>
+                    <span class="cube-stat">💡 ${lightCount} lights</span>
                 </div>
                 <div class="cube-reactions">
                     <button class="reaction-btn" data-reaction="heart">❤️</button>
@@ -101,11 +104,46 @@ export class GalleryManager {
         return card;
     }
     
-    onCubeSelected(cube) {
+    async onCubeSelected(cube) {
         console.log('Selected cube:', cube);
+        
+        // Warn about unsaved changes
+        const hasUnsaved = window.app?.saveManager?.hasUnsavedChanges?.();
+        if (hasUnsaved) {
+            if (!confirm('Loading this cube will lose any unsaved changes to your current cube. Continue?')) {
+                return;
+            }
+        }
+        
         this.economyManager.visitCube(cube.id);
         this.hide();
-        // TODO: Load and transition to selected cube
+        
+        // Load the cube data
+        await this.loadCube(cube);
+    }
+    
+    async loadCube(cube) {
+        if (!window.app) return;
+        
+        // Clear current cube
+        window.app.resetCube();
+        
+        // Load cube data
+        await window.app.loadCubeData(cube.data);
+        
+        // Set cube ID and name in save manager
+        window.app.saveManager.currentCubeId = cube.id;
+        window.app.saveManager.currentCubeName = cube.data?.name || 'Untitled Cube';
+        window.app.saveManager.autoSave();
+        window.app.hudManager.updateCubeNameDisplay();
+        
+        // Ensure cube starts folded
+        if (!window.app.cube.isFolded) {
+            await window.app.foldingAnimator.fold(0.5);
+        }
+        
+        // Show unfold hint banner
+        window.dispatchEvent(new CustomEvent('cubeLoaded'));
     }
     
     onReaction(cube, reactionType) {

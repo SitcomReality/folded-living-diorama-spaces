@@ -306,8 +306,11 @@ export class FoldedLivingApp {
                 if (item.assetId) this.budgetManager.addAsset(item.assetId);
             }
         }
+        
+        // Update outliner after loading
+        this.outlinerManager.populate(this.cube.placedObjects.map(item => item.object));
     }
-    
+
     resetCube() {
         // Clear all objects and reset to default state
         this.cube.placedObjects.slice().forEach(item => {

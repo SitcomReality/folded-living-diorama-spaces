@@ -13,6 +13,7 @@ export class FoldingAnimator {
         setupPivots(cube);
         this.particles = null;
         this.glowLights = [];
+        this.hasUnfoldedOnce = false;
     }
     
     createUnfoldParticles() {
@@ -188,6 +189,13 @@ export class FoldingAnimator {
                     this.animating = false; 
                     this.cube.isFolded = false;
                     this.removeUnfoldParticles();
+                    
+                    // Dispatch event on first unfold
+                    if (!this.hasUnfoldedOnce) {
+                        this.hasUnfoldedOnce = true;
+                        window.dispatchEvent(new CustomEvent('cubeUnfolded'));
+                    }
+                    
                     resolve(); 
                 }
             };
