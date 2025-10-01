@@ -3,16 +3,21 @@ import { CONSTANTS } from '../../config/constants.js';
 export function renderSettingsHTML(settings) {
     const surfaces = Object.keys(CONSTANTS.SURFACES).map(k => CONSTANTS.SURFACES[k]);
     
+    // Reorder surfaces for grid layout: Front, Back, Ceiling on top; Left, Floor, Right on bottom
+    const topRow = ['Front', 'Back', 'Ceiling'];
+    const bottomRow = ['Left', 'Floor', 'Right'];
+    const orderedSurfaces = [...topRow, ...bottomRow];
+    
     // Compact surface grid
-    const surfaceCards = surfaces.map(surfaceName => {
-        const s = settings.surfaces[surfaceName];
-        const displayName = surfaceName.replace('_', ' ');
-        const hasPivot = ['backdrop','wing_left','wing_right'].includes(surfaceName);
+    const surfaceCards = orderedSurfaces.map(surfaceName => {
+        const surfaceKey = Object.keys(CONSTANTS.SURFACES).find(k => CONSTANTS.SURFACES[k] === surfaceName);
+        const s = settings.surfaces[surfaceKey];
+        const hasPivot = ['Back','Left','Right'].includes(surfaceName);
         
         return `
-        <div class="surface-card" data-surface="${surfaceName}">
+        <div class="surface-card" data-surface="${surfaceKey}">
           <div class="surface-card-header">
-            <div class="surface-name">${displayName}</div>
+            <div class="surface-name">${surfaceName}</div>
             <div class="surface-visibility-toggle ${s.visible ? 'visible' : ''}" data-control="visible">
               ${s.visible ? '👁' : ''}
             </div>
@@ -45,7 +50,7 @@ export function renderSettingsHTML(settings) {
       <div class="settings-section" data-section="surfaces">
         <div class="settings-section-header">
           <div class="settings-section-title">🎨 Surfaces</div>
-          <div class="settings-section-toggle">▼</div>
+          <div class="p">▼</div>
         </div>
         <div class="settings-section-content">
           <div class="surfaces-grid">${surfaceCards}</div>
@@ -64,7 +69,7 @@ export function renderSettingsHTML(settings) {
             <div class="slider-value">${Math.round(settings.environment.ambientIntensity*100)}%</div>
           </div>
           <div class="control-row">
-            <div class="control-label">Background</div>
+            <div class="control-label">Sky</div>
             <div class="color-picker-wrapper">
               <div class="color-preview" style="background-color:${settings.environment.backgroundColor};" data-control="bg-color-preview"></div>
               <input type="color" class="color-input" data-control="bg-color" value="${settings.environment.backgroundColor}">

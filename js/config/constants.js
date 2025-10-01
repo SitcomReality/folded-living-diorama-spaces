@@ -24,11 +24,11 @@ export const CONSTANTS = {
     
     // Surface names (fold-agnostic nomenclature)
     SURFACES: {
-        PORTAL: 'portal',      // Front wall (always faces viewer)
-        BACKDROP: 'backdrop',  // Back wall
-        SKY: 'sky',           // Ceiling
-        EARTH: 'earth',       // Ground
-        WING_LEFT: 'wing_left',   // Left wall
-        WING_RIGHT: 'wing_right'  // Right wall
+        PORTAL: 'Front',      // Front wall (always faces viewer)
+        BACKDROP: 'Back',  // Back wall
+        SKY: 'Ceiling',           // Ceiling
+        EARTH: 'Floor',       // Ground
+        WING_LEFT: 'Left',   // Left wall
+        WING_RIGHT: 'Right'  // Right wall
     }
 };

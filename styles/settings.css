@@ -99,6 +99,7 @@
     flex-direction: column;
     gap: 8px;
     transition: all 0.2s ease;
+    min-height: 120px;
 }
 
 .surface-card:hover {
@@ -115,6 +116,7 @@
     font-size: 11px;
     font-weight: 700;
     text-transform: capitalize;
+    letter-spacing: 0.5px;
 }
 
 .surface-visibility-toggle {
@@ -131,7 +133,7 @@
 }
 
 .surface-visibility-toggle.visible {
-    background: var(--accent-color);
+    background: var(--color);
     border-color: var(--accent-color);
 }
 
@@ -167,11 +169,12 @@
     font-size: 11px;
     opacity: 0.7;
     flex: 1;
+    min-width: 40px;
 }
 
 .select-input {
     flex: 1;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.5);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 6px 8px;
@@ -297,4 +300,3 @@
     position: absolute;
     pointer-events: none;
 }
-
