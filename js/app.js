@@ -21,6 +21,7 @@ import { NamingModal } from './ui/naming.js';
 import { AnimationLoop } from './utils/animation.js';
 import * as THREE from 'three';
 import { HistoryManager } from './ui/history.js';
+import { OutlinerManager } from './ui/outliner.js';
 
 export class FoldedLivingApp {
     constructor() {
@@ -73,6 +74,7 @@ export class FoldedLivingApp {
         this.galleryManager = new GalleryManager(this.databaseManager, this.economyManager);
         this.transitionManager = new TransitionManager(this.camera);
         this.historyManager = new HistoryManager(50);
+        this.outlinerManager = new OutlinerManager();
         
         window.addEventListener('newCube', () => this.resetCube());
         
@@ -111,11 +113,14 @@ export class FoldedLivingApp {
                     this.input.getMousePosition()
                 );
                 if (selected) this.inspectorManager.inspect(selected);
+                this.outlinerManager.highlight(selected ? selected.uuid : null);
             } else if (activeTool === 'place') {
                 const placed = await this.placementSystem.placeObject();
                 if (placed) {
                     console.log('Object placed');
                     this.saveManager.autoSave();
+                    this.historyManager.push(this.getSnapshot());
+                    this.outlinerManager.addObject(placed);
                 }
             } else if (activeTool === 'delete') {
                 // Select and delete in one action
@@ -129,6 +134,7 @@ export class FoldedLivingApp {
                         this.budgetManager.removeAsset(assetId);
                         this.inspectorManager.hide();
                         this.saveManager.autoSave();
+                        this.outlinerManager.removeObject(selected);
                     }
                 }
             }
@@ -149,6 +155,7 @@ export class FoldedLivingApp {
                     console.log('Object placed');
                     this.saveManager.autoSave();
                     this.historyManager.push(this.getSnapshot());
+                    this.outlinerManager.addObject(placed);
                 }
             }
         });
@@ -175,7 +182,9 @@ export class FoldedLivingApp {
                 this.placementSystem.cancelPlacement();
                 this.selectionSystem.deselect();
                 this.inspectorManager.hide();
+                this.outlinerManager.highlight(null);
             } else if (e.key === 'Delete' || e.key === 'Backspace') {
+                const selected = this.selectionSystem.getSelected();
                 const assetId = this.selectionSystem.deleteSelected();
                 if (assetId) {
                     this.budgetManager.removeAsset(assetId);
@@ -183,6 +192,7 @@ export class FoldedLivingApp {
                     this.saveManager.autoSave();
                     this.historyManager.push(this.getSnapshot());
                     this.updateHistoryButtons();
+                    this.outlinerManager.removeObject(selected);
                 }
             } else if (e.key === 'g') {
                 this.scene.toggleGrid();
@@ -212,6 +222,17 @@ export class FoldedLivingApp {
             this.historyManager.push(this.getSnapshot());
             this.updateHistoryButtons();
         });
+
+        window.addEventListener('objectSelectedFromOutliner', (e) => {
+            const object = e.detail;
+            if (object) {
+                this.selectionSystem.select(object);
+                this.inspectorManager.inspect(object);
+            } else {
+                this.selectionSystem.deselect();
+                this.inspectorManager.hide();
+            }
+        });
     }
 
     async initialize() {
@@ -227,6 +248,9 @@ export class FoldedLivingApp {
             if (savedData) {
                 await this.loadCubeData(savedData);
             }
+            
+            // Populate outliner with initial objects
+            this.outlinerManager.populate(this.cube.placedObjects.map(item => item.object));
             
             // Ensure camera is in default front-facing position
             this.camera.setDefaultPosition();
@@ -273,9 +297,13 @@ export class FoldedLivingApp {
     
     resetCube() {
         // Clear all objects and reset to default state
-        this.cube.placedObjects.forEach(item => {
+        this.cube.placedObjects.slice().forEach(item => {
             this.cube.removeObject(item.object);
         });
+        this.budgetManager.currentPolyCount = 0;
+        this.budgetManager.currentLightCount = 0;
+        this.budgetManager.notifyListeners();
+        this.outlinerManager.clear();
         this.settingsManager.applySettings(this.settingsManager.createDefaultSettings());
         this.historyManager.push(this.getSnapshot());
     }
@@ -293,6 +321,7 @@ export class FoldedLivingApp {
         // Apply settings then objects
         if (data.settings) this.settingsManager.applySettings(data.settings);
         if (Array.isArray(data.objects)) this.loadCubeData(data);
+        this.outlinerManager.populate(this.cube.placedObjects.map(item => item.object));
     }
 
     update() {

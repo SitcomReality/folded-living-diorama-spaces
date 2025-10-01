@@ -1,0 +1,68 @@
+.outliner {
+    position: absolute;
+    bottom: 80px; /* Aligns with toolbar's visual space */
+    right: 20px;
+    width: 280px;
+    max-height: 40vh;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 120;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.outliner.hidden {
+    display: none;
+}
+
+.outliner-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.outliner-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin: 0;
+}
+
+.outliner-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.outliner-list {
+    list-style: none;
+    padding: 8px;
+    margin: 0;
+}
+
+.outliner-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.outliner-item:hover {
+    background: var(--hover-bg);
+}
+
+.outliner-item.active {
+    background: var(--accent-color);
+    color: white;
+    font-weight: 700;
+    border-color: var(--accent-color);
+}
+

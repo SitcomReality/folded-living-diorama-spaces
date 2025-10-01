@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="styles/gallery.css">
     <link rel="stylesheet" href="styles/naming.css">
     <link rel="stylesheet" href="styles/info-banner.css">
+    <link rel="stylesheet" href="styles/outliner.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body data-theme="light">
@@ -103,6 +104,17 @@
             </div>
         </div>
         
+        <!-- Scene Outliner Panel -->
+        <div id="outliner" class="outliner hidden">
+            <div class="outliner-header">
+                <h3>Scene Outliner</h3>
+                <button id="close-outliner" class="icon-btn">✕</button>
+            </div>
+            <div class="outliner-content">
+                <ul id="outliner-list" class="outliner-list"></ul>
+            </div>
+        </div>
+
         <!-- Loading Overlay -->
         <div id="loading" class="loading-overlay">
             <div class="loading-spinner"></div>
