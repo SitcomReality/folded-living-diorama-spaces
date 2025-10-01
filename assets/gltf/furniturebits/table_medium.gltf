@@ -15,24 +15,24 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "Grass_1_A_Singlesided_Color1"
+            "name" : "table_medium"
         }
     ],
     "materials" : [
         {
-            "name" : "forest",
+            "name" : "furniture_texture",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 0
                 },
                 "metallicFactor" : 0,
-                "roughnessFactor" : 0.6000000238418579
+                "roughnessFactor" : 0.5
             }
         }
     ],
     "meshes" : [
         {
-            "name" : "Grass_1_A_Singlesided_Color1",
+            "name" : "Cube.003",
             "primitives" : [
                 {
                     "attributes" : {
@@ -55,69 +55,69 @@
     "images" : [
         {
             "mimeType" : "image/png",
-            "name" : "forest_texture",
-            "uri" : "forest_texture.png"
+            "name" : "furniturebits_texture",
+            "uri" : "furniturebits_texture.png"
         }
     ],
     "accessors" : [
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 18,
+            "count" : 260,
             "max" : [
-                0.14336270093917847,
-                0.5393414497375488,
-                0.04444076120853424
+                1,
+                1,
+                1
             ],
             "min" : [
-                -0.143336221575737,
-                -0.019999999552965164,
-                -0.08254344761371613
+                -1,
+                -7.450580596923828e-09,
+                -1
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 18,
+            "count" : 260,
             "type" : "VEC2"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 18,
+            "count" : 260,
             "type" : "VEC3"
         },
         {
             "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 42,
+            "count" : 504,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 216,
+            "byteLength" : 3120,
             "byteOffset" : 0,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 144,
-            "byteOffset" : 216,
+            "byteLength" : 2080,
+            "byteOffset" : 3120,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 216,
-            "byteOffset" : 360,
+            "byteLength" : 3120,
+            "byteOffset" : 5200,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 84,
-            "byteOffset" : 576,
+            "byteLength" : 1008,
+            "byteOffset" : 8320,
             "target" : 34963
         }
     ],
@@ -129,8 +129,8 @@
     ],
     "buffers" : [
         {
-            "byteLength" : 660,
-            "uri" : "Grass_1_A_Singlesided_Color1.bin"
+            "byteLength" : 9328,
+            "uri" : "table_medium.bin"
         }
     ]
 }
