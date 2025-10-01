@@ -4,7 +4,7 @@ import { CONSTANTS } from '../config/constants.js';
 export class SceneManager {
     constructor() {
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x0a0a0a);
+        this.scene.background = new THREE.Color(0x87ceeb); // comforting blue sky
         
         this.setupLighting();
         this.setupHelpers();
@@ -45,7 +45,7 @@ export class SceneManager {
     setupGroundPlane() {
         const half = CONSTANTS.CUBE_SIZE / 2;
         const geo = new THREE.PlaneGeometry(200, 200);
-        const mat = new THREE.MeshStandardMaterial({ color: 0xd8d2c7, roughness: 1, metalness: 0 });
+        const mat = new THREE.MeshStandardMaterial({ color: 0x6fbf73, roughness: 1, metalness: 0 }); // grassy green
         this.groundPlane = new THREE.Mesh(geo, mat);
         this.groundPlane.rotation.x = -Math.PI / 2;
         this.groundPlane.position.y = -half - 0.001;

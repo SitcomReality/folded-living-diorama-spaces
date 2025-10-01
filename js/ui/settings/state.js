@@ -11,7 +11,7 @@ export function createDefaultSettings(cube) {
     };
     const settings = {
         surfaces: {},
-        environment: { preset: 'warm', ambientIntensity: 0.6, backgroundColor: '#0a0a0a', groundColor: '#d8d2c7' }
+        environment: { preset: 'warm', ambientIntensity: 0.6, backgroundColor: '#87ceeb', groundColor: '#6fbf73' }
     };
     // Surfaces that can fold and are visually 'down' (horizontal) in the initial unfolded state
     const foldingSurfaces = [CONSTANTS.SURFACES.PORTAL, CONSTANTS.SURFACES.BACKDROP, CONSTANTS.SURFACES.WING_LEFT, CONSTANTS.SURFACES.WING_RIGHT];
