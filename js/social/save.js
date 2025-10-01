@@ -78,7 +78,10 @@ export class SaveManager {
 
         if (this.currentCubeId && this.currentCubeName) {
             // Update existing cube
-            await this.databaseManager.updateCube(this.currentCubeId, data);
+            await this.databaseManager.updateCube(this.currentCubeId, {
+                ...data,
+                name: cubeName
+            });
         } else {
             // Create new cube
             const cube = await this.databaseManager.saveCube(data);
@@ -86,6 +89,7 @@ export class SaveManager {
             this.currentCubeName = cubeName;
         }
 
+        this.currentCubeName = cubeName;
         this.autoSave();
 
         window.dispatchEvent(new CustomEvent('cubeSaved', {
