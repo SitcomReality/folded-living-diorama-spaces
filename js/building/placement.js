@@ -286,8 +286,13 @@ export class PlacementSystem {
         const hit = intersects[0];
         const normalMatrix = new THREE.Matrix4().lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0,1,0));
         this.baseQuat = new THREE.Quaternion().setFromRotationMatrix(normalMatrix);
-        this.lastHitSurfaceName = hit.object.userData?.surfaceName || hit.object.parent?.userData?.surfaceName || null;
+        // robustly resolve surface name up the hierarchy
+        let obj = hit.object, surfaceName = null;
+        while (obj && !surfaceName) { surfaceName = obj.userData?.surfaceName || null; obj = obj.parent; }
+        this.lastHitSurfaceName = surfaceName;
+        if (!this.lastHitSurfaceName) return; // no valid surface, abort anchoring
         const surface = this.cube.surfaces[this.lastHitSurfaceName];
+        if (!surface) return;
         const cell = this.cube.size / 8;
         const local = surface.worldToLocal(hit.point.clone());
         if (snapActive) { local.x = Math.round(local.x / cell) * cell; local.y = Math.round(local.y / cell) * cell; }
