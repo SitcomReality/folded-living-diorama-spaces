@@ -49,12 +49,18 @@ export function setupPivots(cube) {
     const backSurface = cube.surfaces[CONSTANTS.SURFACES.BACK];
     if (ceilingSurface && backSurface) {
         cube.group.remove(ceilingSurface);
-        // Correctly position ceiling relative to the back surface's top edge
-        // Move the ceiling forward so its back edge meets the top edge of the back wall
-        ceilingSurface.position.set(0, halfSize, 0); 
-        // Correctly orient ceiling to be perpendicular to back surface
-        ceilingSurface.rotation.set(-Math.PI / 2, 0, 0); 
-        backSurface.add(ceilingSurface);
+        // Create a small pivot at the BACK surface's top edge, and attach the ceiling to that pivot.
+        // This ensures the ceiling's back edge meets the top edge of the back wall (no T-shape).
+        const topEdgePivot = new THREE.Group();
+        topEdgePivot.position.set(0, halfSize, 0); // top edge of the back surface in backSurface local space
+        // Add pivot onto the back surface so it moves/rotates with it
+        backSurface.add(topEdgePivot);
+
+        // Orient the ceiling to be perpendicular to the back and offset so its back edge sits on the pivot.
+        ceilingSurface.rotation.set(-Math.PI / 2, 0, 0);
+        // Place ceiling so that its back edge (half the plane size) meets the pivot:
+        ceilingSurface.position.set(0, 0, -halfSize / 2);
+        topEdgePivot.add(ceilingSurface);
         ceilingSurface.userData.parentedToBackdrop = true;
     }
 }
