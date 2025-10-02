@@ -20,7 +20,8 @@ export function createDefaultSettings(cube) {
             groundVisible: true,
             sunAzimuth: 45, // 0-360 degrees
             sunInclination: 55 // 0-90 degrees
-        }
+        },
+        thickness: CONSTANTS.CUBE_THICKNESS // minimum thickness
     };
     // Surfaces that can fold and are visually 'down' (horizontal) in the initial unfolded state
     const foldingSurfaces = [CONSTANTS.SURFACES.FRONT, CONSTANTS.SURFACES.BACK, CONSTANTS.SURFACES.LEFT, CONSTANTS.SURFACES.RIGHT];

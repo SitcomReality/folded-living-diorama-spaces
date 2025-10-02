@@ -96,9 +96,9 @@
 .surface-card[data-surface="front"] { grid-area: front; }
 .surface-card[data-surface="ceiling"] { grid-area: ceiling; }
 .surface-card[data-surface="back"] { grid-area: back; }
-.surface-card[data-surface="left"] { grid-area: left; }
+.surface-card[data-surface="left"] { grid-area: right; } /* swap positions */
 .surface-card[data-surface="floor"] { grid-area: floor; }
-.surface-card[data-surface="right"] { grid-area: right; }
+.surface-card[data-surface="right"] { grid-area: left; } /* swap positions */
 
 .surface-card {
     background: rgba(255, 255, 255, 0.03);

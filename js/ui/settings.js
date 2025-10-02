@@ -58,6 +58,8 @@ export class SettingsManager {
             updateColor,
             updateTexture,
             updateOrientation,
+            updateThickness: (cube, t) => cube.updateThickness(t),
+            updateGroundOffset: (scene, t) => scene.setGroundOffset(t),
             onSettingsChanged: () => {
                 this.renderSettings();
                 if (this.saveManager) {

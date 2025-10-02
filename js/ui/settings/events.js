@@ -147,4 +147,17 @@ export function attachSettingsEvents(content, ctx) {
         ctx.setGroundVisible(ctx.scene, e.target.checked);
         ctx.onSettingsChanged();
     });
+
+    const thickSlider = content.querySelector('[data-control="thickness"]');
+    if (thickSlider) {
+        const valEl = thickSlider.parentElement.querySelector('.slider-value');
+        thickSlider.addEventListener('input', (e) => {
+            const v = parseFloat(e.target.value);
+            ctx.settings.thickness = v;
+            valEl.textContent = v.toFixed(2);
+            ctx.updateThickness(ctx.cube, v);
+            ctx.updateGroundOffset(ctx.scene, v);
+        });
+        thickSlider.addEventListener('change', () => ctx.onSettingsChanged());
+    }
 }

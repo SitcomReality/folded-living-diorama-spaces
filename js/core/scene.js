@@ -49,7 +49,7 @@ export class SceneManager {
 
     setupGroundPlane() {
         const half = CONSTANTS.CUBE_SIZE / 2;
-        const groundOffset = CONSTANTS.CUBE_THICKNESS + 0.05; // Slightly more than thickness to ensure padding
+        const groundOffset = CONSTANTS.CUBE_THICKNESS + 0.05;
         const geo = new THREE.PlaneGeometry(200, 200);
         const mat = new THREE.MeshStandardMaterial({ color: 0x6fbf73, roughness: 1, metalness: 0 }); // grassy green
         this.groundPlane = new THREE.Mesh(geo, mat);
@@ -65,6 +65,12 @@ export class SceneManager {
 
     setGroundVisible(visible) {
         if (this.groundPlane) this.groundPlane.visible = visible;
+    }
+
+    setGroundOffset(thickness) {
+        const half = CONSTANTS.CUBE_SIZE / 2;
+        const padding = 0.05;
+        if (this.groundPlane) this.groundPlane.position.y = -half - (thickness + padding);
     }
 
     updateSunPosition(azimuth, inclination) { // angles in degrees

@@ -10,7 +10,9 @@ export function renderSettingsHTML(settings) {
             console.warn(`Settings for surface "${surfaceName}" not found.`);
             return ''; // Skip rendering this card if settings are missing
         }
-        const displayName = surfaceName.charAt(0).toUpperCase() + surfaceName.slice(1);
+        const displayName = surfaceName === 'left' ? 'West' :
+                            surfaceName === 'right' ? 'East' :
+                            surfaceName.charAt(0).toUpperCase() + surfaceName.slice(1);
         const hasPivot = ['back','left','right'].includes(surfaceName);
 
         return `
@@ -71,6 +73,13 @@ export function renderSettingsHTML(settings) {
           <div class="settings-section-toggle">▼</div>
         </div>
         <div class="settings-section-content">
+          <div class="control-row">
+            <div class="control-label">Thickness</div>
+            <input type="range" class="slider-input" data-control="thickness"
+              min="${CONSTANTS.CUBE_THICKNESS}" max="${CONSTANTS.CUBE_THICKNESS*5}" step="0.01"
+              value="${settings.thickness}">
+            <div class="slider-value">${settings.thickness.toFixed(2)}</div>
+          </div>
           <div class="surfaces-grid">${surfaceCards}</div>
         </div>
       </div>
