@@ -230,6 +230,19 @@ export class PlacementSystem {
         const surface = this.cube.surfaces[surfaceName];
         surface.attach(object);
         
+        // Orientation fixes: ensure placed objects face inward on vertical walls and sit on the floor correctly
+        const settings = window.app?.settingsManager?.getSettings?.();
+        if (surfaceName === 'floor') {
+            // Rotate 90° so the object's bottom aligns with the floor
+            object.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
+        } else if (surfaceName === 'left' || surfaceName === 'right') {
+            const orientation = settings?.surfaces?.[surfaceName]?.orientation;
+            if (orientation === 'up') {
+                // Flip to face inward when wall is vertical
+                object.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.PI);
+            }
+        }
+        
         // Track via cube with current local position
         this.cube.addObject(object, surfaceName, object.position.clone());
         
