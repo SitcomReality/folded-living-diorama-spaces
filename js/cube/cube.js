@@ -69,10 +69,10 @@ export class DioramaCube {
         const surfaceConfigs = [
             { name: CONSTANTS.SURFACES.FRONT, color: 0xf5e6d3, position: [0, 0, -halfSize - halfThickness], rotation: [0, 0, 0] },
             { name: CONSTANTS.SURFACES.BACK, color: 0xe8d4c0, position: [0, 0, halfSize + halfThickness], rotation: [0, Math.PI, 0] },
-            { name: CONSTANTS.SURFACES.CEILING, color: 0xd4e8f5, position: [0, halfSize + halfThickness, 0], rotation: [-Math.PI/2, 0, 0] },
-            { name: CONSTANTS.SURFACES.FLOOR, color: 0xa8c9a3, position: [0, -halfSize - halfThickness, 0], rotation: [Math.PI/2, 0, 0] },
-            { name: CONSTANTS.SURFACES.LEFT, color: 0xf0d8c4, position: [-halfSize - halfThickness, 0, 0], rotation: [0, -Math.PI/2, 0] },
-            { name: CONSTANTS.SURFACES.RIGHT, color: 0xf0d8c4, position: [halfSize + halfThickness, 0, 0], rotation: [0, Math.PI/2, 0] }
+            { name: CONSTANTS.SURFACES.CEILING, color: 0xd4e8f5, position: [0, halfSize + halfThickness, 0], rotation: [0, 0, 0] },
+            { name: CONSTANTS.SURFACES.FLOOR, color: 0xa8c9a3, position: [0, -halfSize - halfThickness, 0], rotation: [0, 0, 0] },
+            { name: CONSTANTS.SURFACES.LEFT, color: 0xf0d8c4, position: [-halfSize - halfThickness, 0, 0], rotation: [0, 0, 0] },
+            { name: CONSTANTS.SURFACES.RIGHT, color: 0xf0d8c4, position: [halfSize + halfThickness, 0, 0], rotation: [0, 0, 0] }
         ];
         
         surfaceConfigs.forEach(config => {
