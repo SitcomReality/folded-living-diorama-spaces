@@ -170,93 +170,49 @@ export class DioramaCube {
     
     updateThickness(thickness) {
         const halfSize = this.size / 2;
-        const base = CONSTANTS.CUBE_THICKNESS;
-        const ratio = thickness / base;
-
-        const setScaleAxis = (mesh, axis) => {
-            const oldScale = mesh.scale.clone();
-            mesh.scale.set(
-                axis === 'x' ? ratio : 1,
-                axis === 'y' ? ratio : 1,
-                axis === 'z' ? ratio : 1
-            );
-            return oldScale;
-        };
-
         const halfT = thickness / 2;
-
-        const applyInverseScale = (surfaceName, axis) => {
-            this.placedObjects.forEach(item => {
-                if (item.surface === surfaceName) {
-                    const object = item.object;
-                    // Re-apply original scale, then divide by the new surface scale on the correct axis
-                    if (object.userData.originalScale) {
-                        object.scale.copy(object.userData.originalScale);
-                        if (axis === 'x') object.scale.x /= ratio;
-                        if (axis === 'y') object.scale.y /= ratio;
-                        if (axis === 'z') object.scale.z /= ratio;
-                    }
-                }
-            });
-        };
-
-        // FRONT
-        const front = this.surfaces[CONSTANTS.SURFACES.FRONT];
-        if (front) {
-            setScaleAxis(front, 'z');
-            if (front.userData.pivot) {
-                front.position.set(0, halfSize + halfT, -halfT);
-            } else {
-                front.position.set(0, 0, -halfSize - halfT);
-            }
-            applyInverseScale(CONSTANTS.SURFACES.FRONT, 'z');
-        }
-        // BACK
-        const back = this.surfaces[CONSTANTS.SURFACES.BACK];
-        if (back) {
-            setScaleAxis(back, 'z');
-            if (back.userData.pivot) {
-                back.position.set(0, halfSize + halfT, halfT);
-            } else {
-                back.position.set(0, 0, halfSize + halfT);
-            }
-            applyInverseScale(CONSTANTS.SURFACES.BACK, 'z');
-        }
-        // CEILING (parented to back in pivots)
-        const ceiling = this.surfaces[CONSTANTS.SURFACES.CEILING];
-        if (ceiling) {
-            setScaleAxis(ceiling, 'y');
+        const S = this.surfaces;
+        const G = (w,h,d)=>new THREE.BoxGeometry(w,h,d);
+        
+        // Update geometries per face (no mesh scaling => children keep size)
+        S[CONSTANTS.SURFACES.FRONT].geometry   = G(this.size, this.size, thickness);
+        S[CONSTANTS.SURFACES.BACK].geometry    = G(this.size, this.size, thickness);
+        S[CONSTANTS.SURFACES.LEFT].geometry    = G(thickness, this.size, this.size);
+        S[CONSTANTS.SURFACES.RIGHT].geometry   = G(thickness, this.size, this.size);
+        S[CONSTANTS.SURFACES.FLOOR].geometry   = G(this.size, thickness, this.size);
+        S[CONSTANTS.SURFACES.CEILING].geometry = G(this.size, thickness, this.size);
+        
+        // Ensure no residual mesh scaling affects children
+        Object.values(S).forEach(m => m.scale.set(1,1,1));
+        
+        // Reposition surfaces to keep internal faces at ±halfSize
+        // For pivoted surfaces, position is relative to pivot (which stays at y=-halfSize)
+        const front = S[CONSTANTS.SURFACES.FRONT];
+        front.position.set(0, front.userData.pivot ? halfSize : 0, front.userData.pivot ? -halfT : (-halfSize - halfT));
+        
+        const back = S[CONSTANTS.SURFACES.BACK];
+        back.position.set(0, back.userData.pivot ? halfSize : 0, back.userData.pivot ? halfT : (halfSize + halfT));
+        
+        const left = S[CONSTANTS.SURFACES.LEFT];
+        left.position.set(left.userData.pivot ? -halfT : (-halfSize - halfT), left.userData.pivot ? halfSize : 0, 0);
+        
+        const right = S[CONSTANTS.SURFACES.RIGHT];
+        right.position.set(right.userData.pivot ? halfT : (halfSize + halfT), right.userData.pivot ? halfSize : 0, 0);
+        
+        S[CONSTANTS.SURFACES.FLOOR].position.set(0, -halfSize - halfT, 0);
+        
+        // Ceiling: keep centered in Z, only update Y position
+        const ceiling = S[CONSTANTS.SURFACES.CEILING];
+        if (!ceiling.userData?.parentedToBackdrop) {
+            ceiling.position.set(0, halfSize + halfT, 0);
+        } else {
+            // When parented to back, position relative to back surface to maintain connection
             ceiling.position.set(0, halfSize + halfT, halfSize + halfT);
-            applyInverseScale(CONSTANTS.SURFACES.CEILING, 'y');
         }
-        // FLOOR
-        const floor = this.surfaces[CONSTANTS.SURFACES.FLOOR];
-        if (floor) {
-            setScaleAxis(floor, 'y');
-            floor.position.set(0, -halfSize - halfT, 0);
-            applyInverseScale(CONSTANTS.SURFACES.FLOOR, 'y');
-        }
-        // LEFT
-        const left = this.surfaces[CONSTANTS.SURFACES.LEFT];
-        if (left) {
-            setScaleAxis(left, 'x');
-            if (left.userData.pivot) {
-                left.position.set(-halfT, halfSize + halfT, 0);
-            } else {
-                left.position.set(-halfSize - halfT, 0, 0);
-            }
-            applyInverseScale(CONSTANTS.SURFACES.LEFT, 'x');
-        }
-        // RIGHT
-        const right = this.surfaces[CONSTANTS.SURFACES.RIGHT];
-        if (right) {
-            setScaleAxis(right, 'x');
-            if (right.userData.pivot) {
-                right.position.set(halfT, halfSize + halfT, 0);
-            } else {
-                right.position.set(halfSize + halfT, 0, 0);
-            }
-            applyInverseScale(CONSTANTS.SURFACES.RIGHT, 'x');
+        
+        // Notify animator to recalculate folding positions
+        if (window.app?.foldingAnimator) {
+            window.app.foldingAnimator.recalculateFoldingPositions();
         }
     }
     
@@ -268,9 +224,6 @@ export class DioramaCube {
         }
         
         object.position.copy(localPosition);
-        if (!object.userData.originalScale) {
-            object.userData.originalScale = object.scale.clone();
-        }
         surface.add(object);
         
         this.placedObjects.push({

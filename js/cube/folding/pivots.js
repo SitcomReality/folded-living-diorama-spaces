@@ -15,7 +15,7 @@ export function setupPivots(cube) {
             case CONSTANTS.SURFACES.BACK:
                 pivot.position.set(0, -halfSize, halfSize);
                 cube.group.remove(surface);
-                surface.position.set(0, halfSize + halfThickness, halfThickness);
+                surface.position.set(0, halfSize, halfThickness);
                 pivot.add(surface);
                 cube.group.add(pivot);
                 surface.userData.pivot = pivot;
@@ -25,7 +25,7 @@ export function setupPivots(cube) {
             case CONSTANTS.SURFACES.LEFT:
                 pivot.position.set(-halfSize, -halfSize, 0);
                 cube.group.remove(surface);
-                surface.position.set(-halfThickness, halfSize + halfThickness, 0);
+                surface.position.set(-halfThickness, halfSize, 0);
                 pivot.add(surface);
                 cube.group.add(pivot);
                 surface.userData.pivot = pivot;
@@ -33,7 +33,7 @@ export function setupPivots(cube) {
             case CONSTANTS.SURFACES.RIGHT:
                 pivot.position.set(halfSize, -halfSize, 0);
                 cube.group.remove(surface);
-                surface.position.set(halfThickness, halfSize + halfThickness, 0);
+                surface.position.set(halfThickness, halfSize, 0);
                 pivot.add(surface);
                 cube.group.add(pivot);
                 surface.userData.pivot = pivot;
@@ -41,7 +41,7 @@ export function setupPivots(cube) {
             case CONSTANTS.SURFACES.FRONT:
                 pivot.position.set(0, -halfSize, -halfSize);
                 cube.group.remove(surface);
-                surface.position.set(0, halfSize + halfThickness, -halfThickness);
+                surface.position.set(0, halfSize, -halfThickness);
                 pivot.add(surface);
                 cube.group.add(pivot);
                 surface.userData.pivot = pivot;
@@ -50,16 +50,16 @@ export function setupPivots(cube) {
     });
     const ceilingSurface = cube.surfaces[CONSTANTS.SURFACES.CEILING];
     const backSurface = cube.surfaces[CONSTANTS.SURFACES.BACK];
-    if (ceilingSurface && backSurface && backSurface.parent) { // Ensure back surface is in a pivot
+    if (ceilingSurface && backSurface && backSurface.parent) {
         const backPivot = backSurface.parent;
-        backPivot.remove(backSurface); // Temporarily remove to re-parent ceiling
+        backPivot.remove(backSurface);
         cube.group.remove(ceilingSurface);
         
-        // Correctly position ceiling relative to the back surface's top edge
+        // Position ceiling relative to back surface to maintain connection
         ceilingSurface.position.set(0, halfSize + halfThickness, halfSize + halfThickness); 
         
         backSurface.add(ceilingSurface);
-        backPivot.add(backSurface); // Add back surface (with ceiling) back to pivot
+        backPivot.add(backSurface);
 
         ceilingSurface.userData.parentedToBackdrop = true;
     }

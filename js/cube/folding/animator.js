@@ -8,13 +8,19 @@ export class FoldingAnimator {
     constructor(cube) {
         this.cube = cube;
         this.animating = false;
-        this.foldedPositions = calculateFoldedPositions(cube);
-        this.unfoldedPositions = calculateUnfoldedPositions(cube);
+        this.foldedPositions = calculateFoldedPositions(cube, CONSTANTS.CUBE_THICKNESS);
+        this.unfoldedPositions = calculateUnfoldedPositions(cube, CONSTANTS.CUBE_THICKNESS);
         setupPivots(cube);
         this.particles = null;
         this.glowLights = [];
         this.hasUnfoldedOnce = false;
         this.objectInitialScales = new Map(); // Store original scales
+    }
+    
+    recalculateFoldingPositions() {
+        const thickness = window.app?.settingsManager?.settings?.thickness || CONSTANTS.CUBE_THICKNESS;
+        this.foldedPositions = calculateFoldedPositions(this.cube, thickness);
+        this.unfoldedPositions = calculateUnfoldedPositions(this.cube, thickness);
     }
 
     createUnfoldParticles() {
