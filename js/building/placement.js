@@ -141,20 +141,23 @@ export class PlacementSystem {
         if (intersects.length > 0) {
             const hit = intersects[0];
             
-            // 1. Calculate Base Orientation (aligned with surface normal, but Y axis up)
-            const normalMatrix = new THREE.Matrix4();
-            normalMatrix.lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0, 1, 0));
-            const qBase = new THREE.Quaternion().setFromRotationMatrix(normalMatrix);
-
+            // 1. Calculate Base Orientation (aligned with surface, with special handling per surface)
             const surfaceName = (hit.object.userData && hit.object.userData.surfaceName) 
                 || (hit.object.parent && hit.object.parent.userData && hit.object.parent.userData.surfaceName) 
                 || null;
 
-            if (surfaceName === 'left' || surfaceName === 'right') {
-                const flipQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
-                qBase.multiply(flipQuat);
+            let qBase;
+            if (surfaceName === 'floor') {
+                const worldNormal = hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize();
+                qBase = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), worldNormal);
+            } else {
+                const normalMatrix = new THREE.Matrix4().lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0, 1, 0));
+                qBase = new THREE.Quaternion().setFromRotationMatrix(normalMatrix);
+                if (surfaceName === 'left' || surfaceName === 'right') {
+                    const flipQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+                    qBase.multiply(flipQuat);
+                }
             }
-
             this.baseQuat = qBase.clone();
 
             // 2. Calculate Yaw Rotation (World Y axis rotation based on user input)
@@ -233,12 +236,11 @@ export class PlacementSystem {
         // Orientation fixes: ensure placed objects face inward on vertical walls and sit on the floor correctly
         const settings = window.app?.settingsManager?.getSettings?.();
         if (surfaceName === 'floor') {
-            // Rotate 90° so the object's bottom aligns with the floor
-            object.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
+            // removed incorrect extra rotation so placed objects match the corrected preview orientation
+            // (previous world-axis -90° X rotation caused upside-down placement)
         } else if (surfaceName === 'left' || surfaceName === 'right') {
             const orientation = settings?.surfaces?.[surfaceName]?.orientation;
             if (orientation === 'up') {
-                // Flip to face inward when wall is vertical
                 object.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.PI);
             }
         }
@@ -344,11 +346,18 @@ export class PlacementSystem {
         const intersects = this.raycaster.intersectObjects(Object.values(this.cube.surfaces), true);
         if (intersects.length === 0) return;
         const hit = intersects[0];
-        const normalMatrix = new THREE.Matrix4().lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0,1,0));
-        this.baseQuat = new THREE.Quaternion().setFromRotationMatrix(normalMatrix);
         // robustly resolve surface name up the hierarchy
         let obj = hit.object, surfaceName = null;
         while (obj && !surfaceName) { surfaceName = obj.userData?.surfaceName || null; obj = obj.parent; }
+        let baseQuat;
+        if (surfaceName === 'floor') {
+            const worldNormal = hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize();
+            baseQuat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), worldNormal);
+        } else {
+            const normalMatrix = new THREE.Matrix4().lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0,1,0));
+            baseQuat = new THREE.Quaternion().setFromRotationMatrix(normalMatrix);
+        }
+        this.baseQuat = baseQuat;
         this.lastHitSurfaceName = surfaceName;
         if (!this.lastHitSurfaceName) return; // no valid surface, abort anchoring
         const surface = this.cube.surfaces[this.lastHitSurfaceName];
