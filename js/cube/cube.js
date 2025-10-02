@@ -169,6 +169,9 @@ export class DioramaCube {
     }
     
     updateThickness(thickness) {
+        const oldThickness = this.surfaces[CONSTANTS.SURFACES.FLOOR].geometry.parameters.height;
+        const deltaThickness = thickness - oldThickness;
+
         const halfSize = this.size / 2;
         const halfT = thickness / 2;
         const S = this.surfaces;
@@ -210,6 +213,34 @@ export class DioramaCube {
             ceiling.position.set(0, halfSize + halfT, halfSize + halfT);
         }
         
+        // Adjust child object positions to stick to the inner face
+        this.placedObjects.forEach(item => {
+            const surfaceName = item.surface;
+            const object = item.object;
+            const halfDelta = deltaThickness / 2;
+
+            switch (surfaceName) {
+                case CONSTANTS.SURFACES.FLOOR:
+                    object.position.y -= halfDelta;
+                    break;
+                case CONSTANTS.SURFACES.CEILING:
+                    object.position.y += halfDelta;
+                    break;
+                case CONSTANTS.SURFACES.FRONT:
+                    object.position.z += halfDelta;
+                    break;
+                case CONSTANTS.SURFACES.BACK:
+                    object.position.z -= halfDelta;
+                    break;
+                case CONSTANTS.SURFACES.LEFT:
+                    object.position.x += halfDelta;
+                    break;
+                case CONSTANTS.SURFACES.RIGHT:
+                    object.position.x -= halfDelta;
+                    break;
+            }
+        });
+
         // Notify animator to recalculate folding positions
         if (window.app?.foldingAnimator) {
             window.app.foldingAnimator.recalculateFoldingPositions();
