@@ -59,45 +59,46 @@ export class DioramaCube {
     
     createCube() {
         const halfSize = this.size / 2;
+        const t = CONSTANTS.CUBE_THICKNESS;
         
         // Create whimsical exterior texture
         const exteriorTexture = this.createWhimsicalTexture();
         
         // Warm, cozy colors for surfaces
         const surfaceConfigs = [
-            { name: CONSTANTS.SURFACES.FRONT, color: 0xf5e6d3, position: [0, 0, -halfSize], rotation: [0, 0, 0] },
-            { name: CONSTANTS.SURFACES.BACK, color: 0xe8d4c0, position: [0, 0, halfSize], rotation: [0, Math.PI, 0] },
-            { name: CONSTANTS.SURFACES.CEILING, color: 0xd4e8f5, position: [0, halfSize, 0], rotation: [-Math.PI/2, 0, 0] },
-            { name: CONSTANTS.SURFACES.FLOOR, color: 0xa8c9a3, position: [0, -halfSize, 0], rotation: [Math.PI/2, 0, 0] },
-            { name: CONSTANTS.SURFACES.LEFT, color: 0xf0d8c4, position: [-halfSize, 0, 0], rotation: [0, -Math.PI/2, 0] },
-            { name: CONSTANTS.SURFACES.RIGHT, color: 0xf0d8c4, position: [halfSize, 0, 0], rotation: [0, Math.PI/2, 0] }
+            { name: CONSTANTS.SURFACES.FRONT,  color: 0xf5e6d3, position: [0, 0, -halfSize], rotation: [0, 0, 0],                  extent: [this.size, this.size, t], inward: new THREE.Vector3(0, 0, 1) },
+            { name: CONSTANTS.SURFACES.BACK,   color: 0xe8d4c0, position: [0, 0,  halfSize], rotation: [0, Math.PI, 0],           extent: [this.size, this.size, t], inward: new THREE.Vector3(0, 0, 1) },
+            { name: CONSTANTS.SURFACES.CEILING,color: 0xd4e8f5, position: [0,  halfSize, 0], rotation: [-Math.PI/2, 0, 0],       extent: [this.size, this.size, t], inward: new THREE.Vector3(0, 0, 1) },
+            { name: CONSTANTS.SURFACES.FLOOR,  color: 0xa8c9a3, position: [0, -halfSize, 0], rotation: [ Math.PI/2, 0, 0],       extent: [this.size, this.size, t], inward: new THREE.Vector3(0, 0, 1) },
+            { name: CONSTANTS.SURFACES.LEFT,   color: 0xf0d8c4, position: [-halfSize, 0, 0], rotation: [0, -Math.PI/2, 0],        extent: [this.size, this.size, t], inward: new THREE.Vector3(0, 0, 1) },
+            { name: CONSTANTS.SURFACES.RIGHT,  color: 0xf0d8c4, position: [ halfSize, 0, 0], rotation: [0,  Math.PI/2, 0],        extent: [this.size, this.size, t], inward: new THREE.Vector3(0, 0, 1) }
         ];
         
         surfaceConfigs.forEach(config => {
-            const geometry = new THREE.PlaneGeometry(this.size, this.size);
-            const material = new THREE.MeshStandardMaterial({ 
-                color: config.color,
-                side: THREE.DoubleSide,
-                roughness: 0.9,
-                metalness: 0.05
-            });
-            
-            const mesh = new THREE.Mesh(geometry, material);
+            const geometry = new THREE.BoxGeometry(...config.extent);
+            const interiorMat = new THREE.MeshStandardMaterial({ color: config.color, roughness: 0.9, metalness: 0.05 });
+            const exteriorMat = new THREE.MeshStandardMaterial({ map: exteriorTexture, roughness: 0.8, metalness: 0.1 });
+            const materialsInteriorMode = [
+                exteriorMat, exteriorMat, exteriorMat, exteriorMat,
+                interiorMat, /* +Z face (interior) */ exteriorMat  // -Z face (exterior)
+            ];
+            const materialsExteriorMode = [exteriorMat, exteriorMat, exteriorMat, exteriorMat, exteriorMat, exteriorMat];
+
+            const mesh = new THREE.Mesh(geometry, materialsExteriorMode);
             mesh.position.set(...config.position);
             mesh.rotation.set(...config.rotation);
+            // shift outward so inner face stays at original plane
+            const inward = config.inward.clone().applyEuler(mesh.rotation);
+            mesh.position.add(inward.clone().multiplyScalar(-t * 0.5));
+
+            mesh.castShadow = false;
             mesh.receiveShadow = true;
             mesh.userData.surfaceName = config.name;
-            mesh.userData.interiorMaterial = material;
-            
-            // Create exterior material with texture (will be used when folded)
-            const exteriorMaterial = new THREE.MeshStandardMaterial({
-                map: exteriorTexture,
-                side: THREE.DoubleSide,
-                roughness: 0.8,
-                metalness: 0.1
-            });
-            mesh.userData.exteriorMaterial = exteriorMaterial;
-            
+            mesh.userData.interiorMaterial = interiorMat;
+            mesh.userData.exteriorMaterial = exteriorMat;
+            mesh.userData.materialsInteriorMode = materialsInteriorMode;
+            mesh.userData.materialsExteriorMode = materialsExteriorMode;
+
             this.surfaces[config.name] = mesh;
             this.group.add(mesh);
         });
@@ -111,16 +112,16 @@ export class DioramaCube {
     
     setExteriorTexture() {
         Object.values(this.surfaces).forEach(surface => {
-            if (surface.userData.exteriorMaterial) {
-                surface.material = surface.userData.exteriorMaterial;
+            if (surface.userData.materialsExteriorMode) {
+                surface.material = surface.userData.materialsExteriorMode;
             }
         });
     }
     
     setInteriorTexture() {
         Object.values(this.surfaces).forEach(surface => {
-            if (surface.userData.interiorMaterial) {
-                surface.material = surface.userData.interiorMaterial;
+            if (surface.userData.materialsInteriorMode) {
+                surface.material = surface.userData.materialsInteriorMode;
             }
         });
     }

@@ -1,6 +1,7 @@
 export const CONSTANTS = {
     // Cube dimensions
     CUBE_SIZE: 10,
+    CUBE_THICKNESS: 0.3,
     
     // Asset budgets
     MAX_POLY_COUNT: 50000,
