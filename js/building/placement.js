@@ -145,6 +145,16 @@ export class PlacementSystem {
             const normalMatrix = new THREE.Matrix4();
             normalMatrix.lookAt(hit.point, hit.point.clone().add(hit.face.normal), new THREE.Vector3(0, 1, 0));
             const qBase = new THREE.Quaternion().setFromRotationMatrix(normalMatrix);
+
+            const surfaceName = (hit.object.userData && hit.object.userData.surfaceName) 
+                || (hit.object.parent && hit.object.parent.userData && hit.object.parent.userData.surfaceName) 
+                || null;
+
+            if (surfaceName === 'left' || surfaceName === 'right') {
+                const flipQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+                qBase.multiply(flipQuat);
+            }
+
             this.baseQuat = qBase.clone();
 
             // 2. Calculate Yaw Rotation (World Y axis rotation based on user input)
@@ -157,9 +167,7 @@ export class PlacementSystem {
             // Q_final = Q_yaw * Q_base
             this.previewObject.quaternion.copy(qYaw).multiply(qBase);
             
-            this.lastHitSurfaceName = (hit.object.userData && hit.object.userData.surfaceName) 
-                || (hit.object.parent && hit.object.parent.userData && hit.object.parent.userData.surfaceName) 
-                || null;
+            this.lastHitSurfaceName = surfaceName;
             // position snapping
             const surface = this.cube.surfaces[this.lastHitSurfaceName];
             if (surface) {

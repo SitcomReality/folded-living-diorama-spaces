@@ -56,7 +56,7 @@ export function setupPivots(cube) {
         cube.group.remove(ceilingSurface);
         
         // Correctly position ceiling relative to the back surface's top edge
-        ceilingSurface.position.set(0, halfSize + halfThickness, -halfSize - halfThickness); 
+        ceilingSurface.position.set(0, halfSize + halfThickness, halfSize + halfThickness); 
         
         backSurface.add(ceilingSurface);
         backPivot.add(backSurface); // Add back surface (with ceiling) back to pivot
