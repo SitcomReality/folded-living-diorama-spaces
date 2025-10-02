@@ -224,7 +224,7 @@ export class DioramaCube {
                     object.position.y -= halfDelta;
                     break;
                 case CONSTANTS.SURFACES.CEILING:
-                    object.position.y += halfDelta;
+                    object.position.y -= halfDelta;
                     break;
                 case CONSTANTS.SURFACES.FRONT:
                     object.position.z += halfDelta;
