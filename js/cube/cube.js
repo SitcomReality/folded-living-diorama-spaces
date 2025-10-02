@@ -170,70 +170,40 @@ export class DioramaCube {
     
     updateThickness(thickness) {
         const halfSize = this.size / 2;
-        const base = CONSTANTS.CUBE_THICKNESS;
-        const ratio = thickness / base;
-
-        const setScaleAxis = (mesh, axis) => {
-            mesh.scale.set(
-                axis === 'x' ? ratio : mesh.scale.x,
-                axis === 'y' ? ratio : mesh.scale.y,
-                axis === 'z' ? ratio : mesh.scale.z
-            );
-        };
-
         const halfT = thickness / 2;
-
-        // FRONT
-        const front = this.surfaces[CONSTANTS.SURFACES.FRONT];
-        if (front) {
-            setScaleAxis(front, 'z');
-            if (front.userData.pivot) {
-                front.position.set(0, halfSize + halfT, -halfT);
-            } else {
-                front.position.set(0, 0, -halfSize - halfT);
-            }
-        }
-        // BACK
-        const back = this.surfaces[CONSTANTS.SURFACES.BACK];
-        if (back) {
-            setScaleAxis(back, 'z');
-            if (back.userData.pivot) {
-                back.position.set(0, halfSize + halfT, halfT);
-            } else {
-                back.position.set(0, 0, halfSize + halfT);
-            }
-        }
-        // CEILING (parented to back in pivots)
-        const ceiling = this.surfaces[CONSTANTS.SURFACES.CEILING];
-        if (ceiling) {
-            setScaleAxis(ceiling, 'y');
-            ceiling.position.set(0, halfSize + halfT, halfSize + halfT);
-        }
-        // FLOOR
-        const floor = this.surfaces[CONSTANTS.SURFACES.FLOOR];
-        if (floor) {
-            setScaleAxis(floor, 'y');
-            floor.position.set(0, -halfSize - halfT, 0);
-        }
-        // LEFT
-        const left = this.surfaces[CONSTANTS.SURFACES.LEFT];
-        if (left) {
-            setScaleAxis(left, 'x');
-            if (left.userData.pivot) {
-                left.position.set(-halfT, halfSize + halfT, 0);
-            } else {
-                left.position.set(-halfSize - halfT, 0, 0);
-            }
-        }
-        // RIGHT
-        const right = this.surfaces[CONSTANTS.SURFACES.RIGHT];
-        if (right) {
-            setScaleAxis(right, 'x');
-            if (right.userData.pivot) {
-                right.position.set(halfT, halfSize + halfT, 0);
-            } else {
-                right.position.set(halfSize + halfT, 0, 0);
-            }
+        const S = this.surfaces;
+        const G = (w,h,d)=>new THREE.BoxGeometry(w,h,d);
+        
+        // Update geometries per face (no mesh scaling => children keep size)
+        S[CONSTANTS.SURFACES.FRONT].geometry   = G(this.size, this.size, thickness);
+        S[CONSTANTS.SURFACES.BACK].geometry    = G(this.size, this.size, thickness);
+        S[CONSTANTS.SURFACES.LEFT].geometry    = G(thickness, this.size, this.size);
+        S[CONSTANTS.SURFACES.RIGHT].geometry   = G(thickness, this.size, this.size);
+        S[CONSTANTS.SURFACES.FLOOR].geometry   = G(this.size, thickness, this.size);
+        S[CONSTANTS.SURFACES.CEILING].geometry = G(this.size, thickness, this.size);
+        
+        // Ensure no residual mesh scaling affects children
+        Object.values(S).forEach(m => m.scale.set(1,1,1));
+        
+        // Reposition surfaces based on new thickness (respect pivots where used)
+        const front = S[CONSTANTS.SURFACES.FRONT];
+        front.position.set(0, front.userData.pivot ? (halfSize + halfT) : 0, front.userData.pivot ? -halfT : (-halfSize - halfT));
+        
+        const back = S[CONSTANTS.SURFACES.BACK];
+        back.position.set(0, back.userData.pivot ? (halfSize + halfT) : 0, back.userData.pivot ?  halfT : ( halfSize + halfT));
+        
+        const left = S[CONSTANTS.SURFACES.LEFT];
+        left.position.set(left.userData.pivot ? -halfT : (-halfSize - halfT), left.userData.pivot ? (halfSize + halfT) : 0, 0);
+        
+        const right = S[CONSTANTS.SURFACES.RIGHT];
+        right.position.set(right.userData.pivot ?  halfT : ( halfSize + halfT), right.userData.pivot ? (halfSize + halfT) : 0, 0);
+        
+        S[CONSTANTS.SURFACES.FLOOR].position.set(0, -halfSize - halfT, 0);
+        
+        // Ceiling: only update when not parented to back; keep centered in Z
+        const ceiling = S[CONSTANTS.SURFACES.CEILING];
+        if (!ceiling.userData?.parentedToBackdrop) {
+            ceiling.position.set(0, halfSize + halfT, 0);
         }
     }
     
