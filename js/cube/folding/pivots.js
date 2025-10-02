@@ -12,7 +12,7 @@ export function setupPivots(cube) {
             case CONSTANTS.SURFACES.BACK:
                 pivot.position.set(0, -halfSize, halfSize);
                 cube.group.remove(surface);
-                // keep slab offset; re-center relative to pivot by preserving world transform
+                surface.position.set(0, halfSize, 0);
                 pivot.add(surface);
                 cube.group.add(pivot);
                 surface.userData.pivot = pivot;
@@ -38,6 +38,7 @@ export function setupPivots(cube) {
             case CONSTANTS.SURFACES.FRONT:
                 pivot.position.set(0, -halfSize, -halfSize);
                 cube.group.remove(surface);
+                surface.position.set(0, halfSize, 0);
                 pivot.add(surface);
                 cube.group.add(pivot);
                 surface.userData.pivot = pivot;

@@ -49,11 +49,12 @@ export class SceneManager {
 
     setupGroundPlane() {
         const half = CONSTANTS.CUBE_SIZE / 2;
+        const groundOffset = CONSTANTS.CUBE_THICKNESS + 0.05; // Slightly more than thickness to ensure padding
         const geo = new THREE.PlaneGeometry(200, 200);
         const mat = new THREE.MeshStandardMaterial({ color: 0x6fbf73, roughness: 1, metalness: 0 }); // grassy green
         this.groundPlane = new THREE.Mesh(geo, mat);
         this.groundPlane.rotation.x = -Math.PI / 2;
-        this.groundPlane.position.y = -half - 0.001;
+        this.groundPlane.position.y = -half - groundOffset;
         this.groundPlane.receiveShadow = true;
         this.scene.add(this.groundPlane);
     }
